@@ -6,7 +6,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/magicforge/',
+  base: process.env.NODE_ENV === 'production' ? "/magicforge/" : "/",
   plugins: [
     vue(),
     vueDevTools(),

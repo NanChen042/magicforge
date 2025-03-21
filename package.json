@@ -9,7 +9,7 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
     "predeploy": "pnpm build",
-    "deploy": "gh-pages -d dist -r https://github.com/NanChen042/magicforge.git -b gh-pages -m 'Auto deploy [ci skip]'"
+    "deploy": "gh-pages -d dist -r https://github.com/NanChen042/magicforge.git -b gh-pages"
   },
   "dependencies": {
     "@types/markdown-it": "^14.1.2",
