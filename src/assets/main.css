@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-color: #5b48da;
+  --secondary-color: #ff5a5f;
+  --accent-color: #ffc107;
+  --dark-color: #292639;
+  --medium-color: #3d3654;
+  --light-color: #ffffff;
+  --text-color: #292639;
+  --text-light: #6e6a86;
+  --text-dark: #1c1b29;
+  --gray-100: #f4f2f8;
+  --gray-200: #e9e7f0;
+  --gray-300: #d2cfe3;
+  --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+  --transition-fast: all 0.2s ease;
+  --transition-normal: all 0.3s ease;
+}
+
+body {
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background-color: var(--gray-100);
+  color: var(--text-color);
+}
+
+/* 自定义按钮样式 */
+.btn {
+  @apply px-4 py-2 rounded-lg font-semibold;
+}
+
+.btn-primary {
+  @apply bg-[#5b48da] hover:bg-[#4a3bc9] text-white;
+}
+
+.btn-secondary {
+  @apply bg-[#ff5a5f] hover:bg-[#ff4146] text-white;
+}
+
+.btn-accent {
+  @apply bg-[#ffc107] hover:bg-[#e6ae00] text-[#292639];
+}
+
+/* 自定义卡片样式 */
+.card {
+  @apply bg-white rounded-xl shadow-lg overflow-hidden border border-[#e9e7f0];
+}
+
+/* 渐变背景 */
+.gradient-bg {
+  background-image: linear-gradient(to bottom, var(--dark-color), var(--medium-color));
+}
+
+/* 渐变文本 */
+.gradient-text {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 通用过渡 */
+.transition-common {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+/* 响应式容器 */
+.container-custom {
+  @apply max-w-6xl mx-auto px-4;
+}
+
+/* 标题样式 */
+.title-lg {
+  @apply text-3xl font-bold text-[#292639] mb-6;
+}
+
+.title-md {
+  @apply text-2xl font-bold text-[#292639] mb-4;
+}
+
+.title-sm {
+  @apply text-xl font-bold text-[#292639] mb-3;
+}
+
+/* 图标容器 */
+.icon-container {
+  @apply flex items-center justify-center w-10 h-10 rounded-full;
+}
+
+/* 提示样式 */
+.badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.badge-primary {
+  @apply bg-[#5b48da]/10 text-[#5b48da];
+}
+
+.badge-secondary {
+  @apply bg-[#ff5a5f]/10 text-[#ff5a5f];
+}
+
+.badge-accent {
+  @apply bg-[#ffc107]/10 text-[#292639];
+}
