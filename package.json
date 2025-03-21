@@ -4,10 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "run-p type-check \"build-only {@}\" --",
+    "build": "vite build",
     "preview": "vite preview",
     "build-only": "vite build",
-    "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false"
+    "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
+    "predeploy": "pnpm build",
+    "deploy": "gh-pages -d dist -r https://github.com/NanChen042/magicforge.git -b gh-pages -m 'Auto deploy [ci skip]'"
   },
   "dependencies": {
     "@types/markdown-it": "^14.1.2",
