@@ -1,1 +1,0 @@
-import{d as t}from"./pinia-DjwyY7qi.js";import{r as e}from"./vue-DJBEoy3g.js";const a=t("api",(()=>{const t=e("https://test-app0-9gyupkmi10ed2654.api.tcloudbasegateway.com/v1/ai/deepseek/v1");return{apiUrl:t,setApiUrl:function(e){t.value=e,localStorage.setItem("apiUrl",e)},getApiUrl:function(){return t.value}}}));export{a as u};
