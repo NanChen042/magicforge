@@ -1,0 +1,1 @@
+import{A as e}from"./index-c2a014d9.js";const i=e("api",{state:()=>({apiUrl:"https://test-app0-9gyupkmi10ed2654.api.tcloudbasegateway.com/v1/ai/deepseek/v1"}),actions:{setApiUrl(t){this.apiUrl=t,localStorage.setItem("apiUrl",t)},getApiUrl(){return this.apiUrl}}});export{i as u};
