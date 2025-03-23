@@ -1,0 +1,1 @@
+import{J as p,m}from"./vendor-B40ysMjT.js";const s=p("prompt",()=>{const t=m("");function e(r){t.value=r}function o(){t.value=""}return{promptText:t,setPromptText:e,clearPromptText:o}});export{s as u};

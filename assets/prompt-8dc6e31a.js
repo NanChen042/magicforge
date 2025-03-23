@@ -1,1 +1,0 @@
-import{A as p,r as n}from"./index-71565f69.js";const s=p("prompt",()=>{const t=n("");function e(o){t.value=o}function r(){t.value=""}return{promptText:t,setPromptText:e,clearPromptText:r}});export{s as u};
