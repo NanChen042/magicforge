@@ -1,1 +1,0 @@
-import{d as p}from"./state-BiIMoNJz.js";import{r as m}from"./vue-core-Cz-nAsk4.js";const u=p("prompt",()=>{const t=m("");function r(e){t.value=e}function o(){t.value=""}return{promptText:t,setPromptText:r,clearPromptText:o}});export{u};

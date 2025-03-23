@@ -1,0 +1,1 @@
+System.register(["./pinia-legacy-C3Fkhy1N.js","./vue-legacy-wnYe26o5.js"],(function(t,e){"use strict";var r,n;return{setters:[t=>{r=t.d},t=>{n=t.r}],execute:function(){t("u",r("prompt",(()=>{const t=n("");return{promptText:t,setPromptText:function(e){t.value=e},clearPromptText:function(){t.value=""}}})))}}}));
