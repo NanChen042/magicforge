@@ -1,11 +1,22 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8">
     <link rel="icon" href="./favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vite App</title>
-    <script type="module" crossorigin src="/magicforge/assets/index-c2a014d9.js"></script>
+    <title>MagicForge</title>
+    <script type="text/javascript">
+      // GitHub Pages的SPA支持重定向脚本
+      (function() {
+        // 如果是通过重定向过来的，取回原始URL
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect != location.href) {
+          history.replaceState(null, null, redirect);
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/magicforge/assets/index-71565f69.js"></script>
     <link rel="stylesheet" href="/magicforge/assets/index-e9e0ee74.css">
   </head>
   <body>
