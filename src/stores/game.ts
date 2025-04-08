@@ -39,6 +39,7 @@ export interface StoryProgress {
     gaming: number
     study: number
     social: number
+    other: number
   }
   relationships: {
     [character: string]: {
@@ -64,7 +65,8 @@ export const useGameStore = defineStore('game', {
       mainQuests: {
         gaming: 0,
         study: 0,
-        social: 0
+        social: 0,
+        other: 0
       },
       relationships: {
         '李雪': {
@@ -190,6 +192,7 @@ export const useGameStore = defineStore('game', {
           if (type === 'gaming') this.storyProgress.mainQuests.gaming = Math.min(100, this.storyProgress.mainQuests.gaming + value)
           if (type === 'study') this.storyProgress.mainQuests.study = Math.min(100, this.storyProgress.mainQuests.study + value)
           if (type === 'social') this.storyProgress.mainQuests.social = Math.min(100, this.storyProgress.mainQuests.social + value)
+          if (type === 'other') this.storyProgress.mainQuests.other = Math.min(100, this.storyProgress.mainQuests.other + value)
         }
       }
 
@@ -216,13 +219,13 @@ export const useGameStore = defineStore('game', {
     // 流式输出更新函数
     updateReasoningStream(content: string) {
       // 处理思维链流式内容
-      console.log('思维链更新:', content)
+      // console.log('思维链更新:', content)
       // 此处不修改状态，由组件自行处理
     },
 
     updateDialogStream(content: string) {
       // 处理对话流式内容
-      console.log('对话更新:', content)
+      // console.log('对话更新:', content)
       // 此处不修改状态，由组件自行处理
     },
 
@@ -246,7 +249,8 @@ export const useGameStore = defineStore('game', {
         mainQuests: {
           gaming: 0,
           study: 0,
-          social: 0
+          social: 0,
+          other: 0
         },
         relationships: {
           '李雪': {

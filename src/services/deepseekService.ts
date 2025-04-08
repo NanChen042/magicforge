@@ -3,9 +3,9 @@ import CheckpointService from './CheckpointService';
 
 // API配置 - 现在是可动态配置的
 export const API_CONFIG = {
-  apiKey: '123',
-  baseUrl: 'http://106.14.176.242:9998/v1/chat/completions',
-  model: 'QwQ-32B',
+  apiKey: localStorage.getItem('apiKey') || 'sk-etybbrewlaafxjjqtlgfeqaaskzrmryfndjtjjecyixbsznw',
+  baseUrl: localStorage.getItem('apiUrl') || 'https://api.siliconflow.cn/v1/chat/completions',
+  model: localStorage.getItem('modelName') || '',
   temperature: 0.8,
   maxTokens: 2000
 };
@@ -13,6 +13,11 @@ export const API_CONFIG = {
 // 提供一个函数来更新API配置
 export function updateApiConfig(config: Partial<typeof API_CONFIG>) {
   Object.assign(API_CONFIG, config);
+
+  // 将更新后的值保存到localStorage
+  if (config.apiKey) localStorage.setItem('apiKey', config.apiKey);
+  if (config.baseUrl) localStorage.setItem('apiUrl', config.baseUrl);
+  if (config.model) localStorage.setItem('modelName', config.model);
 }
 
 /**
@@ -305,7 +310,17 @@ ${specialEvent ? `特殊事件：${specialEvent}` : ''}
    */
   public static createModel(params = {}) {
     return {
-      streamText: async ({ messages, model = API_CONFIG.model, temperature = API_CONFIG.temperature, max_tokens = API_CONFIG.maxTokens }) => {
+      streamText: async ({
+        messages,
+        model = API_CONFIG.model,
+        temperature = API_CONFIG.temperature,
+        max_tokens = API_CONFIG.maxTokens
+      }: {
+        messages: any[];
+        model?: string;
+        temperature?: number;
+        max_tokens?: number;
+      }) => {
         console.log('使用模型:', model);
 
         try {
@@ -344,7 +359,7 @@ ${specialEvent ? `特殊事件：${specialEvent}` : ''}
   /**
    * 创建处理流式响应的异步迭代器
    */
-  private static async* _createAsyncIterator(response) {
+  private static async* _createAsyncIterator(response: Response) {
     if (!response.body) {
       throw new Error('响应没有可读的正文');
     }
@@ -743,78 +758,138 @@ ${specialEvent ? `特殊事件：${specialEvent}` : ''}
             .replace(/\s*:\s*/g, ':') // 移除冒号周围空格
             .replace(/\s*,\s*/g, ',') // 移除逗号周围空格
             .replace(/([{,][^,{]*?)(\w+)(\s*:)/g, '$1"$2"$3') // 为未加引号的键添加引号
-            .replace(/:\s*([^",\[\]{}][^,\[\]{}]*?)(\s*[,}])/g, ':"$1"$2'); // 为未加引号的非数字值添加引号
+            .replace(/:\s*([^",\[\]{}][^,\[\]{}]*?)(\s*[,}])/g, ':"$1"$2') // 为未加引号的非数字值添加引号
+            .replace(/:\s*(true|false)(\s*[,}])/g, ':"$1"$2') // 处理布尔值
+            .replace(/,\s*}/g, '}') // 修复尾部多余的逗号
+            .replace(/,\s*]/g, ']') // 修复数组尾部多余的逗号
+            .replace(/([{,]\s*)"([^"]+)"\s*:\s*"([^"]*)"\s*([,}])/g, '$1"$2":"$3"$4'); // 规范化键值对格式
 
-          console.log('进一步清理后的JSON:', jsonContent);
-          parsed = JSON.parse(jsonContent);
-        } catch (innerError) {
-          console.error('更激进清理后仍解析失败:', innerError);
+          // *** 特别针对第20位置附近的处理 ***
+          // 打印前30个字符以便排查
+          console.log('JSON内容前30个字符:', jsonContent.substring(0, 30));
 
-          // 尝试提取最外层的大括号内容
-          const jsonMatch = content.match(/(\{[\s\S]*\})/);
-          if (jsonMatch) {
-            // 尝试手动构造JSON对象
+          // 特别针对位置20附近的错误进行预处理
+          if (jsonContent.length >= 30) {
+            // 检查第20个字符前后的内容
+            const char19 = jsonContent.charAt(19); // 索引从0开始，所以第20个位置是索引19
+            const char20 = jsonContent.charAt(20);
+            const char21 = jsonContent.charAt(21);
+            console.log(`字符位置19-21: "${char19}${char20}${char21}"`);
+
+            // 针对位置20常见错误进行修复
+            // 情况1: {"description":"xxx"title":"yyy"}  - 缺少逗号
+            if (char19 === '"' && char20 !== ':' && char20 !== ',' && char20 !== '}') {
+              console.log('检测到位置20缺少逗号，添加逗号');
+              jsonContent = jsonContent.substring(0, 20) + ',' + jsonContent.substring(20);
+            }
+
+            // 情况2: {"description": xxx, - 缺少值引号
+            if (char19 === ':' && !char20.match(/[\s",\d\[\{]/)) {
+              console.log('检测到位置20缺少值引号，添加引号');
+              jsonContent = jsonContent.substring(0, 20) + '"' + jsonContent.substring(20);
+
+              // 寻找值的结束位置添加引号
+              const endPos = jsonContent.substring(20).search(/[,\}]/);
+              if (endPos > 0) {
+                jsonContent = jsonContent.substring(0, 20 + endPos) + '"' + jsonContent.substring(20 + endPos);
+              }
+            }
+
+            // 情况3: {"description": "xxx - 缺少右引号
+            const openQuotePos = jsonContent.substring(0, 20).lastIndexOf('"');
+            if (openQuotePos >= 0 && !jsonContent.substring(openQuotePos + 1, 25).includes('"')) {
+              let endPos = jsonContent.substring(20).search(/[,\}]/);
+              if (endPos > 0) {
+                console.log('检测到缺少闭合引号，添加引号');
+                jsonContent = jsonContent.substring(0, 20 + endPos) + '"' + jsonContent.substring(20 + endPos);
+              }
+            }
+          }
+
+          // 重建整个JSON
+          if (jsonContent.startsWith('{') && !jsonContent.endsWith('}')) {
+            console.log('检测到缺少结束大括号，添加结束大括号');
+            jsonContent = jsonContent + '}';
+          }
+
+          console.log('清理后的JSON内容:', jsonContent);
+
+          try {
+            parsed = JSON.parse(jsonContent);
+            console.log('成功解析修复后的JSON');
+          } catch (parseError) {
+            console.error('仍解析失败:', parseError);
+
+            // 最后尝试更通用的JSON修复
+            console.log('尝试使用更通用的错误修复...');
+
+            // 强制提取有效的JSON部分
+            let validJson = '{'
+            const keyValueRegex = /"([^"]+)"\s*:\s*("[^"]*"|[0-9]+|true|false|\{.*?\}|\[.*?\])/g;
+            let matches: RegExpExecArray | null;
+            let matchCount = 0;
+
+            while ((matches = keyValueRegex.exec(jsonContent)) !== null) {
+              if (matchCount > 0) validJson += ',';
+              validJson += `"${matches[1]}":${matches[2]}`;
+              matchCount++;
+            }
+            validJson += '}';
+
+            console.log('构造的有效JSON:', validJson);
+
             try {
-              console.log('尝试手动构造JSON...');
-              // 提取主要字段
-              const descMatch = content.match(/"description"\s*:\s*"([^"]+)"/);
-              const dialogMatch = content.match(/"dialog"\s*:\s*"([^"]+)"/);
-
+              parsed = JSON.parse(validJson);
+              console.log('成功解析重构的JSON');
+            } catch (finalError) {
+              // 如果仍然失败，直接使用默认值
+              console.error('无法修复JSON，使用默认值');
               parsed = {
-                description: descMatch ? descMatch[1] : "无法解析场景描述",
-                dialog: dialogMatch ? dialogMatch[1] : "（系统错误，无法获取对话）",
+                description: "由于技术原因，无法加载场景描述",
+                dialog: "系统：发生了一些错误，但我们继续前进吧",
                 options: [],
                 context: {
                   mood: "困惑",
-                  location: "当前位置",
+                  location: "未知位置",
                   timeOfDay: "现在",
-                  previousEvents: ["解析错误"]
+                  previousEvents: ["系统恢复"]
                 }
               };
+            }
+          }
 
-              // 尝试提取选项
-              const optionsMatch = content.match(/"options"\s*:\s*\[([\s\S]*?)\]/);
-              if (optionsMatch) {
-                const optionTexts = optionsMatch[1].match(/"text"\s*:\s*"([^"]+)"/g);
-                const optionHints = optionsMatch[1].match(/"hint"\s*:\s*"([^"]+)"/g);
+        } catch (innerError) {
+          console.error('更激进清理后仍解析失败:', innerError);
 
-                if (optionTexts && optionTexts.length > 0) {
-                  parsed.options = [];  // 确保options是一个空数组
-
-                  for (let i = 0; i < optionTexts.length; i++) {
-                    const textMatch = optionTexts[i].match(/"text"\s*:\s*"([^"]+)"/);
-                    if (!textMatch) continue;
-
-                    const cleanText = textMatch[1];
-                    let hint = "继续";
-
-                    if (optionHints && i < optionHints.length) {
-                      const hintMatch = optionHints[i].match(/"hint"\s*:\s*"([^"]+)"/);
-                      if (hintMatch) {
-                        hint = hintMatch[1];
-                      }
-                    }
-
-                    parsed.options.push({
-                      text: cleanText,
-                      hint: hint,
-                      impact: {
-                        quest: { type: 'social', value: 5 },
-                        relationship: { character: '李雪', value: 0 }
-                      }
-                    });
-                  }
+          // 使用默认值
+          parsed = {
+            description: "无法解析场景描述，请尝试选择其他选项",
+            dialog: "（系统错误，无法获取对话）",
+            options: [
+              {
+                text: "继续尝试",
+                hint: "再试一次",
+                impact: {
+                  quest: { type: 'social', value: 1 },
+                  relationship: { character: '李雪', value: 0 }
+                }
+              },
+              {
+                text: "返回上一步",
+                hint: "回到上一个选择",
+                impact: {
+                  quest: { type: 'study', value: 1 },
+                  relationship: { character: '李雪', value: 0 }
                 }
               }
-
-              console.log('手动构造的JSON:', parsed);
-            } catch (manualError) {
-              console.error('手动构造JSON失败:', manualError);
-              throw new Error('无法解析JSON响应: ' + (e as Error).message);
+            ],
+            context: {
+              mood: "困惑",
+              location: "错误场景",
+              timeOfDay: "现在",
+              previousEvents: ["JSON解析错误"]
             }
-          } else {
-            throw new Error('响应中未找到有效的JSON结构');
-          }
+          };
         }
       }
 
@@ -836,12 +911,15 @@ ${specialEvent ? `特殊事件：${specialEvent}` : ''}
 
       // 确保至少有两个选项
       while (parsed.options.length < 2) {
+        const optionTypes = ['study', 'gaming', 'social'];
+        const randomType = optionTypes[parsed.options.length % optionTypes.length];
+
         parsed.options.push({
           text: parsed.options.length === 0 ? "专注于学习" : "打会游戏放松",
           hint: parsed.options.length === 0 ? "提高成绩是当务之急" : "游戏也很重要",
           impact: {
             quest: {
-              type: parsed.options.length === 0 ? 'study' : 'gaming',
+              type: randomType,
               value: 5
             },
             relationship: {
@@ -858,15 +936,36 @@ ${specialEvent ? `特殊事件：${specialEvent}` : ''}
         image: `https://source.unsplash.com/800x500/?${this.getImageKeywords(parsed.description)}&t=${Date.now()}`,
         description: parsed.description.slice(0, 300), // 增加长度限制
         dialog: parsed.dialog.slice(0, 80), // 增加长度限制
-        options: parsed.options.slice(0, 3).map((opt: any) => ({ // 支持3个选项
-          text: (opt.text || "继续探索").slice(0, 20), // 增加长度
-          next: -1,
-          hint: (opt.hint || "看看接下来会发生什么").slice(0, 30), // 增加长度
-          impact: opt.impact || {
-            quest: { type: 'social', value: 5 },
-            relationship: { character: '李雪', value: 0 }
+        options: parsed.options.slice(0, 3).map((opt: any, index: number) => { // 支持3个选项
+          // 生成多样化的影响类型
+          const optionTypes = ['gaming', 'study', 'social'];
+          const optionText = (opt.text || "继续探索").toLowerCase();
+
+          // 尝试根据选项文本内容判断影响类型
+          let impactType = optionTypes[index % optionTypes.length]; // 默认按顺序分配不同类型
+
+          // 根据选项文本确定更合适的类型
+          if (optionText.includes('游戏') || optionText.includes('打') || optionText.includes('剑魔') ||
+             optionText.includes('技能') || optionText.includes('排位')) {
+            impactType = 'gaming';
+          } else if (optionText.includes('学习') || optionText.includes('考试') || optionText.includes('上课') ||
+                   optionText.includes('听讲') || optionText.includes('作业')) {
+            impactType = 'study';
+          } else if (optionText.includes('朋友') || optionText.includes('聊天') || optionText.includes('交流') ||
+                   optionText.includes('李雪') || optionText.includes('关系')) {
+            impactType = 'social';
           }
-        })),
+
+          return {
+            text: (opt.text || "继续探索").slice(0, 20), // 增加长度
+            next: -1,
+            hint: (opt.hint || "看看接下来会发生什么").slice(0, 30), // 增加长度
+            impact: opt.impact || {
+              quest: { type: impactType, value: 5 },
+              relationship: { character: '李雪', value: 0 }
+            }
+          };
+        }),
         isAIGenerated: true,
         specialEvent: parsed.specialEvent?.slice(0, 50),
         context: parsed.context || {
@@ -945,259 +1044,6 @@ ${specialEvent ? `特殊事件：${specialEvent}` : ''}
     }
 
     return Array.from(keywords).slice(0, 3).join(',');
-  }
-
-  // 前置处理程序，处理DeepSeek API的响应
-  handleDeepSeekResponse(response: string): any {
-    // 先清理可能的非标准JSON格式
-    let cleaned = response.replace(/\+(\d+)/g, '$1');  // 移除数字前的+号
-    cleaned = cleaned.replace(/([{,]\s*)(\w+)(\s*:)/g, '$1"$2"$3');  // 为键名添加引号
-    cleaned = cleaned.replace(/,\s*([}\]])/g, '$1');  // 移除尾随逗号
-
-    try {
-      return JSON.parse(cleaned);
-    } catch (e) {
-      console.error('处理DeepSeek响应出错:', e);
-      return this.parseResponse(response); // 失败则回退到复杂解析
-    }
-  }
-
-  // 将API响应处理为游戏场景
-  async handleChoice(choice: number, gameState: GameState): Promise<GameScene> {
-    console.log(`处理选项: ${choice}, 当前场景ID: ${gameState.currentScene}`);
-    const currentScene = gameState.scenes.find(s => s.id === gameState.currentScene);
-
-    if (!currentScene) {
-      throw new Error(`找不到当前场景: ${gameState.currentScene}`);
-    }
-
-    // 检查API基础URL是否有效
-    if (!this.apiBaseUrl) {
-      console.error('API基础URL未设置');
-      throw new Error('API基础URL未设置，无法生成场景');
-    }
-
-    // 准备API请求参数
-    const params = {
-      model: this.model,
-      prompt: this.generatePrompt(gameState, choice),
-      temperature: 0.7,
-      max_tokens: 1000,
-      stream: false // 不使用流式输出
-    };
-
-    try {
-      console.log('发送API请求:', {
-        url: `${this.apiBaseUrl}/v1/chat/completions`,
-        model: params.model,
-        temperature: params.temperature,
-        max_tokens: params.max_tokens
-      });
-
-      // 记录提示
-      console.log('提示文本:', params.prompt);
-
-      // 发送请求到API
-      const response = await fetch(`${this.apiBaseUrl}/v1/chat/completions`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`
-        },
-        body: JSON.stringify({
-          model: params.model,
-          messages: [{ role: 'user', content: params.prompt }],
-          temperature: params.temperature,
-          max_tokens: params.max_tokens,
-          stream: params.stream
-        })
-      });
-
-      // 检查HTTP响应状态
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('API请求失败:', response.status, errorText);
-        throw new Error(`API请求失败: ${response.status} ${errorText}`);
-      }
-
-      // 解析API响应
-      const data = await response.json();
-      console.log('API响应:', data);
-
-      // 从响应中提取内容
-      if (!data.choices || data.choices.length === 0) {
-        console.error('API响应中没有选择内容:', data);
-        throw new Error('API响应中没有选择内容');
-      }
-
-      const content = data.choices[0].message.content;
-      console.log('生成的内容:', content);
-
-      // 解析内容为游戏场景
-      const parsedData = this.handleDeepSeekResponse(content);
-
-      // 使用NextSceneId
-      const nextSceneId = gameState.nextSceneId;
-
-      // 构建场景对象
-      const scene: GameScene = {
-        id: nextSceneId,
-        image: `https://source.unsplash.com/800x500/?${this.getImageKeywords(parsedData.description)}&t=${Date.now()}`,
-        description: (parsedData.description || '你继续你的旅程...').slice(0, 300),
-        dialog: (parsedData.dialog || '（你思考着下一步行动）').slice(0, 120),
-        options: (parsedData.options || []).slice(0, 3).map((opt: any) => ({
-          text: (opt.text || '继续').slice(0, 30),
-          next: -1,
-          hint: (opt.hint || '看看接下来会发生什么').slice(0, 40),
-          impact: opt.impact || {
-            quest: { type: 'social', value: 0 },
-            relationship: { character: '李雪', value: 0 }
-          }
-        })),
-        isAIGenerated: true,
-        specialEvent: parsedData.specialEvent?.slice(0, 50),
-        context: parsedData.context || {
-          mood: '平静',
-          location: '教室',
-          timeOfDay: '上午',
-          previousEvents: ['开始游戏']
-        }
-      };
-
-      console.log('生成的场景:', scene);
-
-      // 确保至少有两个选项
-      while (scene.options.length < 2) {
-        scene.options.push({
-          text: scene.options.length === 0 ? '仔细观察四周' : '继续前进',
-          next: -1,
-          hint: scene.options.length === 0 ? '寻找线索' : '勇往直前',
-          impact: {
-            quest: { type: 'exploration', value: 5 },
-            relationship: { character: '李雪', value: 0 }
-          }
-        });
-      }
-
-      return scene;
-    } catch (error) {
-      console.error('处理选项时出错:', error);
-      throw error;
-    }
-  }
-
-  // 解析API响应为游戏场景数据
-  parseResponse(response: string): any {
-    console.log('解析响应...');
-
-    try {
-      let content = response.trim();
-
-      // 清理JSON格式问题
-      content = content.replace(/\+(\d+)/g, '$1');  // 移除数字前面的加号
-      content = content.replace(/,\s*([}\]])/g, '$1');  // 移除对象或数组末尾的逗号
-      content = content.replace(/'/g, '"');  // 单引号替换为双引号
-      content = content.replace(/([{,]\s*)(\w+)(\s*:)/g, '$1"$2"$3');  // 给没有引号的键添加引号
-
-      console.log('清理后的内容:', content);
-
-      // 尝试直接解析完整JSON
-      try {
-        const parsed = JSON.parse(content);
-        console.log('成功解析完整JSON');
-        return parsed;
-      } catch (e) {
-        console.log('无法解析完整JSON，尝试提取部分内容:', (e as Error).message);
-
-        // 初始化解析结果
-        const parsed: {
-          scene?: string;
-          character?: string;
-          description: string;
-          dialog: string;
-          options: Array<{
-            text: string;
-            hint: string;
-            impact: {
-              quest: { type: string; value: number };
-              relationship: { character: string; value: number };
-            }
-          }>;
-          context?: any;
-          specialEvent?: string;
-        } = {
-          description: '',
-          dialog: '',
-          options: []
-        };
-
-        // 尝试提取场景描述
-        const descMatch = content.match(/"description"\s*:\s*"([^"]+)"/);
-        if (descMatch) {
-          parsed.description = descMatch[1];
-        }
-
-        // 尝试提取对话内容
-        const dialogMatch = content.match(/"dialog"\s*:\s*"([^"]+)"/);
-        if (dialogMatch) {
-          parsed.dialog = dialogMatch[1];
-        }
-
-        // 尝试提取选项
-        const optionsMatch = content.match(/"options"\s*:\s*\[([\s\S]*?)\]/);
-        if (optionsMatch) {
-          const optionTexts = optionsMatch[1].match(/"text"\s*:\s*"([^"]+)"/g);
-          const optionHints = optionsMatch[1].match(/"hint"\s*:\s*"([^"]+)"/g);
-
-          if (optionTexts && optionTexts.length > 0) {
-            parsed.options = [];  // 确保options是一个空数组
-
-            for (let i = 0; i < optionTexts.length; i++) {
-              const textMatch = optionTexts[i].match(/"text"\s*:\s*"([^"]+)"/);
-              if (!textMatch) continue;
-
-              const cleanText = textMatch[1];
-              let hint = "继续";
-
-              if (optionHints && i < optionHints.length) {
-                const hintMatch = optionHints[i].match(/"hint"\s*:\s*"([^"]+)"/);
-                if (hintMatch) {
-                  hint = hintMatch[1];
-                }
-              }
-
-              parsed.options.push({
-                text: cleanText,
-                hint: hint,
-                impact: {
-                  quest: { type: 'social', value: 5 },
-                  relationship: { character: '李雪', value: 0 }
-                }
-              });
-            }
-          }
-        }
-
-        // 尝试提取特殊事件
-        const specialEventMatch = content.match(/"specialEvent"\s*:\s*"([^"]+)"/);
-        if (specialEventMatch) {
-          parsed.specialEvent = specialEventMatch[1];
-        }
-
-        // 尝试提取上下文
-        const contextMatch = content.match(/"context"\s*:\s*(\{[\s\S]*?\})/);
-        if (contextMatch) {
-          parsed.context = JSON.parse(contextMatch[1]);
-        }
-
-        console.log('解析后的场景数据:', parsed);
-        return parsed;
-      }
-    } catch (error) {
-      console.error('解析响应失败:', error);
-      console.error('原始内容:', response);
-      throw new Error('无法解析API响应');
-    }
   }
 }
 

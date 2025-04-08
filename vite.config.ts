@@ -13,7 +13,7 @@ export default defineConfig({
   ],
   build: {
     rollupOptions: {
-      output: {        
+      output: {
         manualChunks(id) {
           // 处理Vue导出辅助文件
           if (id.includes('plugin-vue:export-helper')) {

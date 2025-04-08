@@ -2,17 +2,25 @@ import { defineStore } from 'pinia'
 
 export const useApiStore = defineStore('api', {
   state: () => ({
-    apiUrl: 'http://106.14.176.242:9998/v1/chat/completions',
+    apiUrl: localStorage.getItem('apiUrl') || '',
+    apiKey: localStorage.getItem('apiKey') || '',
+    modelName: localStorage.getItem('modelName') || 'deepseek-ai/DeepSeek-R1-Distill-Qwen-7B',
   }),
 
   actions: {
     setApiUrl(url: string) {
-      this.apiUrl = url
-      localStorage.setItem('apiUrl', url)
+      this.apiUrl = url;
+      localStorage.setItem('apiUrl', url);
     },
 
-    getApiUrl() {
-      return this.apiUrl
+    setApiKey(key: string) {
+      this.apiKey = key;
+      localStorage.setItem('apiKey', key);
+    },
+
+    setModelName(name: string) {
+      this.modelName = name;
+      localStorage.setItem('modelName', name);
     }
   }
-})
+});
