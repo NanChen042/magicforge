@@ -98,7 +98,7 @@
             </div>
           </div>
         </div>
-        
+
         <div @click="goToPromptLibrary" class="group cursor-pointer relative overflow-hidden">
           <div class="absolute inset-0 bg-gradient-to-r from-green-500/20 to-teal-500/20 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out rounded-2xl"></div>
           <div class="relative bg-white p-8 rounded-2xl shadow-lg border border-gray-100 group-hover:translate-y-[-2px] group-hover:shadow-green-100/50 group-hover:shadow-xl group-hover:border-green-100 transition-all duration-500 ease-out">
@@ -205,7 +205,7 @@ import { defineEmits } from 'vue';
 const emit = defineEmits(['change-tab']);
 
 function goToDemo() {
-  emit('change-tab', 'demo');
+  emit('change-tab', 'api-demo');
 }
 
 function goToGame() {

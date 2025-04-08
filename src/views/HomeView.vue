@@ -12,7 +12,7 @@ const router = useRouter();
 
 const handleTabChange = (tab: string) => {
   switch (tab) {
-    case 'api':
+    case 'api-demo':
       router.push('/api-demo');
       break;
     case 'game':
