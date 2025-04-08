@@ -38,6 +38,7 @@ export function useDeepseekApi() {
   watch(apiKey, (newKey) => {
     if (newKey && newKey !== API_CONFIG.apiKey) {
       updateApiConfig({ apiKey: newKey });
+      localStorage.setItem('apiKey', newKey);
       console.log('API Hooks: 已更新API Key');
     }
   });

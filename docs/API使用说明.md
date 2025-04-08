@@ -25,6 +25,59 @@ const stopGeneration = () => {
     isThinking.value = false;
   }
 };
+
+// 使用 AbortController 监控请求状态
+const initStreamRequest = () => {
+  abortController.value = new AbortController();
+  return {
+    signal: abortController.value.signal,
+    onProgress: (progress) => {
+      streamProgress.value = progress;
+    }
+  };
+};
+```
+
+### 优化的自动滚动机制
+- **功能描述**：实现了智能自动滚动机制，确保新消息到达时自动滚动到底部，同时尊重用户的手动滚动操作
+- **用户体验**：用户向上滚动查看历史消息时，新消息不会打断阅读；用户滚动至底部后，自动恢复自动滚动
+- **技术实现**：结合滚动事件监听和滚动位置计算，智能判断何时应该自动滚动
+- **应用场景**：长对话历史的浏览，确保消息阅读体验流畅自然
+
+```javascript
+// 滚动处理函数
+const handleScroll = () => {
+  if (!chatContainer.value) return;
+  
+  const container = chatContainer.value;
+  const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+  
+  // 只有当用户滚动到接近底部时才启用自动滚动
+  shouldAutoScroll.value = isNearBottom;
+  
+  // 清除现有定时器并设置新的定时器
+  if (scrollTimer) {
+    clearTimeout(scrollTimer);
+  }
+  
+  // 短暂延迟后检查滚动状态
+  scrollTimer = setTimeout(() => {
+    const isStillNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+    shouldAutoScroll.value = isStillNearBottom;
+  }, 150);
+};
+
+// 防抖处理的滚动到底部函数
+const debouncedScrollToBottom = debounce((forceScroll = false) => {
+  const container = chatContainer.value;
+  if (!container) return;
+  
+  // 如果强制滚动或者应该自动滚动，则执行滚动
+  if (forceScroll || shouldAutoScroll.value || isProcessing.value) {
+    container.style.scrollBehavior = 'smooth';
+    container.scrollTop = container.scrollHeight;
+  }
+}, 100);
 ```
 
 ### 修复数据发送重复问题
@@ -198,7 +251,7 @@ function scrollToBottom() {
 
 ### DeepseekClient 使用方法
 
-DeepseekClient支持两种API风格：
+DeepseekClient支持两种API风格，并且现在支持终止生成功能：
 
 1. **OpenAI兼容格式**:
 
@@ -212,12 +265,16 @@ const client = new DeepseekClient({
   model: 'deepseek-r1'
 });
 
+// 创建AbortController
+const abortController = new AbortController();
+
 // 创建聊天完成请求
 const stream = await client.chat.completions.create({
   messages: [{ role: 'user', content: '你好' }],
   stream: true,
   temperature: 0.7,
-  max_tokens: 2000
+  max_tokens: 2000,
+  signal: abortController.signal // 添加终止信号
 });
 
 // 处理流式响应
@@ -229,6 +286,12 @@ for await (const chunk of stream) {
   // 处理生成内容
   const content = chunk.choices?.[0]?.delta?.content;
   if (content) console.log('回答:', content);
+  
+  // 在需要时终止生成
+  if (shouldStop) {
+    abortController.abort();
+    break;
+  }
 }
 ```
 
@@ -243,23 +306,100 @@ const aiModel = ai.createModel("deepseek", {
   baseURL: 'YOUR_API_ENDPOINT'
 });
 
+// 创建AbortController
+const abortController = new AbortController();
+
 // 流式文本生成
 const res = await aiModel.streamText({
   model: "deepseek-r1",
   messages: [{ role: "user", content: "你好" }],
   temperature: 0.7,
-  max_tokens: 2000
+  max_tokens: 2000,
+  signal: abortController.signal // 添加终止信号
 });
 
 // 处理流式响应
-for await (const data of res.dataStream) {
-  // 思维链内容
-  const think = (data?.choices?.[0]?.delta)?.reasoning_content;
-  if (think) console.log('思考:', think);
+try {
+  for await (const data of res.dataStream) {
+    // 处理思维链内容
+    const think = data?.choices?.[0]?.delta?.reasoning_content;
+    if (think) console.log('思维过程:', think);
+    
+    // 处理生成内容
+    const text = data?.choices?.[0]?.delta?.content;
+    if (text) console.log('生成内容:', text);
+    
+    // 在需要时终止生成
+    if (shouldStop) {
+      abortController.abort();
+      break;
+    }
+  }
+} catch (e) {
+  // 处理中断异常
+  if (e.name === 'AbortError') {
+    console.log('生成已手动终止');
+  } else {
+    throw e; // 重新抛出其他异常
+  }
+}
+```
 
-  // 生成文本内容
-  const text = (data?.choices?.[0]?.delta)?.content;
-  if (text) console.log('回答:', text);
+### 性能优化建议
+
+为了获得更好的性能和用户体验，请考虑以下最佳实践：
+
+1. **提前初始化客户端**：在应用启动时创建客户端实例，避免重复初始化
+2. **复用AbortController**：在每次新请求前创建新的AbortController实例
+3. **适当设置超时**：为长时间运行的请求设置合理的超时时间
+4. **错误处理**：妥善处理网络错误和AbortError，提供友好的用户反馈
+5. **缓存常用响应**：对于常见问题，考虑实现前端缓存机制
+
+```javascript
+// 客户端单例实现
+let clientInstance = null;
+
+function getClient(apiKey, baseURL) {
+  if (!clientInstance) {
+    clientInstance = new DeepseekClient({
+      apiKey,
+      baseURL,
+      model: 'deepseek-r1'
+    });
+  }
+  return clientInstance;
+}
+
+// 带超时的请求实现
+async function fetchWithTimeout(apiKey, baseURL, messages, timeout = 30000) {
+  const client = getClient(apiKey, baseURL);
+  const abortController = new AbortController();
+  
+  // 设置超时
+  const timeoutId = setTimeout(() => abortController.abort(), timeout);
+  
+  try {
+    const stream = await client.chat.completions.create({
+      messages,
+      stream: true,
+      signal: abortController.signal
+    });
+    
+    let result = '';
+    for await (const chunk of stream) {
+      const content = chunk.choices?.[0]?.delta?.content;
+      if (content) result += content;
+    }
+    
+    return result;
+  } catch (e) {
+    if (e.name === 'AbortError') {
+      return '请求超时，请稍后重试';
+    }
+    throw e;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 ```
 

@@ -1,22 +1,22 @@
 <template>
-  <div class="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8">
+  <div class="min-h-screen bg-slate-50 py-8 px-1  sm:px-6 lg:px-8">
     <!-- 页面标题区域 -->
-    <div class="max-w-7xl mx-auto mb-12 text-center">
+    <div class="max-w-7xl mx-auto mb-6 md:mb-12 text-center px-4">
       <div class="relative inline-block">
         <div class="absolute -inset-1 rounded-full bg-gradient-to-r from-purple-600 to-blue-500 opacity-30 blur-3xl"></div>
-        <h1 class="relative text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-500 mb-3">
-          Deepseek AI 平台
+        <h1 class="relative text-3xl sm:text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-500 mb-2 md:mb-3">
+          Vista AI 平台
         </h1>
       </div>
-      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-        强大的AI对话与内容生成工具
+      <p class="text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
+        智能体AI对话与内容生成工具
       </p>
     </div>
 
     <!-- 主内容区域：配置面板和聊天面板 -->
-    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-4 md:mb-8 px-4">
       <!-- 配置面板 -->
-      <div class="bg-white rounded-xl shadow-md border border-gray-100 p-6 lg:w-full min-h-[650px]">
+      <div class="bg-white rounded-xl shadow-md border border-gray-100 p-4 md:p-6 lg:w-full min-h-[500px] md:min-h-[650px] order-2 lg:order-1">
         <div class="flex items-center space-x-3 mb-6">
           <div class="bg-purple-100 p-2 rounded-lg">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-600" viewBox="0 0 20 20" fill="currentColor">
@@ -213,9 +213,9 @@
       </div>
 
       <!-- 聊天面板 -->
-      <div class="bg-white rounded-xl shadow-md border border-gray-100 flex flex-col overflow-hidden lg:col-span-2 h-[910px]">
-        <!-- 标签切换栏 -->
-        <div class="flex border-b border-gray-200 bg-gray-50">
+      <div class="col-span-1 lg:col-span-2 flex flex-col bg-white rounded-xl shadow-md border border-gray-100 min-h-[500px] md:min-h-[650px] order-1 lg:order-2">
+        <!-- 聊天头部 -->
+        <div class="flex items-center justify-between px-4 py-3 md:px-6 md:py-4 border-b border-gray-200">
           <button @click="activeTab = 'output'" class="px-4 py-3 text-sm font-medium flex items-center gap-2 border-b-2 transition-colors" :class="activeTab === 'output'
               ? 'text-purple-600 border-purple-600'
               : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300'
@@ -245,9 +245,9 @@
         </div>
 
         <!-- 消息内容区域 -->
-        <div class="flex-1 overflow-y-auto bg-gray-50/50">
+        <div class="flex-1 overflow-hidden">
           <!-- 对话内容 -->
-          <div v-show="activeTab === 'output'" class="chat-container h-full" ref="chatContainer" @scroll="handleScroll">
+          <div v-show="activeTab === 'output'" class="chat-container h-full max-h-[650px]" ref="chatContainer" @scroll="handleScroll">
             <!-- 思考提示 -->
             <div v-if="isThinking" class="flex items-center space-x-3 p-4 mb-4 bg-blue-50 rounded-lg border border-blue-100 animate-pulse thinking-indicator">
               <div class="relative w-8 h-8 flex-shrink-0">
@@ -359,7 +359,7 @@
             </div>
 
             <!-- 打字动画指示器 -->
-            <div v-if="isProcessing && !isThinking && conversationHistory.length > 0" class="flex mb-6 justify-start">
+          <!--   <div v-if="isProcessing && !isThinking && conversationHistory.length > 0" class="flex mb-6 justify-start">
               <div class="flex max-w-[85%] gap-3 flex-row">
                 <div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-lg">
                   🤖
@@ -375,7 +375,7 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </div> -->
 
             <!-- 空状态 -->
             <div v-if="conversationHistory.length === 0" class="flex flex-col items-center justify-center min-h-full p-8 text-center">
@@ -465,7 +465,7 @@
           </div>
 
           <!-- 思维过程 -->
-          <div v-show="activeTab === 'thinking'" class="thinking-process h-full overflow-y-auto p-6" ref="thinkingContainer" @scroll="handleScroll">
+          <div v-show="activeTab === 'thinking'" class="thinking-process h-full overflow-y-auto p-6 max-h-[650px]" ref="thinkingContainer" @scroll="handleScroll">
             <!-- 有思维内容时显示 -->
             <div v-if="reasoningContent" class="relative">
               <div class="absolute -inset-1 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl blur-xl"></div>
@@ -520,7 +520,7 @@
                 <div class="flex flex-col items-center justify-center text-center">
                   <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-6">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
                     </svg>
                   </div>
                   <h3 class="text-xl font-semibold text-gray-900 mb-3">
@@ -544,18 +544,18 @@
         </div>
 
         <!-- 输入区域 -->
-        <div class="p-4 border-t border-gray-200 mt-auto bg-gray-50">
+        <div class="p-3 md:p-4 border-t border-gray-200 mt-auto bg-gray-50">
           <div class="flex flex-col">
             <div class="relative mb-2">
               <textarea
-                v-model="userInput"
                 id="message-input"
-                class="block w-full resize-none border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none text-sm min-h-[100px] pr-12 transition-shadow shadow-sm hover:shadow"
+                v-model="userInput"
+                class="block w-full resize-none border border-gray-300 rounded-xl px-3 md:px-4 py-2 md:py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none text-sm min-h-[80px] md:min-h-[100px] pr-12 transition-shadow shadow-sm hover:shadow"
                 placeholder="请输入您的问题或需求..."
                 :disabled="isProcessing"
                 @keyup.ctrl.enter="sendMessage"
               ></textarea>
-              <div class="absolute bottom-3 right-3 flex items-center gap-2 text-xs text-gray-400">
+              <div class="absolute bottom-3 right-3 hidden md:flex items-center gap-2 text-xs text-gray-400">
                 <kbd class="px-2 py-1 bg-white rounded border border-gray-300 shadow-sm">Ctrl</kbd>
                 <span>+</span>
                 <kbd class="px-2 py-1 bg-white rounded border border-gray-300 shadow-sm">Enter</kbd>
@@ -563,9 +563,9 @@
               </div>
             </div>
 
-            <div class="flex justify-between items-center">
-              <div class="flex gap-2">
-                <button class="inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" title="清空对话" @click="clearHistory">
+            <div class="flex flex-wrap md:flex-nowrap justify-between items-center gap-2">
+              <div class="w-full md:w-auto order-2 md:order-1">
+                <button class="w-full md:w-auto inline-flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" title="清空对话" @click="clearHistory">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
                   </svg>
@@ -573,25 +573,27 @@
                 </button>
               </div>
 
-              <!-- 发送消息按钮 -->
-              <button v-if="!isProcessing" @click="sendMessage" :disabled="!userInput.trim() || !apiKey" class="inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium rounded-lg transition-all disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-sm hover:shadow-md">
-                <span class="flex items-center gap-2">
-                  <span>发送</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-                  </svg>
-                </span>
-              </button>
+              <div class="w-full md:w-auto order-1 md:order-2">
+                <!-- 发送消息按钮 -->
+                <button v-if="!isProcessing" @click="sendMessage" :disabled="!userInput.trim()" class="w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium rounded-lg transition-all disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-sm hover:shadow-md">
+                  <span class="flex items-center gap-2">
+                    <span>发送</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                    </svg>
+                  </span>
+                </button>
 
-              <!-- 终止生成按钮 -->
-              <button v-else @click="stopGeneration" class="inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium rounded-lg transition-all bg-gradient-to-r from-red-500 to-red-600 text-white shadow-sm hover:shadow-md">
-                <span class="flex items-center gap-2">
-                  <span>停止生成</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clip-rule="evenodd" />
-                  </svg>
-                </span>
-              </button>
+                <!-- 终止生成按钮 -->
+                <button v-else @click="stopGeneration" class="w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium rounded-lg transition-all bg-gradient-to-r from-red-500 to-red-600 text-white shadow-sm hover:shadow-md">
+                  <span class="flex items-center gap-2">
+                    <span>停止生成</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clip-rule="evenodd" />
+                    </svg>
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -599,7 +601,7 @@
     </div>
 
     <!-- 代码示例区域 -->
-    <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+    <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden mb-8 mx-4">
       <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
         <div class="flex items-center space-x-3">
           <div class="bg-purple-100 p-2 rounded-lg">
@@ -626,6 +628,7 @@
 import { ref, computed, watch, nextTick, onMounted } from "vue";
 import { useDeepseekApi } from "../hooks/useDeepseekApi";
 import { usePromptStore } from "../stores/prompt";
+import { useApiStore } from '../stores/api';
 // @ts-ignore
 import MarkdownIt from 'markdown-it';
 import hljs from 'highlight.js';
@@ -657,7 +660,7 @@ const md = new MarkdownIt({
 const props = defineProps({
   apiBaseUrl: {
     type: String,
-    default: "http://106.14.176.242:9998/v1/chat/completions",
+    default: "",
   },
   initialPrompt: {
     type: String,
@@ -672,10 +675,22 @@ const temperature = ref(0.7);
 const maxTokens = ref(2000);
 const activeTab = ref("output");
 const apiStyle = ref("openai"); // 默认使用OpenAI兼容格式
-const modelName = ref(""); // 添加模型名称状态
+const modelName = ref(localStorage.getItem('modelName') || "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B"); // 添加模型名称状态
 const isSending = ref(false); // 添加发送状态标志，防止重复发送
 const hotTopics = ref<string[]>([]); // 添加热搜话题数组
 const isLoadingHotTopics = ref(false); // 添加热搜加载状态
+const showingModelSuccess = ref(false); // 添加模型更新成功提示标志
+
+// 添加滚动相关变量
+const shouldAutoScroll = ref(true); // 是否应该自动滚动
+const isUserScrolling = ref(false); // 用户是否正在滚动
+const chatContainer = ref<HTMLElement | null>(null); // 聊天容器引用
+const thinkingContainer = ref<HTMLElement | null>(null); // 思考容器引用
+let scrollTimer: number | null = null; // 滚动计时器
+
+// 获取提示词store和API Store
+const promptStore = usePromptStore();
+const apiStore = useApiStore();
 
 // 使用API Hooks
 const {
@@ -694,8 +709,40 @@ const {
   stopGeneration // 添加引用终止生成方法
 } = useDeepseekApi();
 
-// 获取提示词store
-const promptStore = usePromptStore();
+// 确保API Key从localStorage中加载
+if (!apiKey.value) {
+  const savedApiKey = localStorage.getItem('apiKey');
+  if (savedApiKey) {
+    apiKey.value = savedApiKey;
+    console.log('从localStorage加载API Key成功');
+  }
+}
+
+// 在组件挂载时初始化数据
+onMounted(() => {
+  // 设置API URL
+  if (props.apiBaseUrl) {
+    apiUrl.value = props.apiBaseUrl;
+  }
+
+  // 确保初始状态下滚动到底部
+  nextTick(() => {
+    scrollToBottom(true);
+  });
+
+  // 在组件挂载时获取热搜话题
+  fetchHotTopics();
+
+  // 只有当prompt库中有提示词时才设置输入内容
+  if (promptStore.promptText) {
+    userInput.value = promptStore.promptText;
+    // 清除store中的提示词，避免重复使用
+    promptStore.clearPromptText();
+  } else if (props.initialPrompt) {
+    // 如果有初始提示词，则使用它
+    userInput.value = props.initialPrompt;
+  }
+});
 
 // 设置示例问题的函数
 function setExampleQuestion(question: string) {
@@ -809,23 +856,16 @@ function setModelName(name: string) {
 
 // 更新当前使用的模型
 function updateCurrentModel() {
-  // 实际上我们可以直接使用modelName.value
-  console.log("更新模型为:", modelName.value);
-  // 这里可以添加一个请求或者其他逻辑来更改模型，如果API支持的话
-  // 例如可以在下一次请求中使用这个模型名称
+  if (modelName.value) {
+    // 保存模型名称到localStorage
+    localStorage.setItem('modelName', modelName.value);
 
-  // 显示成功提示
-  showModelUpdateSuccess();
-}
-
-// 显示模型更新成功提示
-const showingModelSuccess = ref(false);
-function showModelUpdateSuccess() {
-  showingModelSuccess.value = true;
-  // 3秒后自动隐藏提示
-  setTimeout(() => {
-    showingModelSuccess.value = false;
-  }, 3000);
+    // 显示成功提示
+    showingModelSuccess.value = true;
+    setTimeout(() => {
+      showingModelSuccess.value = false;
+    }, 2000);
+  }
 }
 
 // 添加防抖函数工具
@@ -840,13 +880,44 @@ function debounce(fn: Function, delay = 300) {
   };
 }
 
+// 改进滚动监听处理函数
+function handleScroll(event: Event) {
+  const container = event.target as HTMLElement;
+  const scrollOffset = container.scrollHeight - container.scrollTop - container.clientHeight;
+
+  // 更精确地检测是否在底部（使用更小的阈值）
+  const isAtBottom = scrollOffset < 50;
+
+  // 只有当用户手动滚动且不在底部时，才禁用自动滚动
+  if (!isThinking.value && !isProcessing.value) {
+    shouldAutoScroll.value = isAtBottom;
+  }
+
+  // 标记用户正在滚动
+  isUserScrolling.value = true;
+  if (scrollTimer) clearTimeout(scrollTimer);
+
+  // 设置滚动超时，记录滚动停止状态
+  scrollTimer = setTimeout(() => {
+    isUserScrolling.value = false;
+  }, 1000) as unknown as number;
+}
+
 // 防抖处理的滚动到底部函数
 const debouncedScrollToBottom = debounce((forceScroll = false) => {
   const container = activeTab.value === 'output' ? chatContainer.value : thinkingContainer.value;
   if (!container) return;
 
-  // 始终强制滚动到底部，除非用户明确滚动到其他位置且forceScroll为false
-  if (forceScroll || shouldAutoScroll.value) {
+  // 判断是否应该滚动到底部:
+  // 1. 强制滚动
+  // 2. 应该自动滚动且没有用户手动滚动操作
+  // 3. 正在思考或处理消息时
+  const shouldScroll = forceScroll ||
+                      (shouldAutoScroll.value && !isUserScrolling.value) ||
+                      isThinking.value ||
+                      isProcessing.value;
+
+  if (shouldScroll) {
     // 添加平滑滚动效果
     container.style.scrollBehavior = 'smooth';
 
@@ -875,32 +946,11 @@ const debouncedScrollToBottom = debounce((forceScroll = false) => {
       }
     }, 500);
   }
-}, 100);
+}, 50); // 减少延迟时间，使滚动更加及时
 
 // 替换原来的scrollToBottom函数
 function scrollToBottom(forceScroll = false) {
   debouncedScrollToBottom(forceScroll);
-}
-
-// 改进滚动监听处理函数
-function handleScroll(event: Event) {
-  const container = event.target as HTMLElement;
-  const scrollOffset = container.scrollHeight - container.scrollTop - container.clientHeight;
-
-  // 使用更大的缓冲区判断是否在底部
-  shouldAutoScroll.value = scrollOffset < 100;
-
-  // 标记用户正在滚动
-  isUserScrolling.value = true;
-
-  // 设置滚动超时，如果用户停止滚动5秒后，恢复自动滚动
-  setTimeout(() => {
-    isUserScrolling.value = false;
-    // 如果用户长时间未滚动，重新启用自动滚动
-    if (!isUserScrolling.value) {
-      shouldAutoScroll.value = true;
-    }
-  }, 5000);
 }
 
 // 优化监听对话历史和思维内容变化的逻辑
@@ -944,28 +994,6 @@ watch(activeTab, async () => {
   debouncedScrollToBottom(true);
 });
 
-// 组件挂载时确保初始滚动位置正确
-onMounted(() => {
-  // 确保初始状态下滚动到底部
-  nextTick(() => {
-    debouncedScrollToBottom(true);
-  });
-  // 在组件挂载时获取热搜话题
-  fetchHotTopics();
-
-  // 设置初始提示词
-  if (props.initialPrompt) {
-    userInput.value = props.initialPrompt;
-  }
-
-  // 从Pinia store中获取提示词（优先级高于props）
-  if (promptStore.promptText) {
-    userInput.value = promptStore.promptText;
-    // 使用后清空store中的提示词，避免再次访问页面时仍然显示
-    promptStore.clearPromptText();
-  }
-});
-
 // 发送消息
 async function sendMessage() {
   // 如果已经在发送中，直接返回
@@ -981,6 +1009,12 @@ async function sendMessage() {
     // 确保输入不为空
     if (!userInput.value.trim()) {
       return;
+    }
+
+    // 如果没有API Key，临时设置一个默认值
+    if (!apiKey.value) {
+      apiKey.value = "temp_key_for_testing";
+      console.log("使用临时API Key");
     }
 
     // 设置活动标签为输出
@@ -1071,12 +1105,6 @@ function formatText(text: string) {
     .replace(/<pre class="hljs code-block([^>]*)><code>/g,
       '<pre class="hljs code-block$1"><div class="code-header"><span class="language-badge">$1</span></div><code>');
 }
-
-// 添加滚动状态控制
-const shouldAutoScroll = ref(true);
-const isUserScrolling = ref(false);
-const chatContainer = ref<HTMLElement | null>(null);
-const thinkingContainer = ref<HTMLElement | null>(null);
 
 // 在script setup部分添加复制相关的代码
 const copySuccess = ref(false);
@@ -1174,6 +1202,18 @@ async function refreshHotTopics() {
   } else {
     // 50%概率随机排序当前话题
     randomizeHotTopics();
+  }
+}
+
+// 简单的防抖函数
+function createDebounce(fn: Function, delay: number) {
+  let timer: number | null = null;
+  return function(...args: any[]) {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => {
+      fn(...args);
+      timer = null;
+    }, delay) as unknown as number;
   }
 }
 </script>

@@ -6,7 +6,7 @@
         <div class="relative inline-block">
           <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-500 opacity-30 blur-3xl"></div>
           <h1 class="relative text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-500 mb-4">
-            Deepseek 接口演示
+            Vista AI 接口演示
           </h1>
         </div>
         <p class="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
