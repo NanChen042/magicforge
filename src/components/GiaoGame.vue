@@ -814,7 +814,7 @@ const setDebugInfo = (scene: any) => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-50 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(94,114,228,0.05),rgba(255,255,255,0))]">
+  <div class="min-h-screen ">
     <!-- 开始界面 -->
     <div v-if="showIntro" class="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-12">
       <div class="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-white p-6 sm:p-12 text-center min-h-[500px] sm:min-h-[600px] shadow-lg shadow-indigo-100/50 border border-slate-100">
@@ -826,8 +826,8 @@ const setDebugInfo = (scene: any) => {
         <div class="relative z-10 mb-8 sm:mb-16">
           <div class="inline-block">
             <div class="relative">
-              <h1 class="text-3xl sm:text-5xl md:text-6xl font-bold text-slate-800 pb-2 tracking-tight">
-                小明是最强剑魔
+              <h1 class="text-3xl sm:text-5xl md:text-6xl font-bold pb-2 tracking-tight bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 bg-clip-text text-transparent">
+                情景模拟篇之小明的剑道传奇
               </h1>
               <div class="absolute -bottom-2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-indigo-200 to-transparent"></div>
             </div>

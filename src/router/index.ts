@@ -16,6 +16,12 @@ const router = createRouter({
       meta: { title: 'API演示' }
     },
     {
+      path: '/ai-image',
+      name: 'ai-image',
+      component: () => import('../views/AIImageView.vue'),
+      meta: { title: 'AI图像生成' }
+    },
+    {
       path: '/game',
       name: 'game',
       component: () => import('../views/GameView.vue'),

@@ -45,7 +45,7 @@ const updateUrl = () => {
 <style scoped>
 .api-url-input {
   max-width: 800px;
-  margin: 0 auto 2rem auto;
+
   display: flex;
   gap: 1rem;
 }

@@ -575,7 +575,7 @@
 
               <div class="w-full md:w-auto order-1 md:order-2">
                 <!-- 发送消息按钮 -->
-                <button v-if="!isProcessing" @click="sendMessage" :disabled="!userInput.trim()" class="w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium rounded-lg transition-all disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-sm hover:shadow-md">
+                <button v-if="!isProcessing" @click="sendMessage" :disabled="!userInput.trim()" class="w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium rounded-lg transition-all disabled:bg-gradient-to-r disabled:from-purple-300 disabled:to-purple-400 disabled:opacity-70 disabled:text-purple-100 disabled:shadow-none disabled:cursor-not-allowed bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-sm hover:shadow-md">
                   <span class="flex items-center gap-2">
                     <span>发送</span>
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">

@@ -33,6 +33,15 @@
               </router-link>
 
               <router-link
+                to="/ai-image"
+                class="relative px-4 py-2 rounded-lg text-gray-700 hover:text-purple-600 transition-colors duration-200 group"
+                active-class="text-purple-600 bg-white shadow-sm shadow-purple-100"
+              >
+                AI图像生成
+                <div class="absolute inset-x-0 -bottom-[6px] h-[2px] bg-purple-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-200"></div>
+              </router-link>
+
+              <router-link
                 to="/game"
                 class="relative px-4 py-2 rounded-lg text-gray-700 hover:text-purple-600 transition-colors duration-200 group"
                 active-class="text-purple-600 bg-white shadow-sm shadow-purple-100"
@@ -81,6 +90,14 @@
             @click="mobileMenuOpen = false"
           >
             API演示
+          </router-link>
+          <router-link
+            to="/ai-image"
+            class="block px-4 py-2.5 rounded-lg text-gray-700 hover:text-purple-600 hover:bg-purple-50 transition-colors"
+            :class="{ 'bg-purple-50 text-purple-600 font-medium': $route.path === '/ai-image' }"
+            @click="mobileMenuOpen = false"
+          >
+            AI图像生成
           </router-link>
           <router-link
             to="/game"
