@@ -283,7 +283,7 @@
                   'relative group rounded-2xl px-4 py-3 text-[15px] leading-6',
                   item.role === 'user'
                     ? 'bg-purple-600 text-white rounded-tr-none'
-                    : 'bg-gray-100 text-gray-800 rounded-tl-none'
+                    : 'bg-white-100 text-gray-800 rounded-tl-none border border-gray-200 border-solid'
                 ]">
                   <div :class="[
                     'text-xs font-medium mb-1',

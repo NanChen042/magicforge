@@ -5,7 +5,8 @@
         <div class="flex justify-between items-center h-16 md:h-20 px-4 sm:px-6">
           <div class="flex items-center gap-3 md:gap-4">
             <div class="p-1.5 md:p-2 bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-xl">
-              <img src="./assets/user.jpg" alt="AIVista" class="h-7 w-7 md:h-9 md:w-9" />
+              <img v-if="imageUrl" :src="imageUrl" alt="AIVista" class="h-7 w-7 md:h-9 md:w-9" />
+              <img v-else src="./assets/user.jpg" alt="AIVista" class="h-7 w-7 md:h-9 md:w-9" />
             </div>
             <h1 class="text-base md:text-lg font-bold bg-gradient-to-br from-purple-600 to-blue-500 bg-clip-text text-transparent whitespace-nowrap">
               SouthernWind——AIVista
@@ -138,10 +139,19 @@
 
 <script setup lang="ts">
 import { defineAsyncComponent, ref } from 'vue';
-
+import axios from 'axios';
 const ApiUrlInput = defineAsyncComponent(() =>
   import('./components/ApiUrlInput.vue')
 );
+const imageUrl = ref('');
+axios.get('https://v.api.aa1.cn/api/qqimg/index.php?qq=1159063863').then(res => {
+
+const match = res.data.match(/<img\s+src=([^\s>]+)/);
+imageUrl.value = match ? match[1] : null;
+
+console.log(imageUrl);
+
+});
 
 // 移动端菜单状态
 const mobileMenuOpen = ref(false);
