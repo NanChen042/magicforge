@@ -33,6 +33,12 @@ const router = createRouter({
       component: () => import('../views/PromptLibraryView.vue'),
       meta: { title: '提示库' }
     },
+    {
+      path: '/mcp-agent',
+      name: 'mcp-agent',
+      component: () => import('../views/McpAgentView.vue'),
+      meta: { title: 'MCP智能体' }
+    },
 
     // 捕获所有未匹配路由，重定向到首页
     {

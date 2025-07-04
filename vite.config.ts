@@ -21,6 +21,30 @@ export default defineConfig({
       resolvers: [ElementPlusResolver()],
     }),
   ],
+  server: {
+    proxy: {
+      // 代理字节跳动联网搜索API - 火山引擎格式
+      '/api/agent': {
+        target: 'https://mercury.volcengineapi.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/agent/, ''),
+        secure: true,
+        headers: {
+          'Origin': 'https://mercury.volcengineapi.com'
+        }
+      },
+      // 代理字节跳动豆包API
+      '/api/bytedance': {
+        target: 'https://ark.cn-beijing.volces.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/bytedance/, '/api/v3'),
+        secure: true,
+        headers: {
+          'Origin': 'https://ark.cn-beijing.volces.com'
+        }
+      }
+    }
+  },
   build: {
     rollupOptions: {
       output: {

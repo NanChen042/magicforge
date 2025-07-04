@@ -177,7 +177,73 @@ export const useGameStore = defineStore('game', {
 
       } catch (error: any) {
         console.error('处理选择时出错:', error)
-        this.aiErrorMessage = '生成场景失败: ' + (error.message || '未知错误')
+
+        // 提供更详细的错误信息
+        let errorMessage = '场景生成遇到问题';
+        if (error.message) {
+          if (error.message.includes('JSON')) {
+            errorMessage = 'AI响应格式异常，正在尝试修复...';
+          } else if (error.message.includes('network') || error.message.includes('fetch')) {
+            errorMessage = '网络连接问题，请检查网络设置';
+          } else if (error.message.includes('401') || error.message.includes('unauthorized')) {
+            errorMessage = 'API密钥无效，请检查配置';
+          } else if (error.message.includes('429')) {
+            errorMessage = '请求过于频繁，请稍后再试';
+          } else {
+            errorMessage = `生成失败: ${error.message}`;
+          }
+        }
+
+        this.aiErrorMessage = errorMessage;
+
+        // 如果是JSON解析错误，尝试使用备用场景
+        if (error.message && error.message.includes('JSON')) {
+          console.log('尝试使用备用场景恢复...');
+          try {
+            // 创建一个简单的备用场景
+            const backupScene = {
+              id: this.currentSceneId + 1,
+              description: `小明在${this.currentScene?.context?.location || '教室'}里继续他的故事。虽然刚才遇到了一些小插曲，但生活还在继续。`,
+              dialog: '虽然有些意外，但我要继续前进...',
+              options: [
+                {
+                  text: '专注学习',
+                  hint: '把注意力放在功课上',
+                  impact: {
+                    quest: { type: 'study', value: 8 }
+                  }
+                },
+                {
+                  text: '放松一下',
+                  hint: '适当休息调整状态',
+                  impact: {
+                    quest: { type: 'gaming', value: 5 }
+                  }
+                },
+                {
+                  text: '和朋友聊天',
+                  hint: '寻求朋友的支持',
+                  impact: {
+                    quest: { type: 'social', value: 6 }
+                  }
+                }
+              ],
+              context: {
+                mood: '坚定',
+                location: this.currentScene?.context?.location || '教室',
+                timeOfDay: this.currentScene?.context?.timeOfDay || '现在',
+                previousEvents: ['遇到技术问题但已恢复']
+              },
+              isAIGenerated: false
+            };
+
+            this.currentScene = backupScene;
+            this.currentSceneId = backupScene.id;
+            this.aiErrorMessage = ''; // 清除错误信息，因为已经恢复
+          } catch (backupError) {
+            console.error('备用场景创建失败:', backupError);
+          }
+        }
       } finally {
         this.isGenerating = false
       }

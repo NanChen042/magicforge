@@ -1,11 +1,11 @@
 import type { GameScene, StoryProgress } from '../stores/game'
 import CheckpointService from './CheckpointService';
 
-// API配置 - 现在是可动态配置的
+// API配置 - 使用字节跳动豆包API
 export const API_CONFIG = {
-  apiKey: localStorage.getItem('apiKey') || 'sk-etybbrewlaafxjjqtlgfeqaaskzrmryfndjtjjecyixbsznw',
-  baseUrl: localStorage.getItem('apiUrl') || 'https://api.siliconflow.cn/v1/chat/completions',
-  model: localStorage.getItem('modelName') || '',
+  apiKey: localStorage.getItem('apiKey') || '5f28bc1b-f678-466a-9143-f1f5f25bda86',
+  baseUrl: localStorage.getItem('apiUrl') || 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
+  model: localStorage.getItem('modelName') || 'doubao-seed-1-6-250615',
   temperature: 0.8,
   maxTokens: 2000
 };
@@ -733,14 +733,20 @@ ${specialEvent ? `特殊事件：${specialEvent}` : ''}
         console.log('从代码块中提取的JSON:', jsonContent);
       }
 
-      // 清理内容中的特殊字符和格式
+      // 改进的JSON清理逻辑
       jsonContent = jsonContent
         .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // 移除控制字符
         .replace(/:\s*\+(\d+)/g, ': $1') // 移除数值前的加号，如 +10 改为 10
         .replace(/,\s*}/g, '}') // 修复尾部多余的逗号
         .replace(/,\s*]/g, ']') // 修复数组尾部多余的逗号
-        .replace(/([{,][^,{]*?)(\w+)(\s*:)/g, '$1"$2"$3') // 为未加引号的键添加引号
-        .replace(/:\s*([^",\[\]{}][^,\[\]{}]*?)(\s*[,}])/g, ':"$1"$2'); // 为未加引号的非数字值添加引号
+        .replace(/([{,]\s*)(\w+)(\s*:)/g, '$1"$2"$3') // 为未加引号的键添加引号
+        .replace(/:\s*([^",\[\]{}0-9true false][^,\[\]{}]*?)(\s*[,}])/g, ':"$1"$2') // 为未加引号的非数字值添加引号
+        .replace(/:\s*(true|false|null)(\s*[,}])/g, ': "$1"$2') // 将布尔值和null转为字符串
+        .replace(/:\s*(\d+)(\s*[,}])/g, ': $1$2') // 保持数字不变
+        .replace(/"\s*:\s*"/g, '":"') // 规范化键值对格式
+        .replace(/"\s*,\s*"/g, '","') // 规范化逗号分隔
+        .replace(/}\s*{/g, '},{') // 修复对象间缺少逗号
+        .replace(/]\s*\[/g, '],['); // 修复数组间缺少逗号
 
       console.log('清理后的JSON内容:', jsonContent);
 
@@ -842,17 +848,42 @@ ${specialEvent ? `特殊事件：${specialEvent}` : ''}
               parsed = JSON.parse(validJson);
               console.log('成功解析重构的JSON');
             } catch (finalError) {
-              // 如果仍然失败，直接使用默认值
-              console.error('无法修复JSON，使用默认值');
+              // 如果仍然失败，尝试从原始内容中提取有用信息
+              console.error('无法修复JSON，尝试从原始内容提取信息');
+              console.log('原始内容:', content);
+
+              // 尝试从原始内容中提取描述和对话
+              let extractedDescription = "小明继续他的高中生活，在游戏与学习之间寻找平衡。";
+              let extractedDialog = "我需要做出选择...";
+
+              // 简单的文本提取逻辑
+              const descriptionMatch = content.match(/描述[：:]\s*([^。！？\n]{10,100}[。！？]?)/);
+              if (descriptionMatch) {
+                extractedDescription = descriptionMatch[1].trim();
+              }
+
+              const dialogMatch = content.match(/对话[：:]?\s*["""]([^"""]{5,50})["""]?/);
+              if (dialogMatch) {
+                extractedDialog = dialogMatch[1].trim();
+              }
+
+              // 如果还是没有提取到，尝试更宽泛的匹配
+              if (extractedDescription === "小明继续他的高中生活，在游戏与学习之间寻找平衡。") {
+                const generalMatch = content.match(/[。！？]\s*([^。！？\n]{20,150}[。！？])/);
+                if (generalMatch) {
+                  extractedDescription = generalMatch[1].trim();
+                }
+              }
+
               parsed = {
-                description: "由于技术原因，无法加载场景描述",
-                dialog: "系统：发生了一些错误，但我们继续前进吧",
+                description: extractedDescription,
+                dialog: extractedDialog,
                 options: [],
                 context: {
                   mood: "困惑",
-                  location: "未知位置",
+                  location: "当前位置",
                   timeOfDay: "现在",
-                  previousEvents: ["系统恢复"]
+                  previousEvents: ["JSON解析失败，已提取文本内容"]
                 }
               };
             }
@@ -861,33 +892,55 @@ ${specialEvent ? `特殊事件：${specialEvent}` : ''}
         } catch (innerError) {
           console.error('更激进清理后仍解析失败:', innerError);
 
-          // 使用默认值
+          // 尝试从原始内容中提取有用信息
+          let extractedDescription = "小明站在教室里，思考着接下来该怎么办。阳光透过窗户洒在桌面上，同学们各自忙着自己的事情。";
+          let extractedDialog = "让我想想下一步该怎么做...";
+
+          // 尝试提取描述
+          const descriptionMatch = content.match(/场景[描述]*[：:]\s*([^。！？\n]{15,200}[。！？]?)/);
+          if (descriptionMatch) {
+            extractedDescription = descriptionMatch[1].trim();
+          } else {
+            // 尝试更宽泛的匹配
+            const generalMatch = content.match(/([^。！？\n]{30,200}[。！？])/);
+            if (generalMatch) {
+              extractedDescription = generalMatch[1].trim();
+            }
+          }
+
+          // 尝试提取对话
+          const dialogMatch = content.match(/[对话内心独白][：:]?\s*["""]?([^"""。！？\n]{5,80})["""。！？]?/);
+          if (dialogMatch) {
+            extractedDialog = dialogMatch[1].trim();
+          }
+
+          // 使用提取的内容
           parsed = {
-            description: "无法解析场景描述，请尝试选择其他选项",
-            dialog: "（系统错误，无法获取对话）",
+            description: extractedDescription,
+            dialog: extractedDialog,
             options: [
               {
-                text: "继续尝试",
-                hint: "再试一次",
+                text: "继续探索",
+                hint: "看看周围的情况",
                 impact: {
-                  quest: { type: 'social', value: 1 },
+                  quest: { type: 'social', value: 3 },
                   relationship: { character: '李雪', value: 0 }
                 }
               },
               {
-                text: "返回上一步",
-                hint: "回到上一个选择",
+                text: "重新思考",
+                hint: "仔细考虑下一步",
                 impact: {
-                  quest: { type: 'study', value: 1 },
+                  quest: { type: 'study', value: 3 },
                   relationship: { character: '李雪', value: 0 }
                 }
               }
             ],
             context: {
-              mood: "困惑",
-              location: "错误场景",
+              mood: "思考",
+              location: "当前位置",
               timeOfDay: "现在",
-              previousEvents: ["JSON解析错误"]
+              previousEvents: ["已从文本内容中提取场景信息"]
             }
           };
         }
@@ -982,38 +1035,86 @@ ${specialEvent ? `特殊事件：${specialEvent}` : ''}
       console.error('解析响应失败:', error);
       console.error('原始内容:', content);
 
-      // 8. 如果解析失败，返回一个默认场景
+      // 8. 如果解析失败，尝试从原始内容中提取有用信息
+      let fallbackDescription = "小明继续他的高中生活，在这个充满挑战的环境中寻找属于自己的道路。教室里的氛围很安静，每个人都在专注于自己的事情。";
+      let fallbackDialog = "我需要仔细考虑下一步该怎么做...";
+
+      // 尝试从原始内容中提取描述
+      try {
+        // 查找可能的场景描述
+        const descriptionPatterns = [
+          /场景[描述]*[：:]\s*([^。！？\n]{20,300}[。！？]?)/,
+          /描述[：:]\s*([^。！？\n]{20,300}[。！？]?)/,
+          /([^。！？\n]*小明[^。！？\n]{20,200}[。！？])/,
+          /([^。！？\n]{40,300}[。！？])/
+        ];
+
+        for (const pattern of descriptionPatterns) {
+          const match = content.match(pattern);
+          if (match && match[1] && match[1].length > 20) {
+            fallbackDescription = match[1].trim();
+            break;
+          }
+        }
+
+        // 查找可能的对话内容
+        const dialogPatterns = [
+          /[对话内心独白][：:]?\s*["""]([^"""]{5,100})["""]?/,
+          /["""]([^"""]{10,80})["""]?/,
+          /（([^）]{5,50}）/
+        ];
+
+        for (const pattern of dialogPatterns) {
+          const match = content.match(pattern);
+          if (match && match[1] && match[1].length > 5) {
+            fallbackDialog = match[1].trim();
+            break;
+          }
+        }
+      } catch (extractError) {
+        console.error('提取内容失败:', extractError);
+      }
+
       return {
         id: nextSceneId,
-        image: 'https://source.unsplash.com/800x500/?classroom,error&t=' + Date.now(),
-        description: '（系统：由于技术原因，无法生成新场景。）小明站在原地，思考着下一步该怎么办。',
-        dialog: '（让我想想接下来该做什么...）',
+        image: 'https://source.unsplash.com/800x500/?classroom,student&t=' + Date.now(),
+        description: fallbackDescription,
+        dialog: fallbackDialog,
         options: [
           {
-            text: '重新尝试',
+            text: '继续前进',
             next: -1,
-            hint: '再试一次',
+            hint: '勇敢面对挑战',
             impact: {
-              quest: { type: 'social', value: 0 },
-              relationship: { character: '李雪', value: 0 }
+              quest: { type: 'gaming', value: 5 },
+              relationship: { character: '李雪', value: 1 }
             }
           },
           {
-            text: '换个方向',
+            text: '仔细观察',
             next: -1,
-            hint: '尝试其他选择',
+            hint: '了解当前情况',
             impact: {
-              quest: { type: 'social', value: 0 },
-              relationship: { character: '李雪', value: 0 }
+              quest: { type: 'study', value: 5 },
+              relationship: { character: '王老师', value: 1 }
+            }
+          },
+          {
+            text: '与他人交流',
+            next: -1,
+            hint: '寻求帮助或建议',
+            impact: {
+              quest: { type: 'social', value: 5 },
+              relationship: { character: '李雪', value: 2 }
             }
           }
         ],
         isAIGenerated: true,
         context: {
-          mood: '困惑',
-          location: '当前位置',
+          mood: '专注',
+          location: '教室',
           timeOfDay: '现在',
-          previousEvents: ['系统错误']
+          previousEvents: ['已从AI响应中提取场景内容']
         }
       };
     }

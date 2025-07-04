@@ -566,7 +566,7 @@ const toggleModelIndicator = () => {
 // 切换模型
 const changeModel = () => {
   // 循环切换模型
-  const models = ['deepseek-ai/DeepSeek-R1-Distill-Qwen-7B','deepseek-r1', 'deepseek-chat', 'QwQ-32B']
+  const models = ['deepseek-ai/DeepSeek-R1-Distill-Qwen-7B', 'deepseek-r1', 'deepseek-chat', 'QwQ-32B']
   const currentIndex = models.indexOf(modelName.value)
   const nextIndex = (currentIndex + 1) % models.length
 
@@ -710,6 +710,43 @@ const closeGameOverAndReset = () => {
   backToHomepage()
 }
 
+// 重新生成当前场景
+const retryCurrentScene = async () => {
+  try {
+    // 清除当前错误状态
+    clearApiError()
+    gameStore.aiErrorMessage = ''
+
+    // 重置流式内容
+    currentDialogStream.value = ''
+    reasoningContent.value = ''
+
+    // 设置重试状态
+    isThinking.value = modelName.value !== 'deepseek-chat'
+    isStreamResponseActive.value = true
+
+    // 重新生成当前场景，使用更简单的重试选择
+    const retryChoice = {
+      text: "继续当前场景",
+      next: gameStore.currentSceneId
+    }
+
+    console.log('开始重新生成场景...')
+    await gameStore.handleChoice(retryChoice)
+
+    console.log('场景重新生成成功')
+
+    // 重置状态
+    isThinking.value = false
+    isStreamResponseActive.value = false
+  } catch (error) {
+    console.error('重新生成场景失败:', error)
+    isThinking.value = false
+    isStreamResponseActive.value = false
+    handleApiError(error)
+  }
+}
+
 // 游戏手册浮动按钮
 const showGameGuide = ref(false)
 // 上次选择分析
@@ -814,428 +851,163 @@ const setDebugInfo = (scene: any) => {
 </script>
 
 <template>
-  <div class="min-h-screen ">
+  <div class="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50/40 to-violet-50/30">
     <!-- 开始界面 -->
-    <div v-if="showIntro" class="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-12">
-      <div class="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-white p-6 sm:p-12 text-center min-h-[500px] sm:min-h-[600px] shadow-lg shadow-indigo-100/50 border border-slate-100">
-        <!-- 装饰背景 -->
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(94,114,228,0.05),rgba(255,255,255,0))]"></div>
-        <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-indigo-100 to-transparent"></div>
+    <div v-if="showIntro" class="relative min-h-screen flex items-center justify-center px-4 sm:px-6">
+      <!-- 增强背景装饰 -->
+      <div class="absolute inset-0 overflow-hidden">
+        <!-- 主要光效 -->
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-indigo-400/30 to-violet-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-violet-400/30 to-cyan-500/20 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-br from-indigo-500/10 to-violet-500/10 rounded-full blur-3xl"></div>
 
-        <!-- 标题区域 -->
-        <div class="relative z-10 mb-8 sm:mb-16">
-          <div class="inline-block">
-            <div class="relative">
-              <h1 class="text-3xl sm:text-5xl md:text-6xl font-bold pb-2 tracking-tight bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 bg-clip-text text-transparent">
-                情景模拟篇之小明的剑道传奇
-              </h1>
-              <div class="absolute -bottom-2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-indigo-200 to-transparent"></div>
+        <!-- 额外装饰光点 -->
+        <div class="absolute top-1/3 right-1/3 w-32 h-32 bg-cyan-400/20 rounded-full blur-2xl animate-pulse" style="animation-delay: 2s"></div>
+        <div class="absolute bottom-1/3 left-1/3 w-48 h-48 bg-violet-400/15 rounded-full blur-2xl animate-pulse" style="animation-delay: 3s"></div>
+      </div>
+
+      <!-- 主内容容器 -->
+      <div class="relative z-10 w-full max-w-7xl mx-auto">
+        <!-- 顶部标题区域 -->
+        <div class="text-center mb-16">
+          <!-- Logo和标题 -->
+          <div class="mb-8">
+            <!-- 增强的Logo设计 -->
+            <div class="inline-flex items-center justify-center w-28 h-28 rounded-3xl bg-gradient-to-br from-indigo-500 via-violet-500 to-cyan-500 shadow-2xl shadow-indigo-500/30 mb-8 relative group">
+              <div class="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/25 to-transparent"></div>
+              <div class="absolute inset-0 rounded-3xl bg-gradient-to-br from-transparent to-black/10"></div>
+              <span class="text-5xl relative z-10 drop-shadow-lg">⚔️</span>
+              <!-- 光环效果 -->
+              <div class="absolute -inset-2 rounded-3xl bg-gradient-to-br from-indigo-400/20 to-violet-400/20 blur-xl group-hover:blur-2xl transition-all duration-500"></div>
             </div>
-            <p class="mt-4 sm:mt-6 text-base sm:text-lg text-slate-500">一段关于剑道、学业与青春的传奇</p>
+
+            <h1 class="text-5xl sm:text-7xl md:text-8xl font-black mb-6 tracking-tight">
+              <span class="bg-gradient-to-r from-indigo-600 via-violet-600 to-cyan-600 bg-clip-text text-transparent drop-shadow-sm">
+                剑道传奇
+              </span>
+            </h1>
+
+            <p class="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed font-medium">
+              在这个充满挑战的武侠世界中，你将扮演一名初入江湖的剑客
+            </p>
+          </div>
+
+          <!-- 增强的特色标签 -->
+          <div class="flex flex-wrap justify-center gap-4 mb-12">
+            <div class="px-6 py-3 bg-gradient-to-r from-indigo-500/20 to-violet-500/20 backdrop-blur-sm rounded-2xl border border-indigo-200/50 shadow-lg shadow-indigo-500/10 hover:shadow-xl hover:shadow-indigo-500/20 transition-all duration-300 group">
+              <span class="text-sm font-medium text-indigo-700 group-hover:text-indigo-800">🎮 互动剧情</span>
+            </div>
+            <div class="px-6 py-3 bg-gradient-to-r from-violet-500/20 to-cyan-500/20 backdrop-blur-sm rounded-2xl border border-violet-200/50 shadow-lg shadow-violet-500/10 hover:shadow-xl hover:shadow-violet-500/20 transition-all duration-300 group">
+              <span class="text-sm font-medium text-violet-700 group-hover:text-violet-800">🤖 AI驱动</span>
+            </div>
+            <div class="px-6 py-3 bg-gradient-to-r from-cyan-500/20 to-indigo-500/20 backdrop-blur-sm rounded-2xl border border-cyan-200/50 shadow-lg shadow-cyan-500/10 hover:shadow-xl hover:shadow-cyan-500/20 transition-all duration-300 group">
+              <span class="text-sm font-medium text-cyan-700 group-hover:text-cyan-800">📈 成长系统</span>
+            </div>
           </div>
         </div>
 
-        <!-- API设置区域 -->
-        <div class="relative z-10 w-full max-w-md mx-auto mb-6 sm:mb-8">
-          <div class="bg-white/80 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-slate-100 shadow-sm">
-            <h3 class="text-lg font-medium text-slate-700 mb-4">API 设置</h3>
+        <!-- 主要内容区域 -->
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <!-- 左侧：游戏开始 -->
+          <div class="xl:col-span-2">
+            <!-- 高级游戏卡片设计 -->
+            <div class="relative group">
+              <!-- 主卡片背景 -->
+              <div class="bg-white rounded-3xl shadow-2xl shadow-indigo-500/20 border border-slate-200/50 p-8 relative overflow-hidden">
+                <!-- 装饰性渐变背景 -->
+                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 via-violet-500 to-cyan-500"></div>
+                <!-- 右上角装饰 -->
+                <div class="absolute top-4 right-4 w-16 h-16 bg-gradient-to-br from-indigo-100 to-violet-100 rounded-full opacity-50"></div>
+                <div class="text-center mb-8">
+                  <h2 class="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent mb-4">开始你的传奇</h2>
+                  <p class="text-slate-600 font-medium">输入你的名字，踏上剑道修行之路</p>
+                </div>
 
-            <div class="space-y-4">
-              <div>
-                <label class="block text-sm text-slate-600 mb-1">API 地址</label>
-                <input
-                  v-model="apiUrl"
-                  type="text"
-                  placeholder="请输入API地址"
+                <!-- 玩家名称输入 -->
+                <div class="mb-8">
+                  <div class="relative">
+                    <input v-model="playerName" type="text" placeholder="输入你的剑客名字..." class="w-full px-6 py-4 pl-14 bg-white rounded-2xl border-2 border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-300 text-lg font-medium shadow-lg shadow-slate-200/50 hover:shadow-indigo-200/50" @keyup.enter="startGame">
+                    <span class="absolute left-5 top-1/2 -translate-y-1/2 text-2xl">⚔️</span>
+                  </div>
+                </div>
 
-                  class="w-full px-4 py-2 bg-slate-50 rounded-lg border border-slate-200 text-slate-700 text-sm focus:outline-none focus:border-indigo-200 focus:ring-2 focus:ring-indigo-100"
-                >
+                <!-- 高级开始按钮 -->
+                <button @click="startGame" :disabled="!playerName" class="w-full group relative overflow-hidden">
+                  <!-- 按钮背景渐变 -->
+                  <div class="absolute inset-0 bg-gradient-to-r from-indigo-600 via-violet-600 to-cyan-600 rounded-2xl"></div>
+                  <!-- 悬停效果 -->
+                  <div class="absolute inset-0 bg-gradient-to-r from-indigo-500 via-violet-500 to-cyan-500 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <!-- 按钮内容 -->
+                  <div class="relative px-8 py-5 text-white font-bold text-xl transform group-hover:-translate-y-0.5 group-active:translate-y-0 transition-all duration-200 group-disabled:opacity-50 group-disabled:cursor-not-allowed group-disabled:transform-none">
+                    <span class="flex items-center justify-center gap-4">
+                      <span class="text-2xl">🗡️</span>
+                      <span>踏上剑道之路</span>
+                      <span class="text-2xl">✨</span>
+                    </span>
+                  </div>
+                  <!-- 按钮光效 -->
+                  <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/20 via-transparent to-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </button>
+
+                <!-- 游戏特色说明 -->
+                <div class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div class="text-center p-4 bg-gradient-to-br from-indigo-50 to-violet-50 rounded-xl border border-indigo-100 hover:shadow-lg hover:shadow-indigo-200/50 transition-all duration-300">
+                    <div class="text-2xl mb-2">🎯</div>
+                    <div class="text-sm font-medium text-slate-700">多重选择</div>
+                  </div>
+                  <div class="text-center p-4 bg-gradient-to-br from-violet-50 to-cyan-50 rounded-xl border border-violet-100 hover:shadow-lg hover:shadow-violet-200/50 transition-all duration-300">
+                    <div class="text-2xl mb-2">⚡</div>
+                    <div class="text-sm font-medium text-slate-700">能力成长</div>
+                  </div>
+                  <div class="text-center p-4 bg-gradient-to-br from-cyan-50 to-indigo-50 rounded-xl border border-cyan-100 hover:shadow-lg hover:shadow-cyan-200/50 transition-all duration-300">
+                    <div class="text-2xl mb-2">🌟</div>
+                    <div class="text-sm font-medium text-slate-700">动态剧情</div>
+                  </div>
+                </div>
               </div>
-              <div>
-                <label class="block text-sm text-slate-600 mb-1">API key</label>
-                <input
-                  v-model="apiKey"
-                  type="password"
-                  placeholder="没有可以去deepseek官网注册"
-                  class="w-full px-4 py-2 bg-slate-50 rounded-lg border border-slate-200 text-slate-700 text-sm focus:outline-none focus:border-indigo-200 focus:ring-2 focus:ring-indigo-100"
-                >
+            </div>
+
+            <!-- 右侧：配置面板 -->
+            <div class="space-y-6">
+              <!-- API配置 -->
+              <div class="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+                <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
+                  <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-sm">🔧</span>
+                  API 配置
+                </h3>
+
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">API 地址</label>
+                    <input v-model="apiUrl" type="text" placeholder="请输入API地址" class="w-full px-4 py-3 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 text-white placeholder-slate-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/50 transition-all duration-200">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">API Key</label>
+                    <input v-model="apiKey" type="password" placeholder="请输入您的API密钥" class="w-full px-4 py-3 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 text-white placeholder-slate-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/50 transition-all duration-200">
+                  </div>
+                </div>
               </div>
-              <div>
-                <label class="block text-sm text-slate-600 mb-1">模型选择</label>
-                <div class="flex flex-wrap gap-2 mb-3">
-                  <button
-                    v-for="model in ['deepseek-ai/DeepSeek-R1-Distill-Qwen-7B','deepseek-r1', 'deepseek-chat', 'QwQ-32B']"
-                    :key="model"
-                    @click="setModel(model)"
-                    class="px-3 py-2 text-sm rounded-md transition-colors duration-200"
-                    :class="modelName === model
-                      ? 'bg-indigo-100 text-indigo-700 border border-indigo-200'
-                      : 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100'"
-                  >
+
+              <!-- 模型选择 -->
+              <div class="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+                <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
+                  <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center text-sm">🤖</span>
+                  模型选择
+                </h3>
+
+                <div class="space-y-3">
+                  <button v-for="model in ['deepseek-ai/DeepSeek-R1-Distill-Qwen-7B', 'deepseek-r1', 'deepseek-chat', 'QwQ-32B']" :key="model" @click="setModel(model)" class="w-full px-4 py-3 text-sm rounded-xl transition-all duration-200 text-left" :class="modelName === model
+                    ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg'
+                    : 'bg-white/10 text-slate-300 border border-white/20 hover:bg-white/20'">
                     {{ model }}
                   </button>
-                </div>
-                <div class="flex gap-2">
-                  <input
-                    v-model="customModelName"
-                    type="text"
-                    placeholder="输入自定义模型名称"
-                    class="flex-1 px-3 py-2 bg-slate-50 rounded-lg border border-slate-200 text-slate-700 text-sm focus:outline-none focus:border-indigo-200 focus:ring-2 focus:ring-indigo-100"
-                    @keyup.enter="setCustomModel"
-                  >
-                  <button
-                    @click="setCustomModel"
-                    class="px-3 py-2 bg-indigo-50 text-indigo-600 rounded-lg border border-indigo-200 text-sm hover:bg-indigo-100 transition-colors"
-                  >
-                    设置
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <!-- 输入区域 -->
-        <div class="relative z-10 w-full max-w-md mx-auto">
-          <div class="bg-white/80 backdrop-blur-xl rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-slate-100 shadow-sm">
-            <div class="mb-6 sm:mb-8">
-              <div class="relative group">
-                <input
-                  v-model="playerName"
-                  type="text"
-                  placeholder="输入你的名字，剑客"
-                  class="w-full px-10 sm:px-14 py-3 sm:py-4 bg-slate-50 rounded-xl border border-slate-200 text-slate-700 placeholder-slate-400 focus:outline-none focus:border-indigo-200 focus:ring-2 focus:ring-indigo-100 transition-all duration-300"
-                  @keyup.enter="startGame"
-                >
-                <span class="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 text-xl sm:text-2xl text-slate-400 group-focus-within:text-indigo-400 transition-colors duration-300">⚔️</span>
-              </div>
-            </div>
-
-            <button
-              @click="startGame"
-              :disabled="!playerName"
-              class="relative w-full group"
-            >
-              <div class="relative bg-gradient-to-r from-indigo-500 to-blue-500 rounded-xl px-6 py-3 sm:py-4 text-white font-medium transform group-hover:-translate-y-1 group-active:translate-y-0 transition-all duration-300 shadow-md shadow-indigo-100">
-                <span class="flex items-center justify-center gap-3">
-                  <span class="text-base sm:text-lg">开启传奇</span>
-                  <span class="text-xl">🗡️</span>
-                </span>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 游戏主界面 -->
-    <div v-else-if="!showIntro" class="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-12">
-      <!-- 游戏手册浮动按钮 -->
-      <div class="fixed bottom-4 right-4 z-40">
-        <button
-          @click="showGameGuide = !showGameGuide"
-          class="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-blue-500 flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-        >
-          <span class="text-white text-xl">📖</span>
-        </button>
-      </div>
-
-      <!-- 游戏手册浮动面板 -->
-      <div v-if="showGameGuide" class="fixed right-4 bottom-20 w-72 sm:w-80 bg-white rounded-xl border border-indigo-100 shadow-xl z-40 overflow-hidden">
-        <div class="bg-gradient-to-r from-indigo-500 to-blue-500 px-4 py-3 flex justify-between items-center">
-          <h3 class="text-white font-medium">游戏手册</h3>
-          <button @click="showGameGuide = false" class="text-white hover:text-indigo-100">×</button>
-        </div>
-        <div class="p-4 max-h-96 overflow-y-auto">
-          <div class="space-y-4">
-            <!-- 当前状态 -->
-            <div>
-              <h4 class="font-bold text-slate-700 mb-2 flex items-center gap-2">
-                <span class="text-indigo-500">🎮</span>
-                <span>当前状态</span>
-              </h4>
-              <div class="bg-slate-50 rounded-lg p-3 text-sm border border-slate-100">
-                <div><span class="font-medium">玩家:</span> {{ playerName }}</div>
-                <div><span class="font-medium">场景:</span> {{ currentScene?.id || '初始' }}</div>
-                <div><span class="font-medium">模型:</span> {{ modelName }}</div>
-              </div>
-            </div>
-
-            <!-- 能力值 -->
-            <div>
-              <h4 class="font-bold text-slate-700 mb-2 flex items-center gap-2">
-                <span class="text-indigo-500">📊</span>
-                <span>能力值</span>
-              </h4>
-              <div class="space-y-2">
-                <div>
-                  <div class="flex justify-between text-xs mb-1">
-                    <span class="text-blue-600 font-medium">游戏技能</span>
-                    <span>{{ Math.round(gameProgress.gaming) }}%</span>
-                  </div>
-                  <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div class="h-full bg-blue-500 rounded-full" :style="`width: ${gameProgress.gaming}%`"></div>
-                  </div>
-                </div>
-                <div>
-                  <div class="flex justify-between text-xs mb-1">
-                    <span class="text-green-600 font-medium">学习能力</span>
-                    <span>{{ Math.round(gameProgress.study) }}%</span>
-                  </div>
-                  <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div class="h-full bg-green-500 rounded-full" :style="`width: ${gameProgress.study}%`"></div>
-                  </div>
-                </div>
-                <div>
-                  <div class="flex justify-between text-xs mb-1">
-                    <span class="text-purple-600 font-medium">社交关系</span>
-                    <span>{{ Math.round(gameProgress.social) }}%</span>
-                  </div>
-                  <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div class="h-full bg-purple-500 rounded-full" :style="`width: ${gameProgress.social}%`"></div>
-                  </div>
-                </div>
-                <div>
-                  <div class="flex justify-between text-xs mb-1">
-                    <span class="text-amber-600 font-medium">神秘能力</span>
-                    <span>{{ Math.round(gameProgress.other) }}%</span>
-                  </div>
-                  <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div class="h-full bg-amber-500 rounded-full" :style="`width: ${gameProgress.other}%`"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- 上次选择分析 -->
-            <div v-if="lastChoiceAnalysis.text">
-              <h4 class="font-bold text-slate-700 mb-2 flex items-center gap-2">
-                <span class="text-indigo-500">🔍</span>
-                <span>上次选择分析</span>
-              </h4>
-              <div class="bg-slate-50 rounded-lg p-3 text-sm border border-slate-100">
-                <div class="mb-1 font-medium">选择: "{{ lastChoiceAnalysis.text }}"</div>
-                <div class="text-xs text-slate-500 space-y-1">
-                  <div v-if="lastChoiceAnalysis.matchedKeywords.gaming?.length">
-                    <span class="text-blue-600 font-medium">游戏关键词:</span> {{ lastChoiceAnalysis.matchedKeywords.gaming.join(', ') }}
-                  </div>
-                  <div v-if="lastChoiceAnalysis.matchedKeywords.study?.length">
-                    <span class="text-green-600 font-medium">学习关键词:</span> {{ lastChoiceAnalysis.matchedKeywords.study.join(', ') }}
-                  </div>
-                  <div v-if="lastChoiceAnalysis.matchedKeywords.social?.length">
-                    <span class="text-purple-600 font-medium">社交关键词:</span> {{ lastChoiceAnalysis.matchedKeywords.social.join(', ') }}
-                  </div>
-                  <div v-if="lastChoiceAnalysis.matchedKeywords.other?.length">
-                    <span class="text-amber-600 font-medium">神秘关键词:</span> {{ lastChoiceAnalysis.matchedKeywords.other.join(', ') }}
-                  </div>
-                  <div v-if="!Object.values(lastChoiceAnalysis.matchedKeywords).some(arr => arr?.length)">
-                    无匹配关键词，增加了神秘能力
-                  </div>
-                  <div class="mt-2 font-medium">
-                    增加了: <span :class="{
-                      'text-blue-600': lastChoiceAnalysis.impactType === 'gaming',
-                      'text-green-600': lastChoiceAnalysis.impactType === 'study',
-                      'text-purple-600': lastChoiceAnalysis.impactType === 'social',
-                      'text-amber-600': lastChoiceAnalysis.impactType === 'other'
-                    }">{{ lastChoiceImpactText }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- 调试开关 -->
-            <div>
-              <div class="inline-flex items-center">
-                <label class="relative flex items-center cursor-pointer">
-                  <input type="checkbox" v-model="showDebugInfo" class="sr-only peer">
-                  <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-500"></div>
-                  <span class="ml-2 text-xs font-medium text-slate-600">显示调试信息</span>
-                </label>
-              </div>
-            </div>
-
-            <!-- 调试信息 -->
-            <div v-if="showDebugInfo" class="bg-slate-800 text-slate-200 p-3 rounded-lg text-xs font-mono overflow-x-auto">
-              <pre>{{ JSON.stringify(debugInfo, null, 2) }}</pre>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="rounded-xl sm:rounded-3xl overflow-hidden bg-white border border-slate-100 shadow-lg shadow-indigo-100/50">
-        <!-- 状态栏 -->
-        <div class="bg-slate-50 border-b border-slate-100 p-4 sm:p-6">
-          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div class="flex items-center gap-3 sm:gap-4">
-              <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-500 p-[1px]">
-                <div class="w-full h-full rounded-[10px] bg-white flex items-center justify-center">
-                  <span class="text-xl sm:text-2xl">⚔️</span>
-                </div>
-              </div>
-              <div>
-                <div class="text-base sm:text-lg font-bold text-slate-800">{{ playerName }}</div>
-                <div class="text-xs sm:text-sm text-slate-500">见习剑客</div>
-              </div>
-            </div>
-
-            <div class="flex flex-wrap items-center gap-2 sm:gap-4 w-full sm:w-auto">
-              <div class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-200 text-slate-700 text-sm">
-                第 {{ currentScene?.id || '?' }} 章
-              </div>
-              <button @click="toggleModelIndicator" class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border transition-colors duration-200 text-sm" :class="[modelName === 'deepseek-r1' ? 'bg-purple-50 text-purple-700 border-purple-200' : 'bg-blue-50 text-blue-700 border-blue-200']">
-                {{ modelName }}
-              </button>
-              <button
-                @click="resetGame"
-                class="group px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100 transition-all duration-300 text-sm"
-              >
-                <span class="flex items-center gap-2">
-                  <span class="text-base sm:text-lg group-hover:rotate-180 transition-transform duration-500">🔄</span>
-                  <span class="hidden sm:inline">重新开始</span>
-                </span>
-              </button>
-              <button
-                @click="backToHomepage"
-                class="group px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-600 hover:bg-indigo-100 transition-all duration-300 text-sm"
-              >
-                <span class="flex items-center gap-2">
-                  <span class="text-base sm:text-lg">🏠</span>
-                  <span class="hidden sm:inline">返回首页</span>
-                </span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- 场景内容 -->
-        <div class="p-4 sm:p-8 space-y-4 sm:space-y-6 bg-white">
-          <!-- 对话与思维过程选项卡 -->
-          <div class="mb-4 sm:mb-6 border border-slate-100 rounded-2xl overflow-hidden bg-white">
-            <!-- 选项卡导航 -->
-            <div class="flex border-b border-slate-100">
-              <button
-                @click="switchTab('dialog')"
-                class="flex-1 py-2 sm:py-3 text-xs sm:text-sm font-medium transition-colors duration-200 relative"
-                :class="activeTab === 'dialog'
-                  ? 'text-indigo-600 bg-indigo-50/50'
-                  : 'text-slate-600 hover:text-slate-800 hover:bg-slate-50'"
-              >
-                <span class="flex items-center justify-center gap-1 sm:gap-2">
-                  <span class="text-base sm:text-lg">💭</span>
-                  <span>对话内容</span>
-                </span>
-                <span v-if="activeTab === 'dialog'" class="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-500"></span>
-              </button>
-
-              <button
-                v-if="modelName !== 'deepseek-chat'"
-                @click="switchTab('reasoning')"
-                class="flex-1 py-2 sm:py-3 text-xs sm:text-sm font-medium transition-colors duration-200 relative"
-                :class="activeTab === 'reasoning'
-                  ? 'text-purple-600 bg-purple-50/50'
-                  : 'text-slate-600 hover:text-slate-800 hover:bg-slate-50'"
-              >
-                <span class="flex items-center justify-center gap-1 sm:gap-2">
-                  <span class="text-base sm:text-lg">🤔</span>
-                  <span>思维过程</span>
-                  <span v-if="isThinking && !reasoningContent" class="inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full bg-purple-100 text-purple-700 text-xs font-medium">
-                    思考中
-                    <span class="ml-1 flex space-x-1">
-                      <span class="w-1 h-1 bg-purple-700 rounded-full animate-bounce" style="animation-delay: 0s"></span>
-                      <span class="w-1 h-1 bg-purple-700 rounded-full animate-bounce" style="animation-delay: 0.1s"></span>
-                      <span class="w-1 h-1 bg-purple-700 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
-                    </span>
-                  </span>
-                </span>
-                <span v-if="activeTab === 'reasoning'" class="absolute bottom-0 left-0 w-full h-0.5 bg-purple-500"></span>
-              </button>
-
-              <button
-                v-if="apiError.show"
-                @click="switchTab('error')"
-                class="flex-1 py-2 sm:py-3 text-xs sm:text-sm font-medium transition-colors duration-200 relative"
-                :class="activeTab === 'error'
-                  ? 'text-red-600 bg-red-50/50'
-                  : 'text-slate-600 hover:text-slate-800 hover:bg-slate-50'"
-              >
-                <span class="flex items-center justify-center gap-1 sm:gap-2">
-                  <span class="text-base sm:text-lg">⚠️</span>
-                  <span>错误信息</span>
-                </span>
-                <span v-if="activeTab === 'error'" class="absolute bottom-0 left-0 w-full h-0.5 bg-red-500"></span>
-              </button>
-            </div>
-
-            <!-- 选项卡内容 -->
-            <div class="p-4 sm:p-6">
-              <!-- 对话内容选项卡 -->
-              <div v-if="activeTab === 'dialog'" class="animate-fadeIn">
-                <div class="flex gap-3 sm:gap-4">
-                  <div class="text-xl sm:text-2xl shrink-0">💭</div>
-                  <div v-if="isGenerating && !currentDialogStream" class="text-slate-600 italic">
-                    <div class="flex items-center text-slate-500 text-sm sm:text-base">
-                      <span>AI正在生成对话</span>
-                      <span class="ml-2 flex space-x-1">
-                        <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0s"></span>
-                        <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></span>
-                        <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
-                      </span>
-                    </div>
-                  </div>
-                  <p class="text-slate-600 italic text-sm sm:text-base">{{ currentDialogStream || (currentScene ? currentScene.dialog : '') }}</p>
-                </div>
-              </div>
-
-              <!-- 思维过程选项卡 -->
-              <div v-else-if="activeTab === 'reasoning'" class="animate-fadeIn">
-                <div class="flex gap-3 sm:gap-4">
-                  <div class="text-xl sm:text-2xl shrink-0">🤔</div>
-                  <div v-if="isGenerating && !reasoningContent" class="text-slate-600 italic">
-                    <div class="flex items-center text-slate-500 text-sm sm:text-base">
-                      <span>AI正在生成思维过程</span>
-                      <span class="ml-2 flex space-x-1">
-                        <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0s"></span>
-                        <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></span>
-                        <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
-                      </span>
-                    </div>
-                  </div>
-                  <p class="text-slate-700 leading-relaxed text-sm sm:text-base">{{ reasoningContent || (currentScene ? currentScene.reasoning : '') }}</p>
-                </div>
-              </div>
-
-              <!-- 错误信息选项卡 -->
-              <div v-else-if="activeTab === 'error'" class="animate-fadeIn">
-                <div class="bg-red-50 rounded-lg p-3 sm:p-4 border border-red-100">
-                  <div class="flex items-start gap-2 sm:gap-3">
-                    <div class="text-xl sm:text-2xl text-red-500 shrink-0">⚠️</div>
-                    <div>
-                      <h3 class="font-bold text-red-700 flex items-center gap-2 text-sm sm:text-base">
-                        <span>错误 {{ apiError.code }}</span>
-                        <span v-if="apiError.details">- {{ apiError.details.title }}</span>
-                      </h3>
-
-                      <p class="text-red-600 mt-1 mb-2 text-xs sm:text-sm">{{ apiError.message }}</p>
-
-                      <div v-if="apiError.details" class="text-xs sm:text-sm space-y-2 text-slate-700">
-                        <p>
-                          <span class="font-medium">原因：</span>
-                          <span>{{ apiError.details.reason }}</span>
-                        </p>
-                        <p>
-                          <span class="font-medium">解决方法：</span>
-                          <span>{{ apiError.details.solution }}</span>
-                        </p>
-                      </div>
-
-                      <div class="mt-3 sm:mt-4">
-                        <button
-                          @click="clearApiError"
-                          class="px-3 py-1 text-xs rounded bg-red-100 text-red-700 hover:bg-red-200 transition-colors"
-                        >
-                          关闭错误提示
-                        </button>
-                      </div>
+                  <div class="pt-4 border-t border-white/20">
+                    <div class="flex gap-2">
+                      <input v-model="customModelName" type="text" placeholder="自定义模型" class="flex-1 px-3 py-2 bg-white/10 rounded-lg border border-white/20 text-white placeholder-slate-400 text-sm focus:outline-none focus:border-purple-400" @keyup.enter="setCustomModel">
+                      <button @click="setCustomModel" class="px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-lg text-sm hover:from-purple-600 hover:to-blue-700 transition-all duration-200">
+                        设置
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -1243,358 +1015,762 @@ const setDebugInfo = (scene: any) => {
             </div>
           </div>
 
-          <!-- 场景描述 - 高级炫酷版 -->
-          <div class="relative overflow-hidden bg-gradient-to-br from-slate-50 via-indigo-50/30 to-blue-50/30 rounded-xl sm:rounded-2xl p-5 sm:p-7 border border-indigo-100/50 mb-4 sm:mb-6 shadow-lg shadow-indigo-100/20 backdrop-blur-sm group">
-            <!-- 装饰元素 -->
-            <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-indigo-300 to-transparent opacity-70"></div>
-            <div class="absolute bottom-0 right-0 w-full h-[2px] bg-gradient-to-r from-blue-300 via-transparent to-transparent opacity-70"></div>
-            <div class="absolute -top-20 -right-20 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl group-hover:bg-blue-500/10 transition-all duration-700"></div>
-            <div class="absolute -bottom-32 -left-20 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/10 transition-all duration-700"></div>
 
-            <div class="relative flex items-start">
-              <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md shadow-indigo-200/30 mr-4 sm:mr-5">
-                <span class="text-white text-xl">📜</span>
-              </div>
-
-              <div class="flex-1">
-                <h3 class="font-bold text-indigo-700 text-lg sm:text-xl mb-3 bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-blue-700">当前场景</h3>
-                <p class="text-slate-700 text-sm sm:text-base leading-relaxed font-medium">{{ currentScene?.description }}</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- 对话内容 - 高级炫酷版 -->
-          <div class="relative overflow-hidden bg-gradient-to-br from-indigo-50 via-purple-50/20 to-blue-50/20 rounded-xl sm:rounded-2xl p-5 sm:p-7 border border-indigo-200/50 mb-4 sm:mb-6 shadow-lg shadow-indigo-200/20 backdrop-blur-sm group">
-            <!-- 装饰元素 -->
-            <div class="absolute top-0 right-0 w-full h-[2px] bg-gradient-to-r from-indigo-300 via-purple-300/70 to-transparent opacity-70"></div>
-            <div class="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-300/70 to-indigo-300 opacity-70"></div>
-            <div class="absolute -top-24 -left-20 w-72 h-72 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/10 transition-all duration-700"></div>
-            <div class="absolute -bottom-32 -right-20 w-80 h-80 bg-purple-500/5 rounded-full blur-3xl group-hover:bg-purple-500/10 transition-all duration-700"></div>
-
-            <div class="absolute top-4 right-4 text-4xl opacity-5 group-hover:opacity-10 transition-opacity duration-700 transform rotate-12">💬</div>
-
-            <div class="relative flex items-start">
-              <div class="flex-shrink-0 mr-4 sm:mr-5">
-                <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center shadow-md shadow-indigo-200/30 p-0.5">
-                  <div class="w-full h-full rounded-full bg-white/90 flex items-center justify-center">
-                    <span class="text-indigo-600 text-xl">💭</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="flex-1">
-                <h3 class="font-bold text-purple-700 text-lg sm:text-xl mb-3 bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">对话内容</h3>
-                <div class="bg-white/40 backdrop-blur-sm rounded-lg p-4 border border-indigo-100/50 shadow-sm">
-                  <p class="text-slate-700 text-sm sm:text-base leading-relaxed whitespace-pre-line">{{ currentScene?.dialog }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 特殊事件 -->
-          <div v-if="currentScene?.specialEvent" class="relative overflow-hidden bg-slate-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-indigo-100 mb-4 sm:mb-6">
-            <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-indigo-200 to-blue-200"></div>
-            <div class="flex gap-3 sm:gap-4">
-              <div class="text-xl sm:text-2xl">⚡</div>
-              <div>
-                <h3 class="font-bold text-slate-800 mb-2 text-sm sm:text-base">特殊事件</h3>
-                <p class="text-slate-600 text-sm sm:text-base">{{ currentScene?.specialEvent }}</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- 游戏进度指标 -->
-          <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
-            <div class="bg-white rounded-xl border border-slate-100 p-3 sm:p-4 relative overflow-hidden group">
-              <div class="text-xs sm:text-sm text-slate-500 mb-1 flex justify-between items-center">
-                <span>游戏技能</span>
-                <span class="font-medium" :class="{'text-blue-600': gameProgress.gaming >= 100}">{{ gameProgress.gaming }}%</span>
-              </div>
-              <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                <div
-                  class="h-2 rounded-full transition-all duration-700 ease-out"
-                  :class="[
-                    gameProgress.gaming >= 100
-                      ? 'bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-500 animate-pulse'
-                      : 'bg-blue-500'
-                  ]"
-                  :style="`width: ${gameProgress.gaming}%`"
-                ></div>
-              </div>
-              <!-- 满值时的特效 -->
-              <div v-if="gameProgress.gaming >= 100" class="absolute inset-0 pointer-events-none">
-                <div class="absolute -inset-1 bg-gradient-to-r from-blue-400 to-indigo-500 opacity-20 blur-xl"></div>
-                <div class="absolute top-1 right-2 text-xs font-bold text-blue-600 animate-bounce">满级!</div>
-              </div>
-            </div>
-            <div class="bg-white rounded-xl border border-slate-100 p-3 sm:p-4 relative overflow-hidden group">
-              <div class="text-xs sm:text-sm text-slate-500 mb-1 flex justify-between items-center">
-                <span>学习能力</span>
-                <span class="font-medium" :class="{'text-green-600': gameProgress.study >= 100}">{{ gameProgress.study }}%</span>
-              </div>
-              <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                <div
-                  class="h-2 rounded-full transition-all duration-700 ease-out"
-                  :class="[
-                    gameProgress.study >= 100
-                      ? 'bg-gradient-to-r from-green-400 via-green-500 to-emerald-500 animate-pulse'
-                      : 'bg-green-500'
-                  ]"
-                  :style="`width: ${gameProgress.study}%`"
-                ></div>
-              </div>
-              <!-- 满值时的特效 -->
-              <div v-if="gameProgress.study >= 100" class="absolute inset-0 pointer-events-none">
-                <div class="absolute -inset-1 bg-gradient-to-r from-green-400 to-emerald-500 opacity-20 blur-xl"></div>
-                <div class="absolute top-1 right-2 text-xs font-bold text-green-600 animate-bounce">满级!</div>
-              </div>
-            </div>
-            <div class="bg-white rounded-xl border border-slate-100 p-3 sm:p-4 relative overflow-hidden group">
-              <div class="text-xs sm:text-sm text-slate-500 mb-1 flex justify-between items-center">
-                <span>社交关系</span>
-                <span class="font-medium" :class="{'text-purple-600': gameProgress.social >= 100}">{{ gameProgress.social }}%</span>
-              </div>
-              <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                <div
-                  class="h-2 rounded-full transition-all duration-700 ease-out"
-                  :class="[
-                    gameProgress.social >= 100
-                      ? 'bg-gradient-to-r from-purple-400 via-purple-500 to-indigo-500 animate-pulse'
-                      : 'bg-purple-500'
-                  ]"
-                  :style="`width: ${gameProgress.social}%`"
-                ></div>
-              </div>
-              <!-- 满值时的特效 -->
-              <div v-if="gameProgress.social >= 100" class="absolute inset-0 pointer-events-none">
-                <div class="absolute -inset-1 bg-gradient-to-r from-purple-400 to-indigo-500 opacity-20 blur-xl"></div>
-                <div class="absolute top-1 right-2 text-xs font-bold text-purple-600 animate-bounce">满级!</div>
-              </div>
-            </div>
-            <div class="bg-white rounded-xl border border-slate-100 p-3 sm:p-4 relative overflow-hidden group">
-              <div class="text-xs sm:text-sm text-slate-500 mb-1 flex justify-between items-center">
-                <span>神秘能力</span>
-                <span class="font-medium" :class="{'text-amber-600': gameProgress.other >= 100}">{{ gameProgress.other }}%</span>
-              </div>
-              <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                <div
-                  class="h-2 rounded-full transition-all duration-700 ease-out"
-                  :class="[
-                    gameProgress.other >= 100
-                      ? 'bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 animate-pulse'
-                      : 'bg-amber-500'
-                  ]"
-                  :style="`width: ${gameProgress.other}%`"
-                ></div>
-              </div>
-              <!-- 满值时的特效 -->
-              <div v-if="gameProgress.other >= 100" class="absolute inset-0 pointer-events-none">
-                <div class="absolute -inset-1 bg-gradient-to-r from-amber-400 to-orange-500 opacity-20 blur-xl"></div>
-                <div class="absolute top-1 right-2 text-xs font-bold text-amber-600 animate-bounce">满级!</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 选项列表 -->
-          <div class="space-y-3 sm:space-y-4" :class="{ 'opacity-50 pointer-events-none': isGenerating }">
-            <div
-              v-for="option in currentScene?.options || []"
-              :key="option.text"
-              class="group cursor-pointer relative overflow-hidden touch-manipulation"
-              @click="!isGenerating && handleChoice(option)"
-            >
-              <div class="absolute inset-0 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl sm:rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <div class="relative bg-slate-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-slate-100 transform group-hover:-translate-y-1 transition-all duration-300 group-hover:shadow-md group-hover:shadow-indigo-100/50">
-                <div class="text-slate-700 font-medium mb-1 sm:mb-2 text-sm sm:text-base">{{ option.text }}</div>
-                <div v-if="option.hint" class="text-slate-500 text-xs sm:text-sm italic">{{ option.hint }}</div>
-                <!-- 选项禁用状态提示 -->
-                <div v-if="isGenerating" class="absolute top-2 right-2 flex items-center justify-center">
-                  <div class="w-4 h-4 rounded-full bg-slate-200 flex items-center justify-center">
-                    <div class="w-2 h-2 rounded-full bg-slate-400 animate-pulse"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
+
       </div>
-    </div>
 
-    <!-- 模型信息弹窗 -->
-    <div v-if="showModelInfo" class="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50" @click="showModelInfo = false">
-      <div class="relative bg-white rounded-xl sm:rounded-2xl p-6 sm:p-8 max-w-xs sm:max-w-md w-full mx-4 shadow-xl" @click.stop>
-        <h2 class="text-xl sm:text-2xl font-bold text-slate-800 mb-4">AI模型信息</h2>
-        <div class="space-y-4">
-          <div>
-            <h3 class="text-xs sm:text-sm font-medium text-slate-500">当前模型</h3>
-            <p class="text-base sm:text-lg font-medium text-slate-800">{{ modelName }}</p>
-          </div>
 
-          <div>
-            <h3 class="text-xs sm:text-sm font-medium text-slate-500">模型特点</h3>
-            <ul class="mt-2 space-y-2">
-              <li v-if="modelName === 'deepseek-r1'" class="flex items-start gap-2">
-                <span class="text-purple-500 mt-0.5">✓</span>
-                <span class="text-slate-700 text-xs sm:text-sm">支持思维链展示，可观察AI思考过程</span>
-              </li>
-              <li v-if="modelName === 'deepseek-r1'" class="flex items-start gap-2">
-                <span class="text-purple-500 mt-0.5">✓</span>
-                <span class="text-slate-700 text-xs sm:text-sm">更强的推理和剧情架构能力</span>
-              </li>
-              <li v-if="modelName === 'deepseek-chat'" class="flex items-start gap-2">
-                <span class="text-blue-500 mt-0.5">✓</span>
-                <span class="text-slate-700 text-xs sm:text-sm">更流畅的对话体验</span>
-              </li>
-              <li v-if="modelName === 'QwQ-32B'" class="flex items-start gap-2">
-                <span class="text-blue-500 mt-0.5">✓</span>
-                <span class="text-slate-700 text-xs sm:text-sm">更大模型参数，知识面更广</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <span class="text-green-500 mt-0.5">✓</span>
-                <span class="text-slate-700 text-xs sm:text-sm">实时流式生成，响应更快</span>
-              </li>
-            </ul>
-          </div>
 
-          <div class="pt-4">
-            <button @click="changeModel" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-xl font-medium text-sm sm:text-base">
-              切换模型
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 加载状态 - 增强版 -->
-    <div v-if="isGenerating && !isStreamResponseActive" class="fixed inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center z-50">
-      <div class="relative">
-        <div class="relative bg-white rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-slate-100 shadow-lg shadow-indigo-100/50">
-          <div class="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4">
-            <svg class="animate-spin w-full h-full text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-          </div>
-          <p class="text-slate-800 text-base sm:text-lg font-medium text-center">正在书写剧情...</p>
-          <!-- 添加更详细的状态显示 -->
-          <p class="text-slate-500 text-xs sm:text-sm text-center mt-2">
-            <span v-if="activeTab === 'reasoning'">正在思考中，请稍候...</span>
-            <span v-else>AI正在创作，故事即将呈现...</span>
-          </p>
-          <!-- 添加进度条 -->
-          <div class="w-full h-1 bg-slate-100 rounded-full mt-4 overflow-hidden">
-            <div class="h-full bg-indigo-400 rounded-full animate-progressBar"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 错误提示 -->
-    <div v-if="aiErrorMessage" class="fixed bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 z-50">
-      <div class="relative">
-        <div class="relative bg-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl border border-red-100 text-red-500 flex items-center gap-2 sm:gap-3 shadow-lg shadow-red-100/50 text-sm sm:text-base">
-          <span class="text-lg sm:text-xl">❌</span>
-          <span class="font-medium">{{ aiErrorMessage }}</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- 游戏结束弹窗 - 超级炫酷版 -->
-    <div v-if="showGameOver" class="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50">
-      <div class="relative max-w-lg w-full mx-4">
-        <!-- 背景光效 -->
-        <div class="absolute -inset-4 rounded-3xl" :class="{
-          'bg-gradient-to-br from-blue-600/20 to-indigo-600/20': gameOverType === 'gaming',
-          'bg-gradient-to-br from-green-600/20 to-emerald-600/20': gameOverType === 'study',
-          'bg-gradient-to-br from-purple-600/20 to-indigo-600/20': gameOverType === 'social',
-          'bg-gradient-to-br from-amber-600/20 to-orange-600/20': gameOverType === 'other'
-        }"></div>
-
-        <div class="relative overflow-hidden bg-white/90 backdrop-blur-lg rounded-xl sm:rounded-2xl p-8 sm:p-10 shadow-xl border border-white/50">
-          <!-- 上部装饰线 -->
-          <div class="absolute top-0 left-0 w-full h-[2px]" :class="{
-            'bg-gradient-to-r from-transparent via-blue-400 to-transparent': gameOverType === 'gaming',
-            'bg-gradient-to-r from-transparent via-green-400 to-transparent': gameOverType === 'study',
-            'bg-gradient-to-r from-transparent via-purple-400 to-transparent': gameOverType === 'social',
-            'bg-gradient-to-r from-transparent via-amber-400 to-transparent': gameOverType === 'other'
+      <!-- 游戏结束弹窗 - 超级炫酷版 -->
+      <div v-if="showGameOver" class="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50">
+        <div class="relative max-w-lg w-full mx-4">
+          <!-- 背景光效 -->
+          <div class="absolute -inset-4 rounded-3xl" :class="{
+            'bg-gradient-to-br from-blue-600/20 to-indigo-600/20': gameOverType === 'gaming',
+            'bg-gradient-to-br from-green-600/20 to-emerald-600/20': gameOverType === 'study',
+            'bg-gradient-to-br from-purple-600/20 to-indigo-600/20': gameOverType === 'social',
+            'bg-gradient-to-br from-amber-600/20 to-orange-600/20': gameOverType === 'other'
           }"></div>
 
-          <!-- 动态装饰元素 -->
-          <div class="absolute -top-24 -right-24 w-48 h-48 rounded-full blur-3xl animate-pulse-slow" :class="{
-            'bg-blue-500/10': gameOverType === 'gaming',
-            'bg-green-500/10': gameOverType === 'study',
-            'bg-purple-500/10': gameOverType === 'social',
-            'bg-amber-500/10': gameOverType === 'other'
-          }"></div>
-          <div class="absolute -bottom-24 -left-24 w-48 h-48 rounded-full blur-3xl animate-pulse-slow" :class="{
-            'bg-blue-600/10': gameOverType === 'gaming',
-            'bg-emerald-500/10': gameOverType === 'study',
-            'bg-indigo-600/10': gameOverType === 'social',
-            'bg-orange-600/10': gameOverType === 'other'
-          }"></div>
+          <div class="relative overflow-hidden bg-white/90 backdrop-blur-lg rounded-xl sm:rounded-2xl p-8 sm:p-10 shadow-xl border border-white/50">
+            <!-- 上部装饰线 -->
+            <div class="absolute top-0 left-0 w-full h-[2px]" :class="{
+              'bg-gradient-to-r from-transparent via-blue-400 to-transparent': gameOverType === 'gaming',
+              'bg-gradient-to-r from-transparent via-green-400 to-transparent': gameOverType === 'study',
+              'bg-gradient-to-r from-transparent via-purple-400 to-transparent': gameOverType === 'social',
+              'bg-gradient-to-r from-transparent via-amber-400 to-transparent': gameOverType === 'other'
+            }"></div>
 
-          <!-- 标题 -->
-          <div class="w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center" :class="{
-            'bg-gradient-to-br from-blue-500 to-indigo-600': gameOverType === 'gaming',
-            'bg-gradient-to-br from-green-500 to-emerald-600': gameOverType === 'study',
-            'bg-gradient-to-br from-purple-500 to-indigo-600': gameOverType === 'social',
-            'bg-gradient-to-br from-amber-500 to-orange-600': gameOverType === 'other'
-          }">
-            <span class="text-white text-2xl">
-              <template v-if="gameOverType === 'gaming'">🎮</template>
-              <template v-else-if="gameOverType === 'study'">🎓</template>
-              <template v-else-if="gameOverType === 'social'">👥</template>
-              <template v-else>✨</template>
-            </span>
-          </div>
+            <!-- 动态装饰元素 -->
+            <div class="absolute -top-24 -right-24 w-48 h-48 rounded-full blur-3xl animate-pulse-slow" :class="{
+              'bg-blue-500/10': gameOverType === 'gaming',
+              'bg-green-500/10': gameOverType === 'study',
+              'bg-purple-500/10': gameOverType === 'social',
+              'bg-amber-500/10': gameOverType === 'other'
+            }"></div>
+            <div class="absolute -bottom-24 -left-24 w-48 h-48 rounded-full blur-3xl animate-pulse-slow" :class="{
+              'bg-blue-600/10': gameOverType === 'gaming',
+              'bg-emerald-500/10': gameOverType === 'study',
+              'bg-indigo-600/10': gameOverType === 'social',
+              'bg-orange-600/10': gameOverType === 'other'
+            }"></div>
 
-          <h2 class="text-2xl sm:text-3xl font-bold text-center mb-2 bg-clip-text text-transparent" :class="{
-            'bg-gradient-to-r from-blue-600 to-indigo-600': gameOverType === 'gaming',
-            'bg-gradient-to-r from-green-600 to-emerald-600': gameOverType === 'study',
-            'bg-gradient-to-r from-purple-600 to-indigo-600': gameOverType === 'social',
-            'bg-gradient-to-r from-amber-600 to-orange-600': gameOverType === 'other'
-          }">
-            {{ gameOverTitle }}
-          </h2>
+            <!-- 标题 -->
+            <div class="w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center" :class="{
+              'bg-gradient-to-br from-blue-500 to-indigo-600': gameOverType === 'gaming',
+              'bg-gradient-to-br from-green-500 to-emerald-600': gameOverType === 'study',
+              'bg-gradient-to-br from-purple-500 to-indigo-600': gameOverType === 'social',
+              'bg-gradient-to-br from-amber-500 to-orange-600': gameOverType === 'other'
+            }">
+              <span class="text-white text-2xl">
+                <template v-if="gameOverType === 'gaming'">🎮</template>
+                <template v-else-if="gameOverType === 'study'">🎓</template>
+                <template v-else-if="gameOverType === 'social'">👥</template>
+                <template v-else>✨</template>
+              </span>
+            </div>
 
-          <div class="w-1/3 h-[1px] mx-auto mb-6" :class="{
-            'bg-gradient-to-r from-transparent via-blue-300 to-transparent': gameOverType === 'gaming',
-            'bg-gradient-to-r from-transparent via-green-300 to-transparent': gameOverType === 'study',
-            'bg-gradient-to-r from-transparent via-purple-300 to-transparent': gameOverType === 'social',
-            'bg-gradient-to-r from-transparent via-amber-300 to-transparent': gameOverType === 'other'
-          }"></div>
+            <h2 class="text-2xl sm:text-3xl font-bold text-center mb-2 bg-clip-text text-transparent" :class="{
+              'bg-gradient-to-r from-blue-600 to-indigo-600': gameOverType === 'gaming',
+              'bg-gradient-to-r from-green-600 to-emerald-600': gameOverType === 'study',
+              'bg-gradient-to-r from-purple-600 to-indigo-600': gameOverType === 'social',
+              'bg-gradient-to-r from-amber-600 to-orange-600': gameOverType === 'other'
+            }">
+              {{ gameOverTitle }}
+            </h2>
 
-          <!-- 内容 -->
-          <div class="bg-white/60 rounded-lg p-4 mb-6 border" :class="{
-            'border-blue-100': gameOverType === 'gaming',
-            'border-green-100': gameOverType === 'study',
-            'border-purple-100': gameOverType === 'social',
-            'border-amber-100': gameOverType === 'other'
-          }">
-            <p class="text-slate-700 text-center">{{ gameOverMessage }}</p>
-          </div>
+            <div class="w-1/3 h-[1px] mx-auto mb-6" :class="{
+              'bg-gradient-to-r from-transparent via-blue-300 to-transparent': gameOverType === 'gaming',
+              'bg-gradient-to-r from-transparent via-green-300 to-transparent': gameOverType === 'study',
+              'bg-gradient-to-r from-transparent via-purple-300 to-transparent': gameOverType === 'social',
+              'bg-gradient-to-r from-transparent via-amber-300 to-transparent': gameOverType === 'other'
+            }"></div>
 
-          <!-- 按钮 -->
-          <button
-            @click="closeGameOverAndReset"
-            class="w-full py-3 rounded-xl font-medium text-white transition transform hover:-translate-y-1 hover:shadow-lg"
-            :class="{
+            <!-- 内容 -->
+            <div class="bg-white/60 rounded-lg p-4 mb-6 border" :class="{
+              'border-blue-100': gameOverType === 'gaming',
+              'border-green-100': gameOverType === 'study',
+              'border-purple-100': gameOverType === 'social',
+              'border-amber-100': gameOverType === 'other'
+            }">
+              <p class="text-slate-700 text-center">{{ gameOverMessage }}</p>
+            </div>
+
+            <!-- 按钮 -->
+            <button @click="closeGameOverAndReset" class="w-full py-3 rounded-xl font-medium text-white transition transform hover:-translate-y-1 hover:shadow-lg" :class="{
               'bg-gradient-to-r from-blue-500 to-indigo-600 hover:shadow-blue-200/50': gameOverType === 'gaming',
               'bg-gradient-to-r from-green-500 to-emerald-600 hover:shadow-green-200/50': gameOverType === 'study',
               'bg-gradient-to-r from-purple-500 to-indigo-600 hover:shadow-purple-200/50': gameOverType === 'social',
               'bg-gradient-to-r from-amber-500 to-orange-600 hover:shadow-amber-200/50': gameOverType === 'other'
             }">
-            <span class="flex items-center justify-center gap-2">
-              <span>继续冒险</span>
-              <template v-if="gameOverType === 'gaming'">🎮</template>
-              <template v-else-if="gameOverType === 'study'">📚</template>
-              <template v-else-if="gameOverType === 'social'">🌟</template>
-              <template v-else>✨</template>
-            </span>
-          </button>
+              <span class="flex items-center justify-center gap-2">
+                <span>继续冒险</span>
+                <template v-if="gameOverType === 'gaming'">🎮</template>
+                <template v-else-if="gameOverType === 'study'">📚</template>
+                <template v-else-if="gameOverType === 'social'">🌟</template>
+                <template v-else>✨</template>
+              </span>
+            </button>
+          </div>
         </div>
       </div>
+
     </div>
+        <!-- 游戏主界面 -->
+    <div v-else class="min-h-screen">
+      <!-- 背景装饰 -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+          <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl"></div>
+          <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+        </div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-6">
+          <!-- 游戏手册浮动按钮 -->
+          <div class="fixed bottom-4 right-4 z-40">
+            <button @click="showGameGuide = !showGameGuide" class="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-blue-500 flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              <span class="text-white text-xl">📖</span>
+            </button>
+          </div>
+
+          <!-- 游戏手册浮动面板 -->
+          <div v-if="showGameGuide" class="fixed right-4 bottom-20 w-72 sm:w-80 bg-white rounded-xl border border-indigo-100 shadow-xl z-40 overflow-hidden">
+            <div class="bg-gradient-to-r from-indigo-500 to-blue-500 px-4 py-3 flex justify-between items-center">
+              <h3 class="text-white font-medium">游戏手册</h3>
+              <button @click="showGameGuide = false" class="text-white hover:text-indigo-100">×</button>
+            </div>
+            <div class="p-4 max-h-96 overflow-y-auto">
+              <div class="space-y-4">
+                <!-- 当前状态 -->
+                <div>
+                  <h4 class="font-bold text-slate-700 mb-2 flex items-center gap-2">
+                    <span class="text-indigo-500">🎮</span>
+                    <span>当前状态</span>
+                  </h4>
+                  <div class="bg-slate-50 rounded-lg p-3 text-sm border border-slate-100">
+                    <div><span class="font-medium">玩家:</span> {{ playerName }}</div>
+                    <div><span class="font-medium">场景:</span> {{ currentScene?.id || '初始' }}</div>
+                    <div><span class="font-medium">模型:</span> {{ modelName }}</div>
+                  </div>
+                </div>
+
+                <!-- 能力值 -->
+                <div>
+                  <h4 class="font-bold text-white mb-6 flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-sm">📊</span>
+                    <span>能力值</span>
+                  </h4>
+                  <div class="space-y-4">
+                    <!-- 游戏技能 -->
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 hover:bg-white/15 transition-all duration-300">
+                      <div class="flex justify-between items-center mb-3">
+                        <div class="flex items-center gap-3">
+                          <span class="text-2xl">🎮</span>
+                          <span class="text-blue-300 font-medium">游戏技能</span>
+                        </div>
+                        <span class="text-blue-200 font-bold text-lg">{{ Math.round(gameProgress.gaming) }}%</span>
+                      </div>
+                      <div class="w-full h-3 bg-white/10 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all duration-700 shadow-lg shadow-blue-500/25" :style="`width: ${gameProgress.gaming}%`"></div>
+                      </div>
+                    </div>
+
+                    <!-- 学习能力 -->
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 hover:bg-white/15 transition-all duration-300">
+                      <div class="flex justify-between items-center mb-3">
+                        <div class="flex items-center gap-3">
+                          <span class="text-2xl">📚</span>
+                          <span class="text-green-300 font-medium">学习能力</span>
+                        </div>
+                        <span class="text-green-200 font-bold text-lg">{{ Math.round(gameProgress.study) }}%</span>
+                      </div>
+                      <div class="w-full h-3 bg-white/10 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full transition-all duration-700 shadow-lg shadow-green-500/25" :style="`width: ${gameProgress.study}%`"></div>
+                      </div>
+                    </div>
+
+                    <!-- 社交关系 -->
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 hover:bg-white/15 transition-all duration-300">
+                      <div class="flex justify-between items-center mb-3">
+                        <div class="flex items-center gap-3">
+                          <span class="text-2xl">👥</span>
+                          <span class="text-purple-300 font-medium">社交关系</span>
+                        </div>
+                        <span class="text-purple-200 font-bold text-lg">{{ Math.round(gameProgress.social) }}%</span>
+                      </div>
+                      <div class="w-full h-3 bg-white/10 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-purple-400 to-purple-600 rounded-full transition-all duration-700 shadow-lg shadow-purple-500/25" :style="`width: ${gameProgress.social}%`"></div>
+                      </div>
+                    </div>
+
+                    <!-- 神秘能力 -->
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 hover:bg-white/15 transition-all duration-300">
+                      <div class="flex justify-between items-center mb-3">
+                        <div class="flex items-center gap-3">
+                          <span class="text-2xl">✨</span>
+                          <span class="text-amber-300 font-medium">神秘能力</span>
+                        </div>
+                        <span class="text-amber-200 font-bold text-lg">{{ Math.round(gameProgress.other) }}%</span>
+                      </div>
+                      <div class="w-full h-3 bg-white/10 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-amber-400 to-amber-600 rounded-full transition-all duration-700 shadow-lg shadow-amber-500/25" :style="`width: ${gameProgress.other}%`"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 上次选择分析 -->
+                <div v-if="lastChoiceAnalysis.text">
+                  <h4 class="font-bold text-slate-700 mb-2 flex items-center gap-2">
+                    <span class="text-indigo-500">🔍</span>
+                    <span>上次选择分析</span>
+                  </h4>
+                  <div class="bg-slate-50 rounded-lg p-3 text-sm border border-slate-100">
+                    <div class="mb-1 font-medium">选择: "{{ lastChoiceAnalysis.text }}"</div>
+                    <div class="text-xs text-slate-500 space-y-1">
+                      <div v-if="lastChoiceAnalysis.matchedKeywords.gaming?.length">
+                        <span class="text-blue-600 font-medium">游戏关键词:</span> {{ lastChoiceAnalysis.matchedKeywords.gaming.join(', ') }}
+                      </div>
+                      <div v-if="lastChoiceAnalysis.matchedKeywords.study?.length">
+                        <span class="text-green-600 font-medium">学习关键词:</span> {{ lastChoiceAnalysis.matchedKeywords.study.join(', ') }}
+                      </div>
+                      <div v-if="lastChoiceAnalysis.matchedKeywords.social?.length">
+                        <span class="text-purple-600 font-medium">社交关键词:</span> {{ lastChoiceAnalysis.matchedKeywords.social.join(', ') }}
+                      </div>
+                      <div v-if="lastChoiceAnalysis.matchedKeywords.other?.length">
+                        <span class="text-amber-600 font-medium">神秘关键词:</span> {{ lastChoiceAnalysis.matchedKeywords.other.join(', ') }}
+                      </div>
+                      <div v-if="!Object.values(lastChoiceAnalysis.matchedKeywords).some(arr => arr?.length)">
+                        无匹配关键词，增加了神秘能力
+                      </div>
+                      <div class="mt-2 font-medium">
+                        增加了: <span :class="{
+                          'text-blue-600': lastChoiceAnalysis.impactType === 'gaming',
+                          'text-green-600': lastChoiceAnalysis.impactType === 'study',
+                          'text-purple-600': lastChoiceAnalysis.impactType === 'social',
+                          'text-amber-600': lastChoiceAnalysis.impactType === 'other'
+                        }">{{ lastChoiceImpactText }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 调试开关 -->
+                <div>
+                  <div class="inline-flex items-center">
+                    <label class="relative flex items-center cursor-pointer">
+                      <input type="checkbox" v-model="showDebugInfo" class="sr-only peer">
+                      <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-500"></div>
+                      <span class="ml-2 text-xs font-medium text-slate-600">显示调试信息</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- 调试信息 -->
+                <div v-if="showDebugInfo" class="bg-slate-800 text-slate-200 p-3 rounded-lg text-xs font-mono overflow-x-auto">
+                  <pre>{{ JSON.stringify(debugInfo, null, 2) }}</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-xl sm:rounded-3xl overflow-hidden bg-white border border-slate-100 shadow-lg shadow-indigo-100/50">
+            <!-- 状态栏 -->
+            <div class="bg-slate-50 border-b border-slate-100 p-4 sm:p-6">
+              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3 sm:gap-4">
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-500 p-[1px]">
+                    <div class="w-full h-full rounded-[10px] bg-white flex items-center justify-center">
+                      <span class="text-xl sm:text-2xl">⚔️</span>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="text-base sm:text-lg font-bold text-slate-800">{{ playerName }}</div>
+                    <div class="text-xs sm:text-sm text-slate-500">见习剑客</div>
+                  </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2 sm:gap-4 w-full sm:w-auto">
+                  <div class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-200 text-slate-700 text-sm">
+                    第 {{ currentScene?.id || '?' }} 章
+                  </div>
+                  <button @click="toggleModelIndicator" class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border transition-colors duration-200 text-sm" :class="[modelName === 'deepseek-r1' ? 'bg-purple-50 text-purple-700 border-purple-200' : 'bg-blue-50 text-blue-700 border-blue-200']">
+                    {{ modelName }}
+                  </button>
+                  <button @click="resetGame" class="group px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100 transition-all duration-300 text-sm">
+                    <span class="flex items-center gap-2">
+                      <span class="text-base sm:text-lg group-hover:rotate-180 transition-transform duration-500">🔄</span>
+                      <span class="hidden sm:inline">重新开始</span>
+                    </span>
+                  </button>
+                  <button @click="backToHomepage" class="group px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-600 hover:bg-indigo-100 transition-all duration-300 text-sm">
+                    <span class="flex items-center gap-2">
+                      <span class="text-base sm:text-lg">🏠</span>
+                      <span class="hidden sm:inline">返回首页</span>
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 场景内容 -->
+            <div class="p-4 sm:p-8 space-y-4 sm:space-y-6 bg-white">
+              <!-- 对话与思维过程选项卡 -->
+              <div class="mb-4 sm:mb-6 border border-slate-100 rounded-2xl overflow-hidden bg-white">
+                <!-- 选项卡导航 -->
+                <div class="flex border-b border-slate-100">
+                  <button @click="switchTab('dialog')" class="flex-1 py-2 sm:py-3 text-xs sm:text-sm font-medium transition-colors duration-200 relative" :class="activeTab === 'dialog'
+                    ? 'text-indigo-600 bg-indigo-50/50'
+                    : 'text-slate-600 hover:text-slate-800 hover:bg-slate-50'">
+                    <span class="flex items-center justify-center gap-1 sm:gap-2">
+                      <span class="text-base sm:text-lg">💭</span>
+                      <span>对话内容</span>
+                    </span>
+                    <span v-if="activeTab === 'dialog'" class="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-500"></span>
+                  </button>
+
+                  <button v-if="modelName !== 'deepseek-chat'" @click="switchTab('reasoning')" class="flex-1 py-2 sm:py-3 text-xs sm:text-sm font-medium transition-colors duration-200 relative" :class="activeTab === 'reasoning'
+                    ? 'text-purple-600 bg-purple-50/50'
+                    : 'text-slate-600 hover:text-slate-800 hover:bg-slate-50'">
+                    <span class="flex items-center justify-center gap-1 sm:gap-2">
+                      <span class="text-base sm:text-lg">🤔</span>
+                      <span>思维过程</span>
+                      <span v-if="isThinking && !reasoningContent" class="inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full bg-purple-100 text-purple-700 text-xs font-medium">
+                        思考中
+                        <span class="ml-1 flex space-x-1">
+                          <span class="w-1 h-1 bg-purple-700 rounded-full animate-bounce" style="animation-delay: 0s"></span>
+                          <span class="w-1 h-1 bg-purple-700 rounded-full animate-bounce" style="animation-delay: 0.1s"></span>
+                          <span class="w-1 h-1 bg-purple-700 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
+                        </span>
+                      </span>
+                    </span>
+                    <span v-if="activeTab === 'reasoning'" class="absolute bottom-0 left-0 w-full h-0.5 bg-purple-500"></span>
+                  </button>
+
+                  <button v-if="apiError.show" @click="switchTab('error')" class="flex-1 py-2 sm:py-3 text-xs sm:text-sm font-medium transition-colors duration-200 relative" :class="activeTab === 'error'
+                    ? 'text-red-600 bg-red-50/50'
+                    : 'text-slate-600 hover:text-slate-800 hover:bg-slate-50'">
+                    <span class="flex items-center justify-center gap-1 sm:gap-2">
+                      <span class="text-base sm:text-lg">⚠️</span>
+                      <span>错误信息</span>
+                    </span>
+                    <span v-if="activeTab === 'error'" class="absolute bottom-0 left-0 w-full h-0.5 bg-red-500"></span>
+                  </button>
+                </div>
+
+                <!-- 选项卡内容 -->
+                <div class="p-4 sm:p-6">
+                  <!-- 对话内容选项卡 -->
+                  <div v-if="activeTab === 'dialog'" class="animate-fadeIn">
+                    <div class="flex gap-3 sm:gap-4">
+                      <div class="text-xl sm:text-2xl shrink-0">💭</div>
+                      <div v-if="isGenerating && !currentDialogStream" class="text-slate-600 italic">
+                        <div class="flex items-center text-slate-500 text-sm sm:text-base">
+                          <span>AI正在生成对话</span>
+                          <span class="ml-2 flex space-x-1">
+                            <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0s"></span>
+                            <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></span>
+                            <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
+                          </span>
+                        </div>
+                      </div>
+                      <div v-if="currentDialogStream" class="text-slate-600 italic text-sm sm:text-base">
+                        {{ currentDialogStream }}
+                      </div>
+                      <div v-else-if="currentScene?.dialog" class="text-slate-600 italic text-sm sm:text-base">
+                        {{ currentScene.dialog }}
+                      </div>
+                      <div v-else-if="aiErrorMessage && aiErrorMessage.includes('修复')" class="text-amber-600 text-sm sm:text-base italic">
+                        <div class="flex items-center gap-2">
+                          <span class="text-lg">🔧</span>
+                          <span>正在修复对话内容...</span>
+                        </div>
+                      </div>
+                      <div v-else-if="aiErrorMessage" class="text-red-600 text-sm sm:text-base">
+                        <div class="flex items-center gap-2">
+                          <span class="text-lg">⚠️</span>
+                          <span>{{ aiErrorMessage }}</span>
+                        </div>
+                      </div>
+                      <div v-else class="text-slate-500 text-sm sm:text-base italic">
+                        <div class="flex items-center gap-2">
+                          <span class="text-lg">💭</span>
+                          <span>等待对话内容...</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 思维过程选项卡 -->
+                  <div v-else-if="activeTab === 'reasoning'" class="animate-fadeIn">
+                    <div class="flex gap-3 sm:gap-4">
+                      <div class="text-xl sm:text-2xl shrink-0">🤔</div>
+                      <div v-if="isGenerating && !reasoningContent" class="text-slate-600 italic">
+                        <div class="flex items-center text-slate-500 text-sm sm:text-base">
+                          <span>AI正在生成思维过程</span>
+                          <span class="ml-2 flex space-x-1">
+                            <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0s"></span>
+                            <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></span>
+                            <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
+                          </span>
+                        </div>
+                      </div>
+                      <p class="text-slate-700 leading-relaxed text-sm sm:text-base">{{ reasoningContent || (currentScene ? currentScene.reasoning : '') }}</p>
+                    </div>
+                  </div>
+
+                  <!-- 错误信息选项卡 -->
+                  <div v-else-if="activeTab === 'error'" class="animate-fadeIn">
+                    <div class="bg-red-50 rounded-lg p-3 sm:p-4 border border-red-100">
+                      <div class="flex items-start gap-2 sm:gap-3">
+                        <div class="text-xl sm:text-2xl text-red-500 shrink-0">⚠️</div>
+                        <div>
+                          <h3 class="font-bold text-red-700 flex items-center gap-2 text-sm sm:text-base">
+                            <span>错误 {{ apiError.code }}</span>
+                            <span v-if="apiError.details">- {{ apiError.details.title }}</span>
+                          </h3>
+
+                          <p class="text-red-600 mt-1 mb-2 text-xs sm:text-sm">{{ apiError.message }}</p>
+
+                          <div v-if="apiError.details" class="text-xs sm:text-sm space-y-2 text-slate-700">
+                            <p>
+                              <span class="font-medium">原因：</span>
+                              <span>{{ apiError.details.reason }}</span>
+                            </p>
+                            <p>
+                              <span class="font-medium">解决方法：</span>
+                              <span>{{ apiError.details.solution }}</span>
+                            </p>
+                          </div>
+
+                          <div class="mt-3 sm:mt-4">
+                            <button @click="clearApiError" class="px-3 py-1 text-xs rounded bg-red-100 text-red-700 hover:bg-red-200 transition-colors">
+                              关闭错误提示
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 场景描述 - 高级炫酷版 -->
+              <div class="relative overflow-hidden bg-gradient-to-br from-slate-50 via-indigo-50/30 to-blue-50/30 rounded-xl sm:rounded-2xl p-5 sm:p-7 border border-indigo-100/50 mb-4 sm:mb-6 shadow-lg shadow-indigo-100/20 backdrop-blur-sm group">
+                <!-- 装饰元素 -->
+                <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-indigo-300 to-transparent opacity-70"></div>
+                <div class="absolute bottom-0 right-0 w-full h-[2px] bg-gradient-to-r from-blue-300 via-transparent to-transparent opacity-70"></div>
+                <div class="absolute -top-20 -right-20 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl group-hover:bg-blue-500/10 transition-all duration-700"></div>
+                <div class="absolute -bottom-32 -left-20 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/10 transition-all duration-700"></div>
+
+                <div class="relative flex items-start">
+                  <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md shadow-indigo-200/30 mr-4 sm:mr-5">
+                    <span class="text-white text-xl">📜</span>
+                  </div>
+
+                  <div class="flex-1">
+                    <h3 class="font-bold text-indigo-700 text-lg sm:text-xl mb-3 bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-blue-700">当前场景</h3>
+                    <div v-if="currentScene?.description" class="text-slate-700 text-sm sm:text-base leading-relaxed font-medium">
+                      {{ currentScene.description }}
+                    </div>
+                    <div v-else-if="isGenerating" class="text-slate-500 text-sm sm:text-base italic">
+                      <div class="flex items-center gap-2">
+                        <span>AI正在生成场景描述</span>
+                        <span class="flex space-x-1">
+                          <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0s"></span>
+                          <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></span>
+                          <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
+                        </span>
+                      </div>
+                    </div>
+                    <div v-else-if="aiErrorMessage && aiErrorMessage.includes('修复')" class="text-amber-600 text-sm sm:text-base">
+                      <div class="flex items-center gap-2">
+                        <span class="text-lg">🔧</span>
+                        <span>{{ aiErrorMessage }}</span>
+                      </div>
+                    </div>
+                    <div v-else-if="aiErrorMessage" class="text-red-600 text-sm sm:text-base">
+                      <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                          <span class="text-lg">⚠️</span>
+                          <span>{{ aiErrorMessage }}</span>
+                        </div>
+                        <button @click="retryCurrentScene" class="px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-xs">
+                          重试
+                        </button>
+                      </div>
+                    </div>
+                    <div v-else class="text-slate-600 text-sm sm:text-base">
+                      <div class="flex items-center gap-2">
+                        <span class="text-lg">📝</span>
+                        <span>等待场景内容...</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 对话内容 - 高级炫酷版 -->
+              <div class="relative overflow-hidden bg-gradient-to-br from-indigo-50 via-purple-50/20 to-blue-50/20 rounded-xl sm:rounded-2xl p-5 sm:p-7 border border-indigo-200/50 mb-4 sm:mb-6 shadow-lg shadow-indigo-200/20 backdrop-blur-sm group">
+                <!-- 装饰元素 -->
+                <div class="absolute top-0 right-0 w-full h-[2px] bg-gradient-to-r from-indigo-300 via-purple-300/70 to-transparent opacity-70"></div>
+                <div class="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-300/70 to-indigo-300 opacity-70"></div>
+                <div class="absolute -top-24 -left-20 w-72 h-72 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/10 transition-all duration-700"></div>
+                <div class="absolute -bottom-32 -right-20 w-80 h-80 bg-purple-500/5 rounded-full blur-3xl group-hover:bg-purple-500/10 transition-all duration-700"></div>
+
+                <div class="absolute top-4 right-4 text-4xl opacity-5 group-hover:opacity-10 transition-opacity duration-700 transform rotate-12">💬</div>
+
+                <div class="relative flex items-start">
+                  <div class="flex-shrink-0 mr-4 sm:mr-5">
+                    <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center shadow-md shadow-indigo-200/30 p-0.5">
+                      <div class="w-full h-full rounded-full bg-white/90 flex items-center justify-center">
+                        <span class="text-indigo-600 text-xl">💭</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="flex-1">
+                    <h3 class="font-bold text-purple-700 text-lg sm:text-xl mb-3 bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">对话内容</h3>
+                    <div class="bg-white/40 backdrop-blur-sm rounded-lg p-4 border border-indigo-100/50 shadow-sm">
+                      <div v-if="currentScene?.dialog" class="text-slate-700 text-sm sm:text-base leading-relaxed whitespace-pre-line">
+                        {{ currentScene.dialog }}
+                      </div>
+                      <div v-else-if="currentDialogStream" class="text-slate-700 text-sm sm:text-base leading-relaxed whitespace-pre-line">
+                        {{ currentDialogStream }}
+                      </div>
+                      <div v-else-if="isGenerating" class="text-slate-500 text-sm sm:text-base italic">
+                        <div class="flex items-center gap-2">
+                          <span>AI正在生成对话内容</span>
+                          <span class="flex space-x-1">
+                            <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0s"></span>
+                            <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></span>
+                            <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
+                          </span>
+                        </div>
+                      </div>
+                      <div v-else-if="aiErrorMessage && aiErrorMessage.includes('修复')" class="text-amber-600 text-sm sm:text-base italic">
+                        <div class="flex items-center gap-2">
+                          <span class="text-lg">🔧</span>
+                          <span>正在修复内容格式...</span>
+                        </div>
+                      </div>
+                      <div v-else-if="aiErrorMessage" class="text-red-600 text-sm sm:text-base">
+                        <div class="flex items-center gap-2">
+                          <span class="text-lg">⚠️</span>
+                          <span>{{ aiErrorMessage }}</span>
+                        </div>
+                      </div>
+                      <div v-else class="text-slate-600 text-sm sm:text-base italic">
+                        <div class="flex items-center gap-2">
+                          <span class="text-lg">💭</span>
+                          <span>等待对话内容...</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 特殊事件 -->
+              <div v-if="currentScene?.specialEvent" class="relative overflow-hidden bg-slate-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-indigo-100 mb-4 sm:mb-6">
+                <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-indigo-200 to-blue-200"></div>
+                <div class="flex gap-3 sm:gap-4">
+                  <div class="text-xl sm:text-2xl">⚡</div>
+                  <div>
+                    <h3 class="font-bold text-slate-800 mb-2 text-sm sm:text-base">特殊事件</h3>
+                    <p class="text-slate-600 text-sm sm:text-base">{{ currentScene?.specialEvent }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 游戏进度指标 -->
+              <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
+                <div class="bg-white rounded-xl border border-slate-100 p-3 sm:p-4 relative overflow-hidden group">
+                  <div class="text-xs sm:text-sm text-slate-500 mb-1 flex justify-between items-center">
+                    <span>游戏技能</span>
+                    <span class="font-medium" :class="{ 'text-blue-600': gameProgress.gaming >= 100 }">{{ gameProgress.gaming }}%</span>
+                  </div>
+                  <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                    <div class="h-2 rounded-full transition-all duration-700 ease-out" :class="[
+                      gameProgress.gaming >= 100
+                        ? 'bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-500 animate-pulse'
+                        : 'bg-blue-500'
+                    ]" :style="`width: ${gameProgress.gaming}%`"></div>
+                  </div>
+                  <!-- 满值时的特效 -->
+                  <div v-if="gameProgress.gaming >= 100" class="absolute inset-0 pointer-events-none">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-blue-400 to-indigo-500 opacity-20 blur-xl"></div>
+                    <div class="absolute top-1 right-2 text-xs font-bold text-blue-600 animate-bounce">满级!</div>
+                  </div>
+                </div>
+                <div class="bg-white rounded-xl border border-slate-100 p-3 sm:p-4 relative overflow-hidden group">
+                  <div class="text-xs sm:text-sm text-slate-500 mb-1 flex justify-between items-center">
+                    <span>学习能力</span>
+                    <span class="font-medium" :class="{ 'text-green-600': gameProgress.study >= 100 }">{{ gameProgress.study }}%</span>
+                  </div>
+                  <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                    <div class="h-2 rounded-full transition-all duration-700 ease-out" :class="[
+                      gameProgress.study >= 100
+                        ? 'bg-gradient-to-r from-green-400 via-green-500 to-emerald-500 animate-pulse'
+                        : 'bg-green-500'
+                    ]" :style="`width: ${gameProgress.study}%`"></div>
+                  </div>
+                  <!-- 满值时的特效 -->
+                  <div v-if="gameProgress.study >= 100" class="absolute inset-0 pointer-events-none">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-green-400 to-emerald-500 opacity-20 blur-xl"></div>
+                    <div class="absolute top-1 right-2 text-xs font-bold text-green-600 animate-bounce">满级!</div>
+                  </div>
+                </div>
+                <div class="bg-white rounded-xl border border-slate-100 p-3 sm:p-4 relative overflow-hidden group">
+                  <div class="text-xs sm:text-sm text-slate-500 mb-1 flex justify-between items-center">
+                    <span>社交关系</span>
+                    <span class="font-medium" :class="{ 'text-purple-600': gameProgress.social >= 100 }">{{ gameProgress.social }}%</span>
+                  </div>
+                  <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                    <div class="h-2 rounded-full transition-all duration-700 ease-out" :class="[
+                      gameProgress.social >= 100
+                        ? 'bg-gradient-to-r from-purple-400 via-purple-500 to-indigo-500 animate-pulse'
+                        : 'bg-purple-500'
+                    ]" :style="`width: ${gameProgress.social}%`"></div>
+                  </div>
+                  <!-- 满值时的特效 -->
+                  <div v-if="gameProgress.social >= 100" class="absolute inset-0 pointer-events-none">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-purple-400 to-indigo-500 opacity-20 blur-xl"></div>
+                    <div class="absolute top-1 right-2 text-xs font-bold text-purple-600 animate-bounce">满级!</div>
+                  </div>
+                </div>
+                <div class="bg-white rounded-xl border border-slate-100 p-3 sm:p-4 relative overflow-hidden group">
+                  <div class="text-xs sm:text-sm text-slate-500 mb-1 flex justify-between items-center">
+                    <span>神秘能力</span>
+                    <span class="font-medium" :class="{ 'text-amber-600': gameProgress.other >= 100 }">{{ gameProgress.other }}%</span>
+                  </div>
+                  <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                    <div class="h-2 rounded-full transition-all duration-700 ease-out" :class="[
+                      gameProgress.other >= 100
+                        ? 'bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 animate-pulse'
+                        : 'bg-amber-500'
+                    ]" :style="`width: ${gameProgress.other}%`"></div>
+                  </div>
+                  <!-- 满值时的特效 -->
+                  <div v-if="gameProgress.other >= 100" class="absolute inset-0 pointer-events-none">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-amber-400 to-orange-500 opacity-20 blur-xl"></div>
+                    <div class="absolute top-1 right-2 text-xs font-bold text-amber-600 animate-bounce">满级!</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 选项列表 -->
+              <div class="space-y-3 sm:space-y-4" :class="{ 'opacity-50 pointer-events-none': isGenerating }">
+                <!-- 当有选项时显示选项 -->
+                <div v-for="option in currentScene?.options || []" :key="option.text" class="group cursor-pointer relative overflow-hidden touch-manipulation" @click="!isGenerating && handleChoice(option)">
+                  <div class="absolute inset-0 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl sm:rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div class="relative bg-slate-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-slate-100 transform group-hover:-translate-y-1 transition-all duration-300 group-hover:shadow-md group-hover:shadow-indigo-100/50">
+                    <div class="text-slate-700 font-medium mb-1 sm:mb-2 text-sm sm:text-base">{{ option.text }}</div>
+                    <div v-if="option.hint" class="text-slate-500 text-xs sm:text-sm italic">{{ option.hint }}</div>
+                    <!-- 选项禁用状态提示 -->
+                    <div v-if="isGenerating" class="absolute top-2 right-2 flex items-center justify-center">
+                      <div class="w-4 h-4 rounded-full bg-slate-200 flex items-center justify-center">
+                        <div class="w-2 h-2 rounded-full bg-slate-400 animate-pulse"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 当没有选项时的提示 -->
+                <div v-if="!isGenerating && (!currentScene?.options || currentScene.options.length === 0)" class="text-center py-8">
+                  <div class="bg-red-50 border border-red-200 rounded-xl p-6">
+                    <div class="text-red-600 text-lg mb-2">⚠️</div>
+                    <div class="text-red-700 font-medium mb-2">场景选项加载失败</div>
+                    <div class="text-red-600 text-sm mb-4">可能是API响应格式错误或网络问题</div>
+                    <button @click="retryCurrentScene" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                      重新生成场景
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 模型信息弹窗 -->
+        <div v-if="showModelInfo" class="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50" @click="showModelInfo = false">
+          <div class="relative bg-white rounded-xl sm:rounded-2xl p-6 sm:p-8 max-w-xs sm:max-w-md w-full mx-4 shadow-xl" @click.stop>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-800 mb-4">AI模型信息</h2>
+            <div class="space-y-4">
+              <div>
+                <h3 class="text-xs sm:text-sm font-medium text-slate-500">当前模型</h3>
+                <p class="text-base sm:text-lg font-medium text-slate-800">{{ modelName }}</p>
+              </div>
+
+              <div>
+                <h3 class="text-xs sm:text-sm font-medium text-slate-500">模型特点</h3>
+                <ul class="mt-2 space-y-2">
+                  <li v-if="modelName === 'deepseek-r1'" class="flex items-start gap-2">
+                    <span class="text-purple-500 mt-0.5">✓</span>
+                    <span class="text-slate-700 text-xs sm:text-sm">支持思维链展示，可观察AI思考过程</span>
+                  </li>
+                  <li v-if="modelName === 'deepseek-r1'" class="flex items-start gap-2">
+                    <span class="text-purple-500 mt-0.5">✓</span>
+                    <span class="text-slate-700 text-xs sm:text-sm">更强的推理和剧情架构能力</span>
+                  </li>
+                  <li v-if="modelName === 'deepseek-chat'" class="flex items-start gap-2">
+                    <span class="text-blue-500 mt-0.5">✓</span>
+                    <span class="text-slate-700 text-xs sm:text-sm">更流畅的对话体验</span>
+                  </li>
+                  <li v-if="modelName === 'QwQ-32B'" class="flex items-start gap-2">
+                    <span class="text-blue-500 mt-0.5">✓</span>
+                    <span class="text-slate-700 text-xs sm:text-sm">更大模型参数，知识面更广</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="text-green-500 mt-0.5">✓</span>
+                    <span class="text-slate-700 text-xs sm:text-sm">实时流式生成，响应更快</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="pt-4">
+                <button @click="changeModel" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-xl font-medium text-sm sm:text-base">
+                  切换模型
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 加载状态 - 增强版 -->
+        <div v-if="isGenerating && !isStreamResponseActive" class="fixed inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center z-50">
+          <div class="relative">
+            <div class="relative bg-white rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-slate-100 shadow-lg shadow-indigo-100/50">
+              <div class="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4">
+                <svg class="animate-spin w-full h-full text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </div>
+              <p class="text-slate-800 text-base sm:text-lg font-medium text-center">正在书写剧情...</p>
+              <!-- 添加更详细的状态显示 -->
+              <p class="text-slate-500 text-xs sm:text-sm text-center mt-2">
+                <span v-if="activeTab === 'reasoning'">正在思考中，请稍候...</span>
+                <span v-else>AI正在创作，故事即将呈现...</span>
+              </p>
+              <!-- 添加进度条 -->
+              <div class="w-full h-1 bg-slate-100 rounded-full mt-4 overflow-hidden">
+                <div class="h-full bg-indigo-400 rounded-full animate-progressBar"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 错误提示 -->
+        <div v-if="aiErrorMessage" class="fixed bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 z-50">
+          <div class="relative">
+            <div class="relative bg-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl border border-red-100 text-red-500 flex items-center gap-2 sm:gap-3 shadow-lg shadow-red-100/50 text-sm sm:text-base">
+              <span class="text-lg sm:text-xl">❌</span>
+              <span class="font-medium">{{ aiErrorMessage }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
   </div>
 </template>
 
@@ -1620,6 +1796,7 @@ const setDebugInfo = (scene: any) => {
 
 /* 在移动端优化触摸目标大小 */
 @media (max-width: 640px) {
+
   button,
   [role="button"],
   .cursor-pointer {
@@ -1629,9 +1806,12 @@ const setDebugInfo = (scene: any) => {
 
 /* 自定义动画 */
 @keyframes pulse-slow {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.5;
   }
+
   50% {
     opacity: 0.7;
   }
@@ -1647,21 +1827,26 @@ const setDebugInfo = (scene: any) => {
     width: 0%;
     opacity: 0.5;
   }
+
   20% {
     width: 20%;
     opacity: 0.7;
   }
+
   50% {
     width: 50%;
     opacity: 0.8;
   }
+
   80% {
     width: 80%;
     opacity: 0.9;
   }
+
   95% {
     width: 95%;
   }
+
   100% {
     width: 98%;
   }
@@ -1671,6 +1856,3 @@ const setDebugInfo = (scene: any) => {
   animation: progressBar 8s cubic-bezier(0.1, 0.5, 0.2, 1) infinite;
 }
 </style>
-
-
-

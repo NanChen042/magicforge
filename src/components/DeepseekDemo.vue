@@ -28,7 +28,6 @@
 
         <!-- API 设置区域 -->
         <div class="space-y-5 mb-6">
-          <!-- API Key 输入 -->
           <div>
             <label for="api-key" class="block text-sm font-medium text-gray-700 mb-1">API KEY</label>
             <div class="relative">
@@ -565,7 +564,7 @@
 
             <div class="flex flex-wrap md:flex-nowrap justify-between items-center gap-2">
               <div class="w-full md:w-auto order-2 md:order-1">
-                <button class="w-full md:w-auto inline-flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" title="清空对话" @click="clearHistory">
+                <button class="w-full md:w-auto inline-flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" title="清空对话" @click="clearConversation">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
                   </svg>
@@ -573,19 +572,56 @@
                 </button>
               </div>
 
-              <div class="w-full md:w-auto order-1 md:order-2">
-                <!-- 发送消息按钮 -->
-                <button v-if="!isProcessing" @click="sendMessage" :disabled="!userInput.trim()" class="w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium rounded-lg transition-all disabled:bg-gradient-to-r disabled:from-purple-300 disabled:to-purple-400 disabled:opacity-70 disabled:text-purple-100 disabled:shadow-none disabled:cursor-not-allowed bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-sm hover:shadow-md">
-                  <span class="flex items-center gap-2">
-                    <span>发送</span>
+              <div class="w-full md:w-auto order-1 md:order-2 flex flex-wrap gap-2 items-center">
+                <!-- 联网搜索开关 -->
+                <div class="flex items-center gap-2 px-3 py-2 bg-blue-50 rounded-lg border border-blue-200">
+                  <input
+                    id="web-search-toggle"
+                    v-model="enableWebSearch"
+                    type="checkbox"
+                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                  />
+                  <label for="web-search-toggle" class="text-sm font-medium text-blue-700 cursor-pointer flex items-center gap-1">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                    </svg>
+                    联网搜索
+                  </label>
+                </div>
+
+                <!-- 关键词转换按钮 -->
+                <button
+                  v-if="!isProcessing"
+                  @click="showTransformModal = true"
+                  :disabled="!userInput.trim() || isTransforming"
+                  class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-green-500 to-green-600 text-white shadow-sm hover:shadow-md"
+                  title="优化提示词"
+                >
+                  <svg v-if="!isTransforming" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947z" clip-rule="evenodd" />
+                  </svg>
+                  <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  <span>{{ isTransforming ? '转换中' : '优化提示词' }}</span>
+                </button>
+
+                <!-- 发送消息按钮 -->
+                <button v-if="!isProcessing" @click="sendMessage" :disabled="!userInput.trim() || isSearching" class="inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium rounded-lg transition-all disabled:bg-gradient-to-r disabled:from-purple-300 disabled:to-purple-400 disabled:opacity-70 disabled:text-purple-100 disabled:shadow-none disabled:cursor-not-allowed bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-sm hover:shadow-md">
+                  <span class="flex items-center gap-2">
+                    <span v-if="isSearching">搜索中...</span>
+                    <span v-else>发送</span>
+                    <svg v-if="isSearching" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                       <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
                     </svg>
                   </span>
                 </button>
 
                 <!-- 终止生成按钮 -->
-                <button v-else @click="stopGeneration" class="w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium rounded-lg transition-all bg-gradient-to-r from-red-500 to-red-600 text-white shadow-sm hover:shadow-md">
+                <button v-else @click="stopGeneration" class="inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium rounded-lg transition-all bg-gradient-to-r from-red-500 to-red-600 text-white shadow-sm hover:shadow-md">
                   <span class="flex items-center gap-2">
                     <span>停止生成</span>
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -600,8 +636,156 @@
       </div>
     </div>
 
+    <!-- 搜索过程展示 -->
+    <div v-if="showSearchProcess" class="fixed top-[300px] right-4 bg-white rounded-lg shadow-2xl border border-gray-200 p-4 max-w-md z-40">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          联网搜索进行中
+        </h3>
+        <button @click="showSearchProcess = false" class="text-gray-400 hover:text-gray-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <div v-for="step in searchSteps" :key="step.step" class="flex items-start gap-3">
+          <!-- 状态图标 -->
+          <div class="flex-shrink-0 mt-1">
+            <div v-if="step.status === 'processing'" class="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            <div v-else-if="step.status === 'completed'" class="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div v-else class="w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </div>
+          </div>
+
+          <!-- 步骤内容 -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-medium text-gray-900">{{ step.action }}</span>
+              <span class="text-xs text-gray-500">{{ step.timestamp }}</span>
+            </div>
+            <p class="text-sm text-gray-600 mt-1">{{ step.details }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- 关键词转换模态框 -->
+    <div v-if="showTransformModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="p-6">
+          <!-- 模态框头部 -->
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-semibold text-gray-900 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947z" clip-rule="evenodd" />
+              </svg>
+              提示词优化
+            </h3>
+            <button @click="showTransformModal = false" class="text-gray-400 hover:text-gray-600 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- 转换模式选择 -->
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-3">选择优化模式</label>
+            <div class="grid grid-cols-2 gap-3">
+              <button
+                v-for="mode in transformModes"
+                :key="mode.value"
+                @click="selectedTransformMode = mode.value"
+                :class="[
+                  'p-4 rounded-lg border-2 transition-all text-left',
+                  selectedTransformMode === mode.value
+                    ? 'border-green-500 bg-green-50'
+                    : 'border-gray-200 hover:border-green-300'
+                ]"
+              >
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-lg">{{ mode.icon }}</span>
+                  <span class="font-medium text-gray-900">{{ mode.label }}</span>
+                </div>
+                <p class="text-sm text-gray-600">{{ mode.description }}</p>
+              </button>
+            </div>
+          </div>
+
+          <!-- 原始文本显示 -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">原始输入</label>
+            <div class="p-3 bg-gray-50 rounded-lg border text-sm text-gray-700">
+              {{ userInput }}
+            </div>
+          </div>
+
+          <!-- 转换结果 -->
+          <div v-if="transformResult" class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">优化后的提示词</label>
+            <div class="p-4 bg-green-50 rounded-lg border border-green-200">
+              <p class="text-gray-800 mb-3">{{ transformResult.transformedText }}</p>
+              <div v-if="transformResult.suggestions.length > 0" class="border-t border-green-200 pt-3">
+                <p class="text-sm font-medium text-gray-700 mb-2">相关建议：</p>
+                <div class="flex flex-wrap gap-2">
+                  <span
+                    v-for="suggestion in transformResult.suggestions"
+                    :key="suggestion"
+                    class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs"
+                  >
+                    {{ suggestion }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 操作按钮 -->
+          <div class="flex justify-end gap-3">
+            <button
+              @click="showTransformModal = false"
+              class="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              取消
+            </button>
+            <button
+              @click="performTransform"
+              :disabled="isTransforming"
+              class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              <svg v-if="isTransforming" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              {{ isTransforming ? '转换中...' : '开始转换' }}
+            </button>
+            <button
+              v-if="transformResult"
+              @click="applyTransform"
+              class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+            >
+              应用优化
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 代码示例区域 -->
-    <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden mb-8 mx-4">
+    <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden mb-8">
       <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
         <div class="flex items-center space-x-3">
           <div class="bg-purple-100 p-2 rounded-lg">
@@ -626,15 +810,18 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, nextTick, onMounted } from "vue";
+import { ElMessageBox, ElMessage } from 'element-plus';
 import { useDeepseekApi } from "../hooks/useDeepseekApi";
 import { usePromptStore } from "../stores/prompt";
-import { useApiStore } from '../stores/api';
 // @ts-ignore
 import MarkdownIt from 'markdown-it';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github-dark.css';
 // 引入axios用于发送HTTP请求
 import axios from 'axios';
+// 引入新的服务
+import keywordTransformService, { type TransformResult } from '../services/keywordTransformService';
+import webSearchService, { type SearchResult } from '../services/webSearchService';
 
 // 创建 markdown-it 实例
 const md = new MarkdownIt({
@@ -681,6 +868,47 @@ const hotTopics = ref<string[]>([]); // 添加热搜话题数组
 const isLoadingHotTopics = ref(false); // 添加热搜加载状态
 const showingModelSuccess = ref(false); // 添加模型更新成功提示标志
 
+
+
+// 新增功能相关状态
+const showTransformModal = ref(false); // 显示转换模态框
+const isTransforming = ref(false); // 转换状态
+const isSearching = ref(false); // 搜索状态
+const enableWebSearch = ref(false); // 启用联网搜索开关
+const transformResult = ref<TransformResult | null>(null); // 转换结果
+const searchResult = ref<SearchResult | null>(null); // 搜索结果
+const searchSteps = ref<any[]>([]); // 搜索步骤
+const showSearchProcess = ref(false); // 显示搜索过程
+const selectedTransformMode = ref<'dialogue' | 'professional' | 'creative' | 'analytical'>('dialogue'); // 选择的转换模式
+
+// 转换模式配置
+const transformModes = ref([
+  {
+    value: 'dialogue' as const,
+    label: '对话优化',
+    icon: '💬',
+    description: '优化为更适合AI对话的表达'
+  },
+  {
+    value: 'professional' as const,
+    label: '专业表达',
+    icon: '🎯',
+    description: '转换为更专业、准确的术语'
+  },
+  {
+    value: 'creative' as const,
+    label: '创意增强',
+    icon: '✨',
+    description: '增加创意元素和想象空间'
+  },
+  {
+    value: 'analytical' as const,
+    label: '深度分析',
+    icon: '🔍',
+    description: '引导进行深入分析和思考'
+  }
+]);
+
 // 添加滚动相关变量
 const shouldAutoScroll = ref(true); // 是否应该自动滚动
 const isUserScrolling = ref(false); // 用户是否正在滚动
@@ -688,9 +916,8 @@ const chatContainer = ref<HTMLElement | null>(null); // 聊天容器引用
 const thinkingContainer = ref<HTMLElement | null>(null); // 思考容器引用
 let scrollTimer: number | null = null; // 滚动计时器
 
-// 获取提示词store和API Store
+// 获取提示词store
 const promptStore = usePromptStore();
-const apiStore = useApiStore();
 
 // 使用API Hooks
 const {
@@ -705,7 +932,6 @@ const {
   isLastMessageStopped, // 添加引用是否手动停止的状态
   sendChatMessage,
   streamChatMessage,
-  clearHistory,
   stopGeneration // 添加引用终止生成方法
 } = useDeepseekApi();
 
@@ -953,6 +1179,61 @@ function scrollToBottom(forceScroll = false) {
   debouncedScrollToBottom(forceScroll);
 }
 
+// 清空对话确认
+const clearConversation = () => {
+  // 如果没有对话历史，直接返回
+  if (conversationHistory.length === 0) {
+    ElMessage({
+      type: 'info',
+      message: '当前没有对话记录'
+    });
+    return;
+  }
+
+  // 使用Element Plus MessageBox
+  ElMessageBox.confirm(
+    '此操作将删除所有对话历史、思维过程和输入内容，且不可撤销。',
+    '清空所有对话',
+    {
+      confirmButtonText: '确定清空',
+      cancelButtonText: '取消',
+      type: 'warning',
+      dangerouslyUseHTMLString: false
+    }
+  )
+    .then(() => {
+      // 确认清空
+      conversationHistory.length = 0;
+      reasoningContent.value = '';
+
+      // 重置相关状态
+      isThinking.value = false;
+      isSearching.value = false;
+      showSearchProcess.value = false;
+      showTransformModal.value = false;
+      isProcessing.value = false;
+      isSending.value = false;
+
+      // 重置用户输入
+      userInput.value = '';
+
+      // 显示成功消息
+      ElMessage({
+        type: 'success',
+        message: '对话已清空'
+      });
+
+      console.log('对话已清空');
+    })
+    .catch(() => {
+      // 取消清空
+      ElMessage({
+        type: 'info',
+        message: '已取消清空操作'
+      });
+    });
+};
+
 // 优化监听对话历史和思维内容变化的逻辑
 watch([conversationHistory, reasoningContent], async () => {
   await nextTick();
@@ -994,11 +1275,78 @@ watch(activeTab, async () => {
   debouncedScrollToBottom(true);
 });
 
+// 注意：原来的独立联网搜索功能已集成到sendMessage中
+
+// 执行关键词转换
+async function performTransform() {
+  if (!userInput.value.trim() || isTransforming.value) return;
+
+  // 检查必要的配置
+  if (!apiKey.value || !apiUrl.value) {
+    console.error('转换失败: API Key 或 API URL 未配置');
+    alert('请先配置 API Key 和 API URL');
+    return;
+  }
+
+  isTransforming.value = true;
+  try {
+    console.log('开始关键词转换:', {
+      query: userInput.value,
+      mode: selectedTransformMode.value,
+      apiUrl: apiUrl.value,
+      model: modelName.value
+    });
+
+    const result = await keywordTransformService.transformKeywords(userInput.value, {
+      mode: selectedTransformMode.value,
+      apiKey: apiKey.value,
+      apiUrl: apiUrl.value,
+      model: modelName.value
+    });
+
+    transformResult.value = result;
+    console.log('关键词转换完成:', result);
+  } catch (error: any) {
+    console.error('转换失败:', error);
+
+    // 提供更详细的错误信息
+    let errorMessage = '关键词转换失败: ';
+    if (error.message) {
+      errorMessage += error.message;
+    } else if (error.response?.data?.error?.message) {
+      errorMessage += error.response.data.error.message;
+    } else {
+      errorMessage += '未知错误';
+    }
+
+    alert(errorMessage);
+  } finally {
+    isTransforming.value = false;
+  }
+}
+
+// 应用转换结果
+function applyTransform() {
+  if (transformResult.value) {
+    userInput.value = transformResult.value.transformedText;
+    showTransformModal.value = false;
+    transformResult.value = null;
+
+    // 将焦点设置到输入框
+    nextTick(() => {
+      const inputElement = document.getElementById('message-input');
+      if (inputElement) {
+        inputElement.focus();
+      }
+    });
+  }
+}
+
 // 发送消息
 async function sendMessage() {
   // 如果已经在发送中，直接返回
-  if (isSending.value) {
-    console.log("已经在发送过程中，忽略此次点击");
+  if (isSending.value || isSearching.value) {
+    console.log("已经在发送或搜索过程中，忽略此次点击");
     return;
   }
 
@@ -1017,14 +1365,82 @@ async function sendMessage() {
       console.log("使用临时API Key");
     }
 
+    // 保存用户输入
+    let input = userInput.value;
+
+    // 如果启用了联网搜索，先进行搜索增强
+    if (enableWebSearch.value && apiKey.value && apiUrl.value) {
+      console.log('🔍 启用联网搜索，开始真实网络搜索...');
+      isSearching.value = true;
+      showSearchProcess.value = true;
+      searchSteps.value = [];
+
+      try {
+        const result = await webSearchService.searchAndEnhance(input, {
+          apiKey: apiKey.value,
+          apiUrl: apiUrl.value,
+          model: modelName.value,
+          maxResults: 5
+        }, (steps) => {
+          // 实时更新搜索步骤
+          searchSteps.value = [...steps];
+        });
+
+        searchResult.value = result;
+
+        // 使用增强后的查询
+        if (result.enhancedQuery && result.enhancedQuery.length > input.length) {
+          console.log('✅ 联网搜索增强完成，使用增强查询');
+          input = result.enhancedQuery;
+
+          // 在对话历史中添加详细的搜索说明
+          const searchInfo = `🔍 **联网搜索增强完成**
+
+**原始查询：** ${userInput.value}
+
+**搜索结果：** 找到 ${result.searchResults.length} 个相关结果
+${result.searchResults.map((item, index) =>
+  `${index + 1}. [${item.title}](${item.url}) - ${item.source}`
+).join('\n')}
+
+**搜索摘要：** ${result.searchSummary}
+
+**增强查询：** ${result.enhancedQuery}
+
+**相关建议：** ${result.suggestions.join('、')}`;
+
+          conversationHistory.push({
+            role: 'system',
+            content: searchInfo
+          });
+        }
+      } catch (searchError: any) {
+        console.error('联网搜索失败，停止发送:', searchError.message);
+
+        // 添加搜索失败说明
+        conversationHistory.push({
+          role: 'system',
+          content: `❌ 联网搜索失败：${searchError.message}\n\n请检查网络连接或稍后重试。`
+        });
+
+        // 搜索失败时直接返回，不继续发送消息
+        return;
+      } finally {
+        isSearching.value = false;
+        // 保持搜索过程显示3秒后自动隐藏
+        setTimeout(() => {
+          showSearchProcess.value = false;
+        }, 3000);
+      }
+    }
+
     // 设置活动标签为输出
     activeTab.value = "output";
 
     // 清除旧的思维内容
     reasoningContent.value = "";
 
-    // 保存用户输入并清空输入框
-    const input = userInput.value;
+    // 清空输入框
     userInput.value = "";
 
     // 自动滚动到最新内容
@@ -1035,7 +1451,7 @@ async function sendMessage() {
     if (streaming.value) {
       isThinking.value = true;
       await streamChatMessage(input, {
-        onContent: (content: string) => {
+        onContent: (_: string) => {
           // 内容更新后滚动到底部
           nextTick(() => {
             scrollToBottom();
@@ -1085,7 +1501,7 @@ function formatText(text: string) {
   // 为确保代码块正确渲染，先处理特殊字符
   let processedText = text
     // 确保代码块中的反引号被正确处理
-    .replace(/```([a-z]*)\n([\s\S]*?)```/g, (match, lang, code) => {
+    .replace(/```([a-z]*)\n([\s\S]*?)```/g, (_, lang, code) => {
       // 替换代码中可能导致HTML解析问题的字符
       const safeCode = code
         .replace(/</g, '&lt;')
@@ -1205,17 +1621,7 @@ async function refreshHotTopics() {
   }
 }
 
-// 简单的防抖函数
-function createDebounce(fn: Function, delay: number) {
-  let timer: number | null = null;
-  return function(...args: any[]) {
-    if (timer) clearTimeout(timer);
-    timer = setTimeout(() => {
-      fn(...args);
-      timer = null;
-    }, delay) as unknown as number;
-  }
-}
+
 </script>
 
 <style scoped>
@@ -1472,48 +1878,74 @@ div.w-10.h-10.rounded-full.flex.items-center.justify-center.flex-shrink-0.text-x
 
 /* 思维过程样式优化 */
 .thinking-process {
-  @apply bg-gradient-to-br from-slate-50 to-white;
+  background: linear-gradient(to bottom right, rgb(248 250 252), rgb(255 255 255));
 }
 
 .thinking-process :deep(.prose) {
-  @apply leading-relaxed;
+  line-height: 1.625;
 }
 
 .thinking-process :deep(.prose p) {
-  @apply text-gray-600 mb-4;
+  color: rgb(75 85 99);
+  margin-bottom: 1rem;
 }
 
 .thinking-process :deep(.prose ul),
 .thinking-process :deep(.prose ol) {
-  @apply my-4 space-y-2;
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .thinking-process :deep(.prose li) {
-  @apply text-gray-600;
+  color: rgb(75 85 99);
 }
 
 .thinking-process :deep(.prose strong) {
-  @apply text-gray-900 font-semibold;
+  color: rgb(17 24 39);
+  font-weight: 600;
 }
 
 .thinking-process :deep(.prose blockquote) {
-  @apply border-l-4 border-purple-200 bg-purple-50/50 text-gray-700 my-4 py-2 px-4 rounded-r-lg;
+  border-left: 4px solid rgb(196 181 253);
+  background-color: rgb(245 243 255 / 0.5);
+  color: rgb(55 65 81);
+  margin: 1rem 0;
+  padding: 0.5rem 1rem;
+  border-radius: 0 0.5rem 0.5rem 0;
 }
 
 .thinking-process :deep(.prose code) {
-  @apply bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-sm;
+  background-color: rgb(243 244 246);
+  color: rgb(31 41 55);
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
 }
 
 .thinking-process :deep(.prose pre) {
-  @apply bg-gray-900 text-gray-100 rounded-lg shadow-sm my-4;
+  background-color: rgb(17 24 39);
+  color: rgb(243 244 246);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  margin: 1rem 0;
 }
 
 .thinking-process :deep(.prose h3) {
-  @apply text-lg font-semibold text-gray-900 mb-3 mt-6;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: rgb(17 24 39);
+  margin-bottom: 0.75rem;
+  margin-top: 1.5rem;
 }
 
 .thinking-process :deep(.prose h4) {
-  @apply text-base font-semibold text-gray-800 mb-2 mt-4;
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgb(31 41 55);
+  margin-bottom: 0.5rem;
+  margin-top: 1rem;
 }
 
 /* 动画效果 */
@@ -1662,6 +2094,8 @@ button:active,
 .thinking-indicator {
   animation: glow 1.5s ease-in-out infinite;
 }
+
+
 </style>
 
 
