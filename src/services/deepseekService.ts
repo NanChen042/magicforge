@@ -38,6 +38,47 @@ export class DeepseekService {
   // 记录已使用的特殊事件，避免重复
   private static usedSpecialEvents = new Set<string>();
 
+  /**
+   * 完整剧情系统设计
+   */
+  private static storyStructure = {
+    // 剧情总长度：10个场景
+    totalScenes: 10,
+
+    // 关键节点场景
+    keyScenes: {
+      1: { type: "开场", title: "新学期的开始", description: "高三开学，小明面临学习和游戏的选择" },
+      2: { type: "日常", title: "课堂风波", description: "上课时想着游戏被老师发现" },
+      3: { type: "冲突", title: "家长会风暴", description: "家长发现游戏成绩，爆发激烈冲突" },
+      4: { type: "抉择", title: "深夜的思考", description: "面临是否放弃游戏的重大选择" },
+      5: { type: "转折", title: "意外的机会", description: "收到电竞俱乐部邀请或重要考试机会" },
+      6: { type: "挑战", title: "双重压力", description: "同时面临游戏比赛和重要考试" },
+      7: { type: "危机", title: "关键时刻", description: "必须在游戏和学习中做出最终选择" },
+      8: { type: "高潮", title: "决战时刻", description: "面临人生最重要的考验" },
+      9: { type: "结果", title: "尘埃落定", description: "选择的结果开始显现" },
+      10: { type: "结局", title: "新的开始", description: "根据之前选择走向不同结局" }
+    },
+
+    // 三种结局路线
+    endings: {
+      academic: {
+        name: "学霸之路",
+        condition: (progress: any) => progress.mainQuests.study >= 70 && progress.mainQuests.gaming <= 30,
+        description: "放下游戏专心学习，最终考上理想大学，成为学霸"
+      },
+      gaming: {
+        name: "电竞传奇",
+        condition: (progress: any) => progress.mainQuests.gaming >= 70 && progress.mainQuests.study <= 30,
+        description: "坚持游戏梦想，成为职业电竞选手，在赛场上发光发热"
+      },
+      balanced: {
+        name: "平衡人生",
+        condition: (progress: any) => progress.mainQuests.study >= 40 && progress.mainQuests.gaming >= 40 && progress.mainQuests.social >= 30,
+        description: "学习游戏两不误，既保持了不错的成绩，也在游戏上有所成就"
+      }
+    }
+  };
+
   private static characterBackground = `角色背景：
 - 姓名：小明（游戏ID：最强剑魔）
 - 身份：高三学生，知名游戏主播
@@ -270,16 +311,18 @@ ${specialEvent ? `特殊事件：${specialEvent}` : ''}
 1. 场景描述要生动有趣，突出高中生活和游戏双重身份的冲突
 2. 对话要用小明的语气，多用游戏梗和台词
 3. 描述要有细节，包括天气、环境、人物心情等
-4. 选项要有趣且符合人物性格
+4. 选项要有趣且符合人物性格，**每个选项的text必须完全不同，不能重复**
 5. 如果有特殊事件，要自然地融入场景中
+6. **选项文本必须具体明确，避免使用模糊词汇如"游戏状态"、"情感变化"等**
 
 输出格式：
 {
   "description": "场景描述（200字以内）",
   "dialog": "小明的对话（50字以内）",
   "options": [
-    {"text": "选项1（15字以内）", "hint": "选项提示（20字以内）"},
-    {"text": "选项2（15字以内）", "hint": "选项提示（20字以内）"}
+    {"text": "具体行动1（15字以内）", "hint": "选项提示（20字以内）"},
+    {"text": "具体行动2（15字以内）", "hint": "选项提示（20字以内）"},
+    {"text": "具体行动3（15字以内）", "hint": "选项提示（20字以内）"}
   ],
   "specialEvent": "特殊事件的具体描述（可选，50字以内）"
 }`;
@@ -288,7 +331,7 @@ ${specialEvent ? `特殊事件：${specialEvent}` : ''}
       const messages = [
         {
           role: 'system',
-          content: '你现在是小明（游戏ID：最强剑魔），一个高三学生兼游戏主播。你要生动地讲述在学习和游戏之间的故事。确保输出是合法的JSON格式。'
+          content: '你现在是小明（游戏ID：最强剑魔），一个高三学生兼游戏主播。你要生动地讲述在学习和游戏之间的故事。确保输出是合法的JSON格式。重要：每个选项的text字段必须完全不同，使用具体的动作词汇，如"去图书馆学习"、"开始排位赛"、"找同学聊天"等，避免使用抽象词汇。'
         },
         {
           role: 'user',
@@ -435,15 +478,35 @@ ${specialEvent ? `特殊事件：${specialEvent}` : ''}
         this.updateSceneHistory(params.currentScene);
       }
 
-      // 准备提示词 - 更加简化，无需每次都传递全部上下文
+      // 检查是否到达结局
+      const nextSceneId = params.currentSceneId + 1;
+      if (nextSceneId > this.storyStructure.totalScenes) {
+        return this.generateEnding(params.storyProgress);
+      }
+
+      // 获取当前场景的剧情信息
+      const currentStoryScene = this.storyStructure.keyScenes[nextSceneId as keyof typeof this.storyStructure.keyScenes];
+      const isKeyScene = !!currentStoryScene;
+
+      // 准备提示词 - 包含剧情结构信息
       const messages = [
         {
           role: 'system',
-          content: this.characterBackground  // 只在首次传递，利用模型的上下文能力
+          content: `${this.characterBackground}
+
+【剧情进度】当前是第${nextSceneId}/${this.storyStructure.totalScenes}个场景
+${isKeyScene ? `【关键场景】${currentStoryScene.title} - ${currentStoryScene.description}` : '【日常场景】根据玩家选择自然发展'}
+
+【结局导向】根据当前数值趋势：
+- 学习值: ${params.storyProgress.mainQuests.study}
+- 游戏值: ${params.storyProgress.mainQuests.gaming}
+- 社交值: ${params.storyProgress.mainQuests.social}
+
+请确保场景推进符合剧情节奏，为最终结局做铺垫。`
         },
         {
           role: 'user',
-          content: `玩家选择了: "${params.choiceText}"。请为"最强剑魔是高三生"游戏生成下一个场景，场景ID ${params.currentSceneId + 1}。
+          content: `玩家选择了: "${params.choiceText}"。请为"最强剑魔是高三生"游戏生成第${nextSceneId}个场景。
 
           请以JSON格式返回以下内容：
           1. description: 场景描述 (200字以内)
@@ -523,6 +586,61 @@ ${specialEvent ? `特殊事件：${specialEvent}` : ''}
       console.error('生成场景失败:', error);
       throw error;
     }
+  }
+
+  /**
+   * 生成游戏结局
+   */
+  private static generateEnding(storyProgress: StoryProgress): GameScene {
+    // 判断结局类型
+    let endingType = 'balanced';
+    let endingData = this.storyStructure.endings.balanced;
+
+    // 检查学霸路线
+    if (this.storyStructure.endings.academic.condition(storyProgress)) {
+      endingType = 'academic';
+      endingData = this.storyStructure.endings.academic;
+    }
+    // 检查电竞路线
+    else if (this.storyStructure.endings.gaming.condition(storyProgress)) {
+      endingType = 'gaming';
+      endingData = this.storyStructure.endings.gaming;
+    }
+
+    // 生成结局场景
+    const endingScenes = {
+      academic: {
+        description: "高考结束了，小明放下了游戏，全身心投入学习。经过几个月的努力，他收到了心仪大学的录取通知书。虽然告别了游戏主播的身份，但他在学术道路上找到了新的目标。",
+        dialog: "虽然放弃了游戏，但我在学习中找到了新的成就感。这条路或许更适合我。",
+        options: []
+      },
+      gaming: {
+        description: "小明坚持了自己的游戏梦想，最终收到了职业电竞俱乐部的正式邀请。虽然学业成绩不理想，但他在电竞道路上闯出了自己的天地，成为了真正的'最强剑魔'。",
+        dialog: "我证明了自己！游戏不只是游戏，它也可以成为我的事业和梦想！",
+        options: []
+      },
+      balanced: {
+        description: "小明找到了学习和游戏的平衡点。他既保持了不错的学习成绩，也在游戏上有所成就。虽然不是最顶尖的，但他过得很充实，朋友们都很羡慕他的生活状态。",
+        dialog: "原来学习和游戏并不是对立的，关键是要找到平衡。我很满意现在的生活。",
+        options: []
+      }
+    };
+
+    const selectedEnding = endingScenes[endingType as keyof typeof endingScenes];
+
+    return {
+      id: 999, // 结局场景ID
+      image: `https://source.unsplash.com/800x500/?graduation,success,achievement&t=${Date.now()}`,
+      description: selectedEnding.description,
+      dialog: selectedEnding.dialog,
+      options: [], // 结局没有选项
+      context: {
+        mood: "满足",
+        location: "人生新阶段",
+        timeOfDay: "未来",
+        previousEvents: [`获得了${endingData.name}结局`]
+      }
+    };
   }
 
   /**
@@ -962,14 +1080,41 @@ ${specialEvent ? `特殊事件：${specialEvent}` : ''}
         parsed.options = [];
       }
 
+      // 检查并修复重复的选项文本
+      const seenTexts = new Set();
+      const uniqueOptions = [];
+
+      for (let i = 0; i < parsed.options.length; i++) {
+        const option = parsed.options[i];
+        let optionText = option.text || `选项${i + 1}`;
+
+        // 如果文本重复，添加后缀使其唯一
+        let counter = 1;
+        let originalText = optionText;
+        while (seenTexts.has(optionText)) {
+          optionText = `${originalText}${counter}`;
+          counter++;
+        }
+
+        seenTexts.add(optionText);
+        uniqueOptions.push({
+          ...option,
+          text: optionText
+        });
+      }
+
+      parsed.options = uniqueOptions;
+
       // 确保至少有两个选项
       while (parsed.options.length < 2) {
         const optionTypes = ['study', 'gaming', 'social'];
         const randomType = optionTypes[parsed.options.length % optionTypes.length];
+        const defaultTexts = ["专注于学习", "打会游戏放松", "和朋友聊天"];
+        const defaultHints = ["提高成绩是当务之急", "游戏也很重要", "社交也不能忽视"];
 
         parsed.options.push({
-          text: parsed.options.length === 0 ? "专注于学习" : "打会游戏放松",
-          hint: parsed.options.length === 0 ? "提高成绩是当务之急" : "游戏也很重要",
+          text: defaultTexts[parsed.options.length] || `选择${parsed.options.length + 1}`,
+          hint: defaultHints[parsed.options.length] || "这是一个选择",
           impact: {
             quest: {
               type: randomType,
@@ -1060,8 +1205,7 @@ ${specialEvent ? `特殊事件：${specialEvent}` : ''}
         // 查找可能的对话内容
         const dialogPatterns = [
           /[对话内心独白][：:]?\s*["""]([^"""]{5,100})["""]?/,
-          /["""]([^"""]{10,80})["""]?/,
-          /（([^）]{5,50}）/
+          /["""]([^"""]{10,80})["""]?/
         ];
 
         for (const pattern of dialogPatterns) {

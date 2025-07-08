@@ -196,35 +196,38 @@ export const useGameStore = defineStore('game', {
 
         this.aiErrorMessage = errorMessage;
 
-        // 如果是JSON解析错误，尝试使用备用场景
-        if (error.message && error.message.includes('JSON')) {
-          console.log('尝试使用备用场景恢复...');
-          try {
-            // 创建一个简单的备用场景
-            const backupScene = {
-              id: this.currentSceneId + 1,
-              description: `小明在${this.currentScene?.context?.location || '教室'}里继续他的故事。虽然刚才遇到了一些小插曲，但生活还在继续。`,
-              dialog: '虽然有些意外，但我要继续前进...',
-              options: [
-                {
-                  text: '专注学习',
-                  hint: '把注意力放在功课上',
-                  impact: {
-                    quest: { type: 'study', value: 8 }
-                  }
-                },
-                {
-                  text: '放松一下',
-                  hint: '适当休息调整状态',
-                  impact: {
-                    quest: { type: 'gaming', value: 5 }
-                  }
-                },
-                {
-                  text: '和朋友聊天',
-                  hint: '寻求朋友的支持',
-                  impact: {
-                    quest: { type: 'social', value: 6 }
+        // 尝试使用备用场景恢复
+        console.log('尝试使用备用场景恢复...');
+        try {
+          // 创建一个简单的备用场景
+          const backupScene = {
+            id: this.currentSceneId + 1,
+            image: `https://source.unsplash.com/800x500/?classroom,student&t=${Date.now()}`,
+            description: `小明在${this.currentScene?.context?.location || '教室'}里继续他的故事。虽然刚才遇到了一些小插曲，但生活还在继续。他需要重新整理思路，决定下一步该怎么做。`,
+            dialog: '虽然有些意外，但我要继续前进...这次我要更仔细地考虑。',
+            options: [
+              {
+                text: '专注学习',
+                hint: '把注意力放在功课上',
+                impact: {
+                  quest: { type: 'study', value: 8 },
+                  relationship: { character: '李雪', value: 2 }
+                }
+              },
+              {
+                text: '打开游戏',
+                hint: '适当放松调整状态',
+                impact: {
+                  quest: { type: 'gaming', value: 8 },
+                  relationship: { character: '李雪', value: 0 }
+                }
+              },
+              {
+                text: '和朋友聊天',
+                hint: '社交也很重要',
+                impact: {
+                  quest: { type: 'social', value: 8 },
+                  relationship: { character: '李雪', value: 3 }
                   }
                 }
               ],
@@ -243,7 +246,6 @@ export const useGameStore = defineStore('game', {
           } catch (backupError) {
             console.error('备用场景创建失败:', backupError);
           }
-        }
       } finally {
         this.isGenerating = false
       }

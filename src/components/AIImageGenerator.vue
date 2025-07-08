@@ -10,145 +10,271 @@
       <div class="form-container">
         <el-form :model="formData" label-position="top" class="generation-form">
           <!-- 卡片1: 提示词输入区 -->
-          <div class="form-card">
-          <!-- 提示词模板选择 -->
-          <div class="templates-section">
-            <h3>快速模板</h3>
-            <div class="template-grid">
-              <el-button v-for="template in promptTemplates" :key="template.label" size="small" @click="applyTemplate(template)">
-                {{ template.label }}
-              </el-button>
+          <div class="modern-parameter-card">
+            <div class="space-y-6">
+              <!-- 头部 -->
+              <div class="flex items-center gap-2 mb-4">
+                <div class="parameter-icon-modern">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M16 13H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M16 17H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M10 9H9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-foreground">提示词设置</h3>
+              </div>
+
+              <!-- 快速模板 -->
+              <div class="space-y-2">
+                <label class="text-sm font-medium text-foreground">快速模板</label>
+                <div class="grid grid-cols-2 gap-2">
+                  <button
+                    v-for="template in promptTemplates"
+                    :key="template.label"
+                    @click="applyTemplate(template)"
+                    class="flex items-center justify-center text-xs px-3 py-2 rounded-lg font-medium transition-all duration-200 border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                  >
+                    {{ template.label }}
+                  </button>
+                </div>
+              </div>
+
+              <!-- 提示词输入 -->
+              <div class="space-y-2">
+                <label class="text-sm font-medium text-foreground">提示词 (Prompt)</label>
+                <el-input
+                  v-model="formData.prompt"
+                  type="textarea"
+                  :rows="4"
+                  placeholder="描述你想要生成的图片内容..."
+                  class="modern-textarea"
+                />
+              </div>
+
+              <!-- 负面提示词输入 -->
+              <div class="space-y-2">
+                <label class="text-sm font-medium text-foreground">负面提示词 (Negative Prompt)</label>
+                <el-input
+                  v-model="formData.negative_prompt"
+                  type="textarea"
+                  :rows="2"
+                  placeholder="描述你不希望出现在图片中的内容..."
+                  class="modern-textarea"
+                />
+              </div>
             </div>
-          </div>
-
-          <!-- 提示词输入 -->
-          <el-form-item label="提示词 (Prompt)">
-            <el-input v-model="formData.prompt" type="textarea" :rows="4" placeholder="描述你想要生成的图片内容..." />
-          </el-form-item>
-
-          <!-- 负面提示词输入 -->
-          <el-form-item label="负面提示词 (Negative Prompt)">
-            <el-input v-model="formData.negative_prompt" type="textarea" :rows="2" placeholder="描述你不希望出现在图片中的内容..." />
-          </el-form-item>
           </div>
 
           <!-- 卡片2: 参数设置区 -->
-          <div class="form-card">
-            <div class="card-header">
-              <h3>图片参数</h3>
-              <!-- 参数预设选择 - 更改为 el-radio-group -->
-              <div class="presets-section">
-                <span class="preset-title">快速预设:</span>
-                <el-radio-group
-                  v-model="selectedPresetLabel"
-                  @change="handlePresetChange"
-                  size="small"
-                  class="preset-radio-group"
-                >
-                  <el-radio-button
+          <div class="modern-parameter-card">
+            <div class="space-y-6">
+              <!-- 头部 -->
+              <div class="flex items-center gap-2 mb-4">
+                <div class="parameter-icon-modern">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2"/>
+                    <path d="M19.4 15C19.2669 15.3016 19.2272 15.6362 19.286 15.9606C19.3448 16.285 19.4995 16.5843 19.73 16.82L19.79 16.88C19.976 17.0657 20.1235 17.2863 20.2241 17.5291C20.3248 17.7719 20.3766 18.0322 20.3766 18.295C20.3766 18.5578 20.3248 18.8181 20.2241 19.0609C20.1235 19.3037 19.976 19.5243 19.79 19.71C19.6043 19.896 19.3837 20.0435 19.1409 20.1441C18.8981 20.2448 18.6378 20.2966 18.375 20.2966C18.1122 20.2966 17.8519 20.2448 17.6091 20.1441C17.3663 20.0435 17.1457 19.896 16.96 19.71L16.9 19.65C16.6643 19.4195 16.365 19.2648 16.0406 19.206C15.7162 19.1472 15.3816 19.1869 15.08 19.32C14.7842 19.4468 14.532 19.6572 14.3543 19.9255C14.1766 20.1938 14.0813 20.5082 14.08 20.83V21C14.08 21.5304 13.8693 22.0391 13.4942 22.4142C13.1191 22.7893 12.6104 23 12.08 23C11.5496 23 11.0409 22.7893 10.6658 22.4142C10.2907 22.0391 10.08 21.5304 10.08 21V20.91C10.0723 20.579 9.96512 20.258 9.77251 19.9887C9.5799 19.7194 9.31074 19.5143 9 19.4C8.69838 19.2669 8.36381 19.2272 8.03941 19.286C7.71502 19.3448 7.41568 19.4995 7.18 19.73L7.12 19.79C6.93425 19.976 6.71368 20.1235 6.47088 20.2241C6.22808 20.3248 5.96783 20.3766 5.705 20.3766C5.44217 20.3766 5.18192 20.3248 4.93912 20.2241C4.69632 20.1235 4.47575 19.976 4.29 19.79C4.10405 19.6043 3.95653 19.3837 3.85588 19.1409C3.75523 18.8981 3.70343 18.6378 3.70343 18.375C3.70343 18.1122 3.75523 17.8519 3.85588 17.6091C3.95653 17.3663 4.10405 17.1457 4.29 16.96L4.35 16.9C4.58054 16.6643 4.73519 16.365 4.794 16.0406C4.85282 15.7162 4.81312 15.3816 4.68 15.08C4.55324 14.7842 4.34276 14.532 4.07447 14.3543C3.80618 14.1766 3.49179 14.0813 3.17 14.08H3C2.46957 14.08 1.96086 13.8693 1.58579 13.4942C1.21071 13.1191 1 12.6104 1 12.08C1 11.5496 1.21071 11.0409 1.58579 10.6658C1.96086 10.2907 2.46957 10.08 3 10.08H3.09C3.42099 10.0723 3.742 9.96512 4.0113 9.77251C4.28059 9.5799 4.48572 9.31074 4.6 9C4.73312 8.69838 4.77282 8.36381 4.714 8.03941C4.65519 7.71502 4.50054 7.41568 4.27 7.18L4.21 7.12C4.02405 6.93425 3.87653 6.71368 3.77588 6.47088C3.67523 6.22808 3.62343 5.96783 3.62343 5.705C3.62343 5.44217 3.67523 5.18192 3.77588 4.93912C3.87653 4.69632 4.02405 4.47575 4.21 4.29C4.39575 4.10405 4.61632 3.95653 4.85912 3.85588C5.10192 3.75523 5.36217 3.70343 5.625 3.70343C5.88783 3.70343 6.14808 3.75523 6.39088 3.85588C6.63368 3.95653 6.85425 4.10405 7.04 4.29L7.1 4.35C7.33568 4.58054 7.63502 4.73519 7.95941 4.794C8.28381 4.85282 8.61838 4.81312 8.92 4.68H9C9.29577 4.55324 9.54802 4.34276 9.72569 4.07447C9.90337 3.80618 9.99872 3.49179 10 3.17V3C10 2.46957 10.2107 1.96086 10.5858 1.58579C10.9609 1.21071 11.4696 1 12 1C12.5304 1 13.0391 1.21071 13.4142 1.58579C13.7893 1.96086 14 2.46957 14 3V3.09C14.0013 3.41179 14.0966 3.72618 14.2743 3.99447C14.452 4.26276 14.7042 4.47324 15 4.6C15.3016 4.73312 15.6362 4.77282 15.9606 4.714C16.285 4.65519 16.5843 4.50054 16.82 4.27L16.88 4.21C17.0657 4.02405 17.2863 3.87653 17.5291 3.77588C17.7719 3.67523 18.0322 3.62343 18.295 3.62343C18.5578 3.62343 18.8181 3.67523 19.0609 3.77588C19.3037 3.87653 19.5243 4.02405 19.71 4.21C19.896 4.39575 20.0435 4.61632 20.1441 4.85912C20.2448 5.10192 20.2966 5.36217 20.2966 5.625C20.2966 5.88783 20.2448 6.14808 20.1441 6.39088C20.0435 6.63368 19.896 6.85425 19.71 7.04L19.65 7.1C19.4195 7.33568 19.2648 7.63502 19.206 7.95941C19.1472 8.28381 19.1869 8.61838 19.32 8.92V9C19.4468 9.29577 19.6572 9.54802 19.9255 9.72569C20.1938 9.90337 20.5082 9.99872 20.83 10H21C21.5304 10 22.0391 10.2107 22.4142 10.5858C22.7893 10.9609 23 11.4696 23 12C23 12.5304 22.7893 13.0391 22.4142 13.4142C22.0391 13.7893 21.5304 14 21 14H20.91C20.5882 14.0013 20.2738 14.0966 20.0055 14.2743C19.7372 14.452 19.5268 14.7042 19.4 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-foreground">AI 参数设置</h3>
+              </div>
+
+              <!-- 图片尺寸选择 -->
+              <div class="space-y-3">
+                <label class="text-sm font-medium text-foreground">图片尺寸</label>
+                <div class="size-preview-grid">
+                  <button
+                    v-for="(value, key) in imageSizeOptions"
+                    :key="key"
+                    @click="formData.image_size = value.value"
+                    :class="[
+                      'size-preview-card',
+                      formData.image_size === value.value ? 'size-preview-active' : 'size-preview-inactive'
+                    ]"
+                  >
+                    <!-- 比例预览框 -->
+                    <div class="size-preview-container">
+                      <div
+                        class="size-preview-box"
+                        :style="getSizePreviewStyle(value.ratio)"
+                      >
+                        <div class="size-preview-inner">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="2"/>
+                            <path d="M21 15L16 10L5 21" stroke="currentColor" stroke-width="2"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- 尺寸信息 -->
+                    <div class="size-preview-info">
+                      <div class="size-preview-label">{{ value.ratioLabel || value.label }}</div>
+                      <div class="size-preview-ratio">{{ value.ratio }}</div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 预设按钮 -->
+              <div class="space-y-2">
+                <label class="text-sm font-medium text-foreground">快速预设</label>
+                <div class="grid grid-cols-2 gap-2">
+                  <button
                     v-for="preset in parameterPresets"
                     :key="preset.label"
-                    :value="preset.label"
+                    @click="applyPreset(preset)"
+                    :class="[
+                      'flex items-center gap-2 text-xs px-3 py-2 rounded-lg font-medium transition-all duration-200',
+                      selectedPresetLabel === preset.label
+                        ? 'bg-primary text-white shadow-md'
+                        : 'border border-input bg-background hover:bg-accent hover:text-accent-foreground'
+                    ]"
                   >
+                    <span class="text-sm">{{ getPresetIcon(preset.label) }}</span>
                     {{ preset.label }}
-                  </el-radio-button>
-                </el-radio-group>
-              </div>
-            </div>
-
-          <!-- 图片尺寸选择 -->
-          <el-form-item label="图片尺寸">
-              <el-radio-group v-model="formData.image_size" class="size-selector">
-                <el-radio-button
-                v-for="(value, key) in imageSizeOptions"
-                :key="key"
-                  :value="value.value"
-                  class="size-radio-button"
-                >
-                  <div class="size-option-content">
-                    <svg class="size-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect
-                        :x="getSvgRect(value.ratio).x"
-                        :y="getSvgRect(value.ratio).y"
-                        :width="getSvgRect(value.ratio).width"
-                        :height="getSvgRect(value.ratio).height"
-                        rx="1"
-                        class="svg-rect"
-                      />
-                    </svg>
-                    <span class="size-label">{{ value.ratioLabel || value.label }}</span>
+                  </button>
                 </div>
-                </el-radio-button>
-              </el-radio-group>
-          </el-form-item>
-
-            <div class="parameter-grid">
-          <!-- 批量生成数量 -->
-          <el-form-item label="生成数量">
-            <el-slider v-model="formData.batch_size" :min="1" :max="4" :step="1" :marks="{1: '1', 2: '2', 3: '3', 4: '4'}" show-stops />
-          </el-form-item>
-
-          <!-- 引导系数 -->
-          <el-form-item label="创造性 (引导系数)">
-            <el-tooltip content="较低的值会产生更有创意但不太准确的结果，较高的值会使生成更忠于提示词但创意性较低" placement="top">
-              <el-slider v-model="formData.guidance_scale" :min="1" :max="20" :step="0.5" :marks="{1: '高创造性', 10: '平衡', 20: '高精确性'}" />
-            </el-tooltip>
-          </el-form-item>
-
-          <!-- 推理步骤 -->
-          <el-form-item label="细节程度 (推理步骤)">
-            <el-tooltip content="更高的值会产生更细致的图像，但需要更长时间生成。最大值为50。" placement="top">
-              <el-slider v-model="formData.num_inference_steps" :min="1" :max="50" :step="1" :marks="{1: '低', 20: '中', 50: '高'}" />
-            </el-tooltip>
-          </el-form-item>
-            </div>
-
-          <!-- 随机种子 -->
-          <el-form-item label="随机种子 (可选)">
-            <el-tooltip content="使用相同种子可以在其他参数相同时获得相似结果" placement="top">
-              <div class="seed-input-group">
-                <el-input v-model.number="formData.seed" type="number" placeholder="输入种子或留空随机生成" />
-                <el-button @click="randomizeSeed">随机</el-button>
               </div>
-            </el-tooltip>
-          </el-form-item>
+
+              <!-- 生成数量滑块 -->
+              <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                  <label class="text-sm font-medium text-foreground">生成数量</label>
+                  <span class="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">{{ formData.batch_size }}</span>
+                </div>
+                <el-slider
+                  v-model="formData.batch_size"
+                  :min="1"
+                  :max="4"
+                  :step="1"
+                  :marks="{1: '1', 2: '2', 3: '3', 4: '4'}"
+                  show-stops
+                  class="modern-slider-custom"
+                />
+              </div>
+
+              <!-- 创造性滑块 -->
+              <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                  <label class="text-sm font-medium text-foreground">创造性</label>
+                  <span class="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">{{ formData.guidance_scale }}</span>
+                </div>
+                <el-tooltip content="较低的值会产生更有创意但不太准确的结果，较高的值会使生成更忠于提示词但创意性较低" placement="top">
+                  <el-slider
+                    v-model="formData.guidance_scale"
+                    :min="1"
+                    :max="20"
+                    :step="0.5"
+                    :marks="{1: '高创造性', 10: '平衡', 20: '高精确性'}"
+                    class="modern-slider-custom"
+                  />
+                </el-tooltip>
+              </div>
+
+              <!-- 细节程度滑块 -->
+              <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                  <label class="text-sm font-medium text-foreground">细节程度</label>
+                  <span class="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">{{ formData.num_inference_steps }}</span>
+                </div>
+                <el-tooltip content="更高的值会产生更细致的图像，但需要更长时间生成。最大值为50。" placement="top">
+                  <el-slider
+                    v-model="formData.num_inference_steps"
+                    :min="1"
+                    :max="50"
+                    :step="1"
+                    :marks="{1: '低', 20: '中', 50: '高'}"
+                    class="modern-slider-custom"
+                  />
+                </el-tooltip>
+              </div>
+
+              <!-- 随机种子 -->
+              <div class="space-y-2">
+                <label class="text-sm font-medium text-foreground">随机种子</label>
+                <div class="flex gap-2">
+                  <el-input
+                    v-model.number="formData.seed"
+                    type="number"
+                    placeholder="输入种子或留空随机生成"
+                    class="flex-1 modern-input"
+                  />
+                  <el-button @click="randomizeSeed" class="modern-button-secondary">
+                    🎲
+                  </el-button>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- 卡片3: 参考图片上传 -->
-          <div class="form-card">
-            <h3>参考图片</h3>
-            <el-form-item>
-            <el-upload
-              class="image-uploader"
-              :show-file-list="false"
-              :before-upload="beforeImageUpload"
-              :auto-upload="true"
-              :http-request="handleCustomUpload"
-              action="#">
-              <div v-if="imageUrl" class="image-preview">
-                <img :src="imageUrl" class="uploaded-image" />
-                <div class="remove-image" @click.stop="removeImage">
-                  <el-icon>
-                    <Delete />
-                  </el-icon>
+          <div class="modern-parameter-card">
+            <div class="space-y-6">
+              <!-- 头部 -->
+              <div class="flex items-center gap-2 mb-4">
+                <div class="parameter-icon-modern">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="2"/>
+                    <path d="M21 15L16 10L5 21" stroke="currentColor" stroke-width="2"/>
+                  </svg>
                 </div>
+                <h3 class="text-lg font-semibold text-foreground">参考图片</h3>
               </div>
-              <div v-else class="upload-placeholder">
-                <el-icon class="upload-icon">
-                  <Plus />
-                </el-icon>
-                <div class="upload-text">点击上传参考图片</div>
+
+              <!-- 图片上传区域 -->
+              <div class="space-y-2">
+                <label class="text-sm font-medium text-foreground">上传参考图片</label>
+                <el-upload
+                  class="modern-image-uploader"
+                  :show-file-list="false"
+                  :before-upload="beforeImageUpload"
+                  :auto-upload="true"
+                  :http-request="handleCustomUpload"
+                  action="#">
+                  <div v-if="imageUrl" class="modern-image-preview">
+                    <img :src="imageUrl" class="uploaded-image-modern" />
+                    <div class="remove-image-modern" @click.stop="removeImage">
+                      <el-icon>
+                        <Delete />
+                      </el-icon>
+                    </div>
+                  </div>
+                  <div v-else class="modern-upload-placeholder">
+                    <el-icon class="upload-icon-modern">
+                      <Plus />
+                    </el-icon>
+                    <div class="upload-text-modern">点击上传参考图片</div>
+                    <div class="upload-hint-modern">支持 JPG、PNG 格式</div>
+                  </div>
+                </el-upload>
+                <div class="upload-tip-modern">上传图片后，AI将生成与参考图片风格相似的图像</div>
               </div>
-            </el-upload>
-            <div class="upload-tip">上传图片后，AI将生成与参考图片风格相似的图像</div>
-          </el-form-item>
+            </div>
           </div>
 
           <!-- 生成按钮 -->
-          <div class="generate-button-container">
-            <el-button type="primary" class="generate-button" @click="generateImage" :loading="loading" :disabled="!formData.prompt || loading">
+          <div class="modern-parameter-card modern-parameter-card-last">
+            <button
+              @click="generateImage"
+              :disabled="!formData.prompt || loading"
+              class="w-full h-12 flex items-center justify-center gap-2 bg-primary text-white rounded-lg font-medium transition-all duration-200 hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <svg v-if="loading" class="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/>
+                <path fill="currentColor" class="opacity-75" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+              </svg>
+              <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
               {{ loading ? '生成中...' : '生成图片' }}
-            </el-button>
+            </button>
           </div>
         </el-form>
       </div>
@@ -924,44 +1050,98 @@ onMounted(() => {
 watch([() => formData.num_inference_steps, () => formData.guidance_scale], () => {
   checkAndUpdatePresetSelection();
 });
+
+// 获取预设图标
+const getPresetIcon = (presetLabel: string): string => {
+  const iconMap: Record<string, string> = {
+    '快速生成': '⚡',
+    '标准质量': '⚖️',
+    '高质量': '💎'
+  };
+  return iconMap[presetLabel] || '🎨';
+};
+
+// 获取尺寸预览样式
+const getSizePreviewStyle = (ratio: string) => {
+  const containerSize = 36; // 容器大小，减小了
+  let width = containerSize;
+  let height = containerSize;
+
+  try {
+    const [wRatio, hRatio] = ratio.split(':').map(Number);
+    if (wRatio && hRatio) {
+      const aspectRatio = wRatio / hRatio;
+
+      if (aspectRatio > 1) {
+        // 横向图片
+        width = containerSize;
+        height = containerSize / aspectRatio;
+      } else {
+        // 纵向图片
+        height = containerSize;
+        width = containerSize * aspectRatio;
+      }
+    }
+  } catch (e) {
+    console.error("Error parsing ratio:", ratio, e);
+  }
+
+  return {
+    width: `${width}px`,
+    height: `${height}px`,
+  };
+};
 </script>
 
 <style scoped>
-/* CSS变量定义 - 移至组件作用域而非:root */
+/* 现代化高级配色方案 */
 .image-gen-view {
-  /* 颜色变量 */
-  --primary-color: #4e54c8;
-  --primary-light: #8f94fb;
-  --primary-dark: #3a3f9f;
-  --secondary-color: #ff7eb3;
+  /* 主色调 - 优雅的紫蓝渐变 */
+  --primary-color: #6366f1;
+  --primary-light: #a5b4fc;
+  --primary-dark: #4338ca;
+  --primary-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
 
-  --neutral-50: #f9fafb;
-  --neutral-100: #f3f4f6;
-  --neutral-200: #e5e7eb;
-  --neutral-300: #d1d5db;
-  --neutral-400: #9ca3af;
-  --neutral-500: #6b7280;
-  --neutral-600: #4b5563;
-  --neutral-700: #374151;
-  --neutral-800: #1f2937;
-  --neutral-900: #111827;
+  /* 辅助色 - 温暖的渐变 */
+  --secondary-color: #f59e0b;
+  --accent-color: #06b6d4;
+  --accent-light: #67e8f9;
 
-  --success-color: #10b981;
+  /* 现代中性色调 */
+  --neutral-50: #fafafa;
+  --neutral-100: #f5f5f5;
+  --neutral-200: #e5e5e5;
+  --neutral-300: #d4d4d4;
+  --neutral-400: #a3a3a3;
+  --neutral-500: #737373;
+  --neutral-600: #525252;
+  --neutral-700: #404040;
+  --neutral-800: #262626;
+  --neutral-900: #171717;
+
+  /* 功能色彩 */
+  --success-color: #22c55e;
   --warning-color: #f59e0b;
   --error-color: #ef4444;
   --info-color: #3b82f6;
 
-  /* 阴影变量 */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  /* 现代化阴影系统 */
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 
-  /* 圆角变量 */
-  --border-radius-sm: 0.25rem;
+  /* 彩色阴影 */
+  --shadow-primary: 0 10px 25px -5px rgba(99, 102, 241, 0.2);
+  --shadow-accent: 0 10px 25px -5px rgba(6, 182, 212, 0.2);
+
+  /* 现代圆角系统 */
+  --border-radius-sm: 0.375rem;
   --border-radius-md: 0.5rem;
   --border-radius-lg: 0.75rem;
   --border-radius-xl: 1rem;
+  --border-radius-2xl: 1.5rem;
   --border-radius-full: 9999px;
 
   /* 间距变量 */
@@ -976,44 +1156,81 @@ watch([() => formData.num_inference_steps, () => formData.guidance_scale], () =>
   --spacing-12: 3rem;
   --spacing-16: 4rem;
 
-  /* 基础样式 */
-  padding: var(--spacing-5);
-  background: linear-gradient(135deg, var(--neutral-50), var(--neutral-100));
+  /* 现代化基础样式 */
+  padding: var(--spacing-6);
+  background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 50%, #f0f0f0 100%);
   min-height: calc(100vh - 64px);
   box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: var(--neutral-800);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* 添加微妙的背景纹理 */
+.image-gen-view::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(circle at 25% 25%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
+                    radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .page-header {
   text-align: center;
-  margin-bottom: var(--spacing-8);
+  margin-bottom: var(--spacing-10);
+  position: relative;
+  z-index: 1;
 }
 
 .page-header h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: var(--spacing-2);
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: var(--spacing-3);
+  background: var(--primary-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  letter-spacing: -0.025em;
+  background-clip: text;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  position: relative;
+}
+
+.page-header h1::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: var(--primary-gradient);
+  border-radius: var(--border-radius-full);
 }
 
 .subtitle {
-  font-size: 1.1rem;
+  font-size: 1.125rem;
   color: var(--neutral-600);
   margin: 0;
-  font-weight: 400;
+  font-weight: 500;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
 }
 
 .content-container {
   display: grid;
-  grid-template-columns: minmax(320px, 400px) 1fr;
-  gap: var(--spacing-6);
-  max-width: 1600px;
+  grid-template-columns: minmax(360px, 420px) 1fr;
+  gap: var(--spacing-8);
+  max-width: 1800px;
   margin: 0 auto;
   position: relative;
+  z-index: 1;
 }
 
 /* 表单区域 */
@@ -1047,17 +1264,32 @@ watch([() => formData.num_inference_steps, () => formData.guidance_scale], () =>
 }
 
 .form-card {
-  background: white;
-  border-radius: var(--border-radius-lg);
-  padding: var(--spacing-5);
-  box-shadow: var(--shadow-md);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border: 1px solid var(--neutral-200);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: var(--border-radius-xl);
+  padding: var(--spacing-6);
+  box-shadow: var(--shadow-lg);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+  animation: slideInUp 0.6s ease-out;
+}
+
+.form-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--primary-gradient);
 }
 
 .form-card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+  transform: translateY(-4px);
+  border-color: rgba(99, 102, 241, 0.2);
 }
 
 .card-header {
@@ -1077,7 +1309,7 @@ watch([() => formData.num_inference_steps, () => formData.guidance_scale], () =>
 .generation-form {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-4);
+  gap: 0; /* 移除gap，使用卡片自身的margin-bottom */
 }
 
 .parameter-grid {
@@ -1085,19 +1317,32 @@ watch([() => formData.num_inference_steps, () => formData.guidance_scale], () =>
   gap: var(--spacing-4);
 }
 
-/* 结果容器 */
+/* 现代化结果容器 */
 .results-container {
-  background: white;
-  border-radius: var(--border-radius-lg);
-  padding: var(--spacing-6);
-  box-shadow: var(--shadow-md);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: var(--border-radius-xl);
+  padding: var(--spacing-8);
+  box-shadow: var(--shadow-xl);
   display: flex;
   flex-direction: column;
-  transition: box-shadow 0.3s ease;
-  border: 1px solid var(--neutral-200);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   height: calc(100vh - 140px);
   overflow-y: auto;
   scrollbar-width: thin;
+  position: relative;
+  animation: slideInUp 0.8s ease-out 0.2s both;
+}
+
+.results-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--primary-gradient);
 }
 
 .results-container::-webkit-scrollbar {
@@ -1129,41 +1374,47 @@ watch([() => formData.num_inference_steps, () => formData.guidance_scale], () =>
   margin-bottom: var(--spacing-2);
 }
 
-/* Image uploader */
+/* 现代化图片上传器 */
 .image-uploader {
   border: 2px dashed var(--neutral-300);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--border-radius-xl);
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   width: 100%;
-  height: 160px;
+  height: 180px;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: var(--neutral-50);
+  background: linear-gradient(135deg, var(--neutral-50), rgba(255, 255, 255, 0.8));
+  backdrop-filter: blur(5px);
 }
 
 .image-uploader:hover {
-  border-color: var(--primary-light);
-  background: rgba(78, 84, 200, 0.03);
+  border-color: var(--primary-color);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
 }
 
 .upload-icon {
-  font-size: 28px;
-  color: var(--neutral-500);
-  transition: color 0.3s ease;
+  font-size: 32px;
+  color: var(--neutral-400);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: var(--spacing-2);
 }
 
 .upload-placeholder:hover .upload-icon {
   color: var(--primary-color);
+  transform: scale(1.1);
 }
 
 .upload-tip {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: var(--neutral-500);
   margin-top: var(--spacing-2);
+  font-weight: 500;
 }
 
 .image-preview {
@@ -1209,28 +1460,46 @@ watch([() => formData.num_inference_steps, () => formData.guidance_scale], () =>
   transform: scale(1.1);
 }
 
-/* 生成按钮样式 */
+/* 现代化生成按钮 */
 .generate-button {
   width: 100%;
-  height: 48px;
-  font-size: 1rem;
+  height: 56px;
+  font-size: 1.125rem;
   font-weight: 600;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  background: var(--primary-gradient);
   border: none;
-  transition: all 0.3s ease;
-  border-radius: var(--border-radius-md);
-  box-shadow: 0 4px 10px rgba(78, 84, 200, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-primary);
+  position: relative;
+  overflow: hidden;
+  color: white;
+}
+
+.generate-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
 }
 
 .generate-button:hover:not(:disabled) {
   background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(78, 84, 200, 0.3);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-2xl);
+}
+
+.generate-button:hover:not(:disabled)::before {
+  left: 100%;
 }
 
 .generate-button:active:not(:disabled) {
-  transform: translateY(0);
-  box-shadow: 0 2px 5px rgba(78, 84, 200, 0.3);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-primary);
 }
 
 /* 空状态样式 */
@@ -1252,9 +1521,45 @@ watch([() => formData.num_inference_steps, () => formData.guidance_scale], () =>
   border: 1px solid var(--neutral-200);
 }
 
+/* 现代化动画效果 */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
 }
 
 .empty-header {
@@ -1507,24 +1812,42 @@ watch([() => formData.num_inference_steps, () => formData.guidance_scale], () =>
 
 .image-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: var(--spacing-5);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-6);
   width: 100%;
 }
 
 .image-item {
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--border-radius-2xl);
   overflow: hidden;
-  box-shadow: var(--shadow-md);
-  transition: all 0.3s ease;
-  background: var(--neutral-50);
-  border: 1px solid var(--neutral-200);
+  box-shadow: var(--shadow-lg);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+}
+
+.image-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--primary-gradient);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .image-item:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-xl);
-  z-index: 1;
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--shadow-2xl);
+  z-index: 10;
+}
+
+.image-item:hover::before {
+  opacity: 1;
 }
 
 .image-wrapper {
@@ -1665,21 +1988,25 @@ watch([() => formData.num_inference_steps, () => formData.guidance_scale], () =>
   margin-top: var(--spacing-2);
 }
 
-/* 提示词和预设区域样式 */
+/* 现代化提示词和预设区域 */
 .templates-section,
 .presets-section {
   margin-bottom: var(--spacing-4);
-  padding: var(--spacing-4);
-  background: var(--neutral-50);
-  border-radius: var(--border-radius-md);
-  transition: all 0.3s ease;
+  padding: var(--spacing-5);
+  background: linear-gradient(135deg, var(--neutral-50), rgba(255, 255, 255, 0.8));
+  backdrop-filter: blur(5px);
+  border-radius: var(--border-radius-xl);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid var(--neutral-200);
+  box-shadow: var(--shadow-sm);
 }
 
 .templates-section:hover,
 .presets-section:hover {
-  background: rgba(78, 84, 200, 0.05);
-  border-color: rgba(78, 84, 200, 0.2);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+  border-color: rgba(99, 102, 241, 0.3);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
 .presets-section {
@@ -1719,23 +2046,27 @@ watch([() => formData.num_inference_steps, () => formData.guidance_scale], () =>
   gap: var(--spacing-2);
 }
 
-/* Element Plus 组件样式定制 */
+/* 现代化按钮样式 */
 .template-buttons :deep(.el-button),
 .preset-buttons :deep(.el-button) {
-  background: white;
-  border: 1px solid var(--neutral-300);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(5px);
+  border: 1px solid var(--neutral-200);
   color: var(--neutral-700);
-  transition: all 0.3s ease;
-  font-size: 0.75rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .template-buttons :deep(.el-button:hover),
 .preset-buttons :deep(.el-button:hover) {
-  background: rgba(78, 84, 200, 0.05);
+  background: var(--primary-gradient);
   border-color: var(--primary-color);
-  color: var(--primary-color);
-  transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(78, 84, 200, 0.1);
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-primary);
 }
 
 /* 图片尺寸选择器样式 - 恢复网格布局并优化 */
@@ -1758,20 +2089,22 @@ watch([() => formData.num_inference_steps, () => formData.guidance_scale], () =>
   display: block;
 }
 
-/* 自定义内容容器 - 优化样式 */
+/* 现代化尺寸选择容器 */
 .size-option-content {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 64px; /* 调整高度 */
+  height: 72px;
   cursor: pointer;
-  border: 1px solid var(--neutral-200); /* 更柔和的边框 */
-  border-radius: var(--border-radius-lg);
-  background-color: white;
-  transition: all 0.25s ease-out;
+  border: 2px solid var(--neutral-200);
+  border-radius: var(--border-radius-xl);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(5px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  padding: var(--spacing-1) 0; /* 增加垂直内边距 */
+  padding: var(--spacing-2) 0;
+  box-shadow: var(--shadow-sm);
 }
 
 /* SVG 图标样式 - 优化 */
@@ -1798,30 +2131,32 @@ watch([() => formData.num_inference_steps, () => formData.guidance_scale], () =>
   padding-bottom: var(--spacing-1);
 }
 
-/* 悬停状态 - 更精致 */
+/* 现代化悬停状态 */
 .size-radio-button:hover .size-option-content {
-  border-color: var(--neutral-300);
-  background-color: var(--neutral-50);
-  box-shadow: var(--shadow-sm);
+  border-color: var(--primary-light);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 .size-radio-button:hover .svg-rect {
-  fill: var(--neutral-500);
+  fill: var(--primary-light);
 }
 
-/* 激活/选中状态 - 更高级 */
+/* 现代化激活/选中状态 */
 .size-radio-button.is-active .size-option-content {
   border-color: var(--primary-color);
-  background-color: white;
-  box-shadow: 0 0 0 2px var(--primary-color), var(--shadow-sm); /* 边框高亮 + 细微阴影 */
+  background: var(--primary-gradient);
+  box-shadow: var(--shadow-primary);
+  transform: translateY(-1px);
 }
 
 .size-radio-button.is-active .svg-rect {
-  fill: var(--primary-color);
+  fill: white;
 }
 
 .size-radio-button.is-active .size-label {
-  color: var(--primary-color);
+  color: white;
   font-weight: 600;
 }
 
@@ -2251,5 +2586,534 @@ watch([() => formData.num_inference_steps, () => formData.guidance_scale], () =>
      .step-description {
        font-size: 0.75rem;
      }
+}
+
+/* 现代化参数卡片样式 */
+.modern-parameter-card {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: white;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: slideInUp 0.6s ease-out;
+  margin-bottom: 1.5rem;
+}
+
+.modern-parameter-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* 最后一个卡片移除底边距 */
+.modern-parameter-card-last {
+  margin-bottom: 0;
+}
+
+.parameter-icon-modern {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--primary-color);
+}
+
+/* 现代化样式变量 */
+.modern-parameter-card {
+  --primary: #6366f1;
+  --primary-foreground: #ffffff;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #f8fafc;
+  --accent-foreground: #0f172a;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --background: #ffffff;
+  --foreground: #0f172a;
+}
+
+/* Element Plus 组件现代化定制 */
+.modern-select :deep(.el-select__wrapper) {
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--background);
+  transition: all 0.2s;
+}
+
+.modern-select :deep(.el-select__wrapper:hover) {
+  border-color: var(--primary);
+}
+
+.modern-select :deep(.el-select__wrapper.is-focused) {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.modern-slider-custom :deep(.el-slider__runway) {
+  background-color: #e2e8f0;
+  border-radius: 9999px;
+  height: 6px;
+}
+
+.modern-slider-custom :deep(.el-slider__bar) {
+  background: var(--primary);
+  border-radius: 9999px;
+}
+
+.modern-slider-custom :deep(.el-slider__button) {
+  width: 18px;
+  height: 18px;
+  background: white;
+  border: 3px solid var(--primary);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modern-slider-custom :deep(.el-slider__button:hover) {
+  transform: scale(1.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.modern-slider-custom :deep(.el-slider__marks-text) {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  font-weight: 500;
+}
+
+.modern-input :deep(.el-input__wrapper) {
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--background);
+  transition: all 0.2s;
+}
+
+.modern-input :deep(.el-input__wrapper:hover) {
+  border-color: var(--primary);
+}
+
+.modern-input :deep(.el-input__wrapper.is-focus) {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.modern-button-secondary {
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--foreground);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.modern-button-secondary:hover {
+  background: var(--accent);
+  border-color: var(--primary);
+}
+
+/* 文本样式 */
+.text-foreground {
+  color: var(--foreground);
+}
+
+.text-muted-foreground {
+  color: var(--muted-foreground);
+}
+
+.bg-muted {
+  background-color: var(--muted);
+}
+
+.bg-primary {
+  background-color: var(--primary);
+}
+
+.text-white {
+  color: white;
+}
+
+.bg-background {
+  background-color: var(--background);
+}
+
+.bg-accent {
+  background-color: var(--accent);
+}
+
+.text-accent-foreground {
+  color: var(--accent-foreground);
+}
+
+.border-input {
+  border-color: var(--input);
+}
+
+/* 间距工具类 */
+.space-y-2 > * + * {
+  margin-top: 0.5rem;
+}
+
+.space-y-3 > * + * {
+  margin-top: 0.75rem;
+}
+
+.space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+/* 布局工具类 */
+.flex {
+  display: flex;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.grid {
+  display: grid;
+}
+
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.w-full {
+  width: 100%;
+}
+
+.flex-1 {
+  flex: 1 1 0%;
+}
+
+/* 文字样式 */
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+/* 圆角 */
+.rounded {
+  border-radius: 0.25rem;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+/* 内边距 */
+.px-2 {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.px-3 {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+.py-1 {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+/* 阴影 */
+.shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* 过渡 */
+.transition-all {
+  transition-property: all;
+}
+
+.duration-200 {
+  transition-duration: 200ms;
+}
+
+/* 现代化文本域样式 */
+.modern-textarea :deep(.el-textarea__inner) {
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--background);
+  transition: all 0.2s;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.modern-textarea :deep(.el-textarea__inner:hover) {
+  border-color: var(--primary);
+}
+
+.modern-textarea :deep(.el-textarea__inner:focus) {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  outline: none;
+}
+
+/* 现代化图片上传器 */
+.modern-image-uploader {
+  width: 100%;
+}
+
+.modern-image-uploader :deep(.el-upload) {
+  width: 100%;
+  border: 2px dashed var(--border);
+  border-radius: 0.75rem;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--background);
+}
+
+.modern-image-uploader :deep(.el-upload:hover) {
+  border-color: var(--primary);
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.modern-upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  min-height: 160px;
+}
+
+.upload-icon-modern {
+  font-size: 2rem;
+  color: var(--muted-foreground);
+  margin-bottom: 0.5rem;
+  transition: all 0.3s;
+}
+
+.modern-image-uploader :deep(.el-upload:hover) .upload-icon-modern {
+  color: var(--primary);
+  transform: scale(1.1);
+}
+
+.upload-text-modern {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+  margin-bottom: 0.25rem;
+}
+
+.upload-hint-modern {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.upload-tip-modern {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  text-align: center;
+  margin-top: 0.5rem;
+  line-height: 1.4;
+}
+
+/* 现代化图片预览 */
+.modern-image-preview {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.uploaded-image-modern {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.remove-image-modern {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 2rem;
+  height: 2rem;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.remove-image-modern:hover {
+  background: rgba(239, 68, 68, 0.8);
+  transform: scale(1.1);
+}
+
+/* 动画类 */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 高度类 */
+.h-12 {
+  height: 3rem;
+}
+
+/* 尺寸预览样式 */
+.size-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 0.5rem;
+}
+
+.size-preview-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 2px solid var(--border);
+  background: var(--background);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  min-height: 85px;
+}
+
+.size-preview-inactive {
+  border-color: var(--border);
+  color: var(--muted-foreground);
+}
+
+.size-preview-inactive:hover {
+  border-color: var(--primary);
+  background: rgba(99, 102, 241, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+}
+
+.size-preview-active {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+}
+
+.size-preview-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 45px;
+}
+
+.size-preview-box {
+  border: 1.5px solid currentColor;
+  border-radius: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.size-preview-active .size-preview-box {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+.size-preview-inner {
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.size-preview-active .size-preview-inner {
+  opacity: 0.9;
+}
+
+.size-preview-info {
+  text-align: center;
+  min-height: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.size-preview-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.1;
+  margin-bottom: 0.0625rem;
+}
+
+.size-preview-ratio {
+  font-size: 0.5625rem;
+  opacity: 0.7;
+  font-weight: 500;
+}
+
+.size-preview-active .size-preview-ratio {
+  opacity: 0.9;
+}
+
+/* 响应式调整 */
+@media (max-width: 640px) {
+  .size-preview-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .size-preview-card {
+    padding: 0.75rem;
+    min-height: 100px;
+  }
+
+  .size-preview-container {
+    width: 50px;
+    height: 50px;
+  }
 }
 </style>
