@@ -3,7 +3,6 @@
 <p align="center">
   <img src="assets/README/image.png" alt="AI Vista Preview" width="100%">
 </p>
-![alt text](assets/README/image.png)
 <p align="center">
   <img src="assets/README.md/101.png" alt="AI Vista Chat" width="49%">
   <img src="assets/README.md/102.png" alt="AI Vista Game" width="49%">
