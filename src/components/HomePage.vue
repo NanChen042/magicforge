@@ -1,56 +1,137 @@
 <template>
   <div class="min-h-screen bg-[#F8FAFC] selection:bg-indigo-500/30 text-slate-800 font-sans">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8  relative">
+      <!-- Hero Refactored: 浅色科技风 + 边缘悬浮特效 -->
+      <section class="relative pt-20 pb-32 lg:pt-32 lg:pb-40 text-center overflow-hidden">
+        
+        <!-- ==================== [新增] 1. 边缘酷炫特效层 ==================== -->
+        <div class="absolute inset-0 z-0 pointer-events-none select-none">
+          
+          <!-- A. 左上角：悬浮的“玻璃逻辑卡片” (3D Floating Card) -->
+          <!-- 仅在大屏显示，增加空间进深感 -->
+          <div class="absolute top-10 left-[5%] lg:left-[10%] w-48 p-3 rounded-2xl bg-white/40 backdrop-blur-xl border border-white/60 shadow-[0_8px_32px_rgba(31,38,135,0.1)] -rotate-6 animate-float-slow hidden lg:block">
+             <!-- 模拟代码块 -->
+             <div class="flex items-center gap-2 mb-2">
+               <div class="w-2 h-2 rounded-full bg-red-400"></div>
+               <div class="w-2 h-2 rounded-full bg-yellow-400"></div>
+               <div class="w-2 h-2 rounded-full bg-green-400"></div>
+             </div>
+             <div class="space-y-1.5">
+               <div class="h-1.5 w-3/4 bg-slate-400/20 rounded-full"></div>
+               <div class="h-1.5 w-1/2 bg-indigo-500/20 rounded-full"></div>
+               <div class="h-1.5 w-5/6 bg-slate-400/20 rounded-full"></div>
+             </div>
+             <!-- 装饰光泽 -->
+             <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/40 to-transparent rounded-2xl pointer-events-none"></div>
+          </div>
 
-    <!-- 全局背景装饰 - 更高级的极光效果 -->
-    <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-      <div class="absolute top-[-10%] left-[-10%] w-[50rem] h-[50rem] bg-indigo-500/10 rounded-full blur-[100px] mix-blend-multiply animate-blob"></div>
-      <div class="absolute top-[-10%] right-[-10%] w-[50rem] h-[50rem] bg-violet-500/10 rounded-full blur-[100px] mix-blend-multiply animate-blob animation-delay-2000"></div>
-      <div class="absolute bottom-[-20%] left-[20%] w-[60rem] h-[60rem] bg-blue-500/5 rounded-full blur-[100px] mix-blend-multiply animate-blob animation-delay-4000"></div>
-      <!-- 网格纹理叠加，增加科技感 -->
-      <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150"></div>
-    </div>
+          <!-- B. 右上角：动态“神经轨道” (Spinning Orbits) -->
+          <div class="absolute -top-20 -right-20 w-[500px] h-[500px] opacity-30">
+             <!-- 轨道 1 -->
+             <div class="absolute inset-0 border border-indigo-200/40 rounded-full animate-spin-slower border-dashed"></div>
+             <!-- 轨道 2 (反向) -->
+             <div class="absolute inset-[15%] border border-violet-200/40 rounded-full animate-reverse-spin border-dotted"></div>
+             <!-- 核心光晕 -->
+             <div class="absolute inset-[30%] bg-gradient-to-br from-indigo-500/5 to-purple-500/5 rounded-full blur-2xl"></div>
+          </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative">
-      <!-- 1. Hero 区域：更克制、更有力的排版 -->
-      <header class="text-center mb-24 max-w-4xl mx-auto">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 border border-indigo-100 shadow-sm mb-8 backdrop-blur-sm animate-fade-in-up">
-          <span class="relative flex h-2 w-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-          </span>
-          <span class="text-xs font-semibold text-indigo-600 tracking-wide uppercase">AI Vista 2.0 Now Available</span>
+          <!-- C. 散落的“科技锚点” (Tech Decorators) -->
+          <!-- 十字准星 + -->
+          <svg class="absolute top-24 right-[15%] w-6 h-6 text-slate-200" viewBox="0 0 24 24" fill="currentColor"><path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg>
+          <svg class="absolute bottom-24 left-[10%] w-4 h-4 text-slate-200" viewBox="0 0 24 24" fill="currentColor"><path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg>
+          <!-- 刻度线 -->
+          <div class="absolute bottom-10 right-10 flex gap-2">
+             <div class="w-1 h-4 bg-slate-200"></div>
+             <div class="w-1 h-2 bg-slate-200 mt-2"></div>
+             <div class="w-1 h-4 bg-slate-200"></div>
+          </div>
         </div>
 
-        <h1 class="text-5xl md:text-7xl font-bold tracking-tight text-slate-900 mb-6 leading-[1.1]">
-          探索 <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600 relative">AI 智能
-            <!-- 下划线装饰 -->
-            <svg class="absolute w-full h-3 -bottom-1 left-0 text-indigo-200/50 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
-              <path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="8" fill="none" />
-            </svg>
-          </span>
-          的无限边界
-        </h1>
+        <!-- ==================== 2. 原有背景装饰 (保留光晕) ==================== -->
+        <div class="absolute inset-0 -z-10 pointer-events-none">
+           <div class="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-indigo-500/5 rounded-full blur-[100px] mix-blend-multiply animate-blob"></div>
+           <div class="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+        </div>
 
-        <p class="text-xl text-slate-500 mb-10 max-w-2xl mx-auto leading-relaxed font-light">
-          下一代智能对话与创作平台。集成多种大模型接口，为您提供企业级的流式响应、思维链展示与多模态创作体验。
-        </p>
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          
+          <!-- 顶部胶囊 -->
+          <div class="inline-flex items-center justify-center mb-8 animate-fade-in-up">
+            <a href="#" class="group relative inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-sm border border-slate-200 shadow-[0_2px_10px_rgba(0,0,0,0.05)] hover:border-indigo-300 transition-all duration-300">
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-600"></span>
+              </span>
+              <span class="text-xs font-semibold text-slate-600 group-hover:text-indigo-600 transition-colors uppercase tracking-wide">AI Vista 2.0</span>
+              <span class="text-slate-300 mx-1">|</span>
+              <span class="text-xs text-slate-500">System Upgrade Available</span>
+            </a>
+          </div>
 
-        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <router-link to="/api-demo" class="group relative px-8 py-4 bg-slate-900 text-white rounded-2xl font-medium shadow-xl shadow-indigo-500/20 hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all duration-300 overflow-hidden">
-            <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-500 to-violet-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <span class="relative flex items-center gap-2">
-              开始构建
-              <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
+          <!-- 主标题 -->
+          <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-slate-900 mb-6 leading-[1.1] animate-fade-in-up animation-delay-200">
+            重塑
+            <span class="relative whitespace-nowrap inline-block">
+              <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600 animate-gradient-x font-extrabold">
+                数字创造力
+              </span>
+              <!-- 标题背景光晕增强 -->
+              <span class="absolute -inset-x-8 -inset-y-6 bg-indigo-400/10 blur-2xl -z-10 rounded-full mix-blend-multiply"></span>
             </span>
-          </router-link>
+            <br class="hidden sm:block" />
+            的无限边界
+          </h1>
 
-          <router-link to="/prompt-library" class="group px-8 py-4 bg-white text-slate-700 rounded-2xl font-medium border border-slate-200 shadow-sm hover:border-indigo-200 hover:text-indigo-600 hover:shadow-md transition-all duration-300">
-            浏览提示库
-          </router-link>
+          <!-- 副标题 -->
+          <p class="text-lg md:text-xl text-slate-500 mb-10 max-w-2xl mx-auto leading-relaxed font-normal animate-fade-in-up animation-delay-400">
+            下一代企业级智能引擎。
+            <span class="text-slate-900 font-medium decoration-indigo-200/50 underline underline-offset-4">零延迟</span> 流式响应，
+            <span class="text-slate-900 font-medium decoration-indigo-200/50 underline underline-offset-4">全链路</span> 思维推理。
+            为开发者打造的极致体验。
+          </p>
+
+          <!-- 按钮组 -->
+          <div class="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up animation-delay-600">
+            <router-link to="/api-demo" class="group relative px-8 py-3.5 bg-slate-900 text-white rounded-xl font-medium shadow-xl shadow-slate-900/10 hover:shadow-2xl hover:shadow-indigo-900/20 hover:-translate-y-0.5 transition-all duration-300 overflow-hidden">
+              <span class="relative flex items-center gap-2">
+                开始构建
+                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </span>
+            </router-link>
+
+            <router-link to="/prompt-library" class="group px-8 py-3.5 bg-white text-slate-700 rounded-xl font-medium border border-slate-200 shadow-sm hover:border-indigo-200 hover:text-indigo-600 transition-all duration-300">
+              <span class="flex items-center gap-2">
+                 <svg class="w-5 h-5 text-slate-400 group-hover:text-indigo-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 6.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 6.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 6.253" />
+                 </svg>
+                 浏览提示库
+              </span>
+            </router-link>
+          </div>
+
+          <!-- 底部数据背书 -->
+          <div class="mt-16 pt-8 border-t border-slate-200/60 flex flex-col md:flex-row items-center justify-center gap-8 animate-fade-in-up animation-delay-600">
+             <div class="flex items-center gap-2 text-slate-500 text-sm font-medium">
+               <div class="flex -space-x-2">
+                 <div class="w-6 h-6 rounded-full bg-slate-200 border-2 border-white"></div>
+                 <div class="w-6 h-6 rounded-full bg-slate-300 border-2 border-white"></div>
+                 <div class="w-6 h-6 rounded-full bg-slate-400 border-2 border-white"></div>
+               </div>
+               <span>2,000+ 开发者正在使用</span>
+             </div>
+          </div>
+
         </div>
-      </header>
+      </section>
+
+
+
+
+
+
+
 
       <!-- 2. 核心价值 Showcase (重构版：高级光影美学) -->
       <section class="mb-24 px-4 sm:px-6 lg:px-8">
@@ -199,31 +280,60 @@
 
       <section class="mb-24 px-4 sm:px-6 lg:px-8">
 
-        <!-- 标题区：增加更强的引导感 -->
-        <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-          <div class="max-w-2xl">
-            <h2 class="text-4xl font-bold text-slate-900 mb-4 tracking-tight">
+        <!-- 标题区 (重构版：旗舰级排版) -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8 relative z-10">
+
+          <!-- 左侧：标题核心 -->
+          <div class="max-w-2xl relative">
+            <!-- 装饰：左侧竖线光标 -->
+            <div class="absolute -left-6 top-2 w-1 h-12 bg-gradient-to-b from-indigo-500 to-violet-500 rounded-full hidden lg:block"></div>
+
+            <!-- 眉题 Tag -->
+            <div class="inline-flex items-center gap-2 mb-4 px-3 py-1 rounded-full bg-white/80 border border-indigo-100 backdrop-blur-sm shadow-sm">
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+              </span>
+              <span class="text-xs font-semibold text-indigo-600 tracking-wide uppercase">Capabilities Matrix</span>
+            </div>
+
+            <!-- 主标题 -->
+            <h2 class="text-4xl md:text-5xl font-bold text-slate-900 mb-6 tracking-tight leading-[1.2]">
               释放 AI 的
               <span class="relative inline-block">
-                <span class="relative z-10 text-indigo-600">多元潜能</span>
-                <span class="absolute bottom-1 left-0 w-full h-3 bg-indigo-100 -z-0 -rotate-1"></span>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-600 animate-gradient-x">
+                  多元潜能
+                </span>
+                <!-- 科技感下划线 -->
+                <svg class="absolute -bottom-2 left-0 w-full h-2 text-indigo-500/30" viewBox="0 0 100 10" preserveAspectRatio="none">
+                  <path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="4 2" />
+                </svg>
               </span>
             </h2>
-            <p class="text-lg text-slate-500 leading-relaxed">
-              精心打造的功能矩阵，从自然语言处理到多模态创作，为您提供一站式智能体验。
+
+            <!-- 描述文案 -->
+            <p class="text-lg text-slate-500 leading-relaxed font-light">
+              精心打造的功能矩阵。从<span class="text-slate-800 font-medium">自然语言处理</span>到<span class="text-slate-800 font-medium">多模态创作</span>，为您提供一站式、企业级的智能体验。
             </p>
           </div>
 
-          <!-- 查看更多链接 -->
-          <a href="#" class="hidden md:flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors group">
-            查看完整文档
-            <span class="w-6 h-6 rounded-full bg-indigo-50 flex items-center justify-center group-hover:bg-indigo-100 group-hover:translate-x-1 transition-all">
-              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          <!-- 右侧：高级交互按钮 -->
+          <a href="#" class="group flex items-center justify-between gap-4 px-6 py-3 rounded-2xl bg-white border border-slate-200 hover:border-indigo-300 shadow-sm hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300 min-w-[180px]">
+            <div class="flex flex-col">
+              <span class="text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">查看完整文档</span>
+              <span class="text-[10px] text-slate-400 font-mono">DOCS & API REF</span>
+            </div>
+
+            <!-- 箭头图标容器 -->
+            <div class="w-8 h-8 rounded-full bg-slate-50 group-hover:bg-indigo-600 flex items-center justify-center transition-all duration-300 group-hover:rotate-45">
+              <svg class="w-4 h-4 text-slate-600 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7" />
               </svg>
-            </span>
+            </div>
           </a>
+
         </div>
+
         <!-- Bento Grid 布局：宽幅游戏版 (流体交错结构) -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 auto-rows-[240px]">
 
@@ -607,39 +717,150 @@
 
           <!-- ==================== [Row 3 Right] 收尾小卡片 ==================== -->
 
-          <!-- 6. MCP 智能体 (1x1) -->
-          <router-link to="/mcp-agent" class="group relative col-span-1 h-full bg-slate-900 rounded-[2.5rem] overflow-hidden border border-slate-700/50 hover:border-cyan-400/50 hover:shadow-[0_0_40px_rgba(34,211,238,0.15)] transition-all duration-500">
-            <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#22d3ee 1px, transparent 1px); background-size: 16px 16px;"></div>
-            <div class="absolute -right-8 -bottom-8 w-32 h-32 border border-cyan-500/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-700">
-              <div class="w-20 h-20 border border-cyan-500/20 rounded-full border-dashed animate-[spin_10s_linear_infinite]"></div>
-            </div>
-            <div class="p-6 relative z-20 h-full flex flex-col justify-between">
-              <div class="px-2 py-1 self-start rounded-full bg-cyan-950/50 border border-cyan-500/30 backdrop-blur-md flex items-center gap-2">
-                <span class="relative flex h-1.5 w-1.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span><span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-cyan-500"></span></span>
-                <span class="text-[9px] font-mono font-bold text-cyan-400 tracking-wider">MCP_V2</span>
+          <!-- 6. MCP 智能体 (重构版：全息数据枢纽) -->
+          <router-link to="/mcp-agent" class="group relative col-span-1 h-full bg-[#081018] rounded-[2.5rem] overflow-hidden border border-cyan-500/20 hover:border-cyan-400/50 hover:shadow-[0_0_40px_rgba(34,211,238,0.2)] transition-all duration-500">
+
+            <!-- 1. 背景：电路板纹理 -->
+            <div class="absolute inset-0 overflow-hidden">
+              <!-- 基础底色 -->
+              <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-cyan-900/40 via-[#081018] to-[#081018]"></div>
+
+              <!-- 电路网格 -->
+              <div class="absolute inset-0 opacity-20" style="background-image: linear-gradient(rgba(34,211,238,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,0.1) 1px, transparent 1px); background-size: 20px 20px;">
               </div>
-              <div>
-                <h3 class="text-lg font-bold text-white mb-1">MCP 智能体</h3>
-                <p class="text-[10px] text-slate-400">数据神经链路</p>
+
+              <!-- 扫描光波 -->
+              <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-tr from-transparent via-cyan-500/10 to-transparent translate-x-[-100%] group-hover:animate-[shimmer_2s_infinite]"></div>
+            </div>
+
+            <!-- 2. 视觉主体：核心与卫星节点 (Hub & Spoke) -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full pointer-events-none">
+
+              <!-- 旋转轨道 -->
+              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 border border-cyan-500/10 rounded-full animate-[spin_10s_linear_infinite]"></div>
+              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 border border-dashed border-cyan-500/20 rounded-full animate-[spin_15s_linear_infinite_reverse]"></div>
+
+              <!-- 中心核心 (Core) -->
+              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-cyan-900/80 backdrop-blur-md border border-cyan-400 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(34,211,238,0.4)] group-hover:scale-110 transition-transform duration-500 z-10">
+                <svg class="w-6 h-6 text-cyan-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+              </div>
+
+              <!-- 卫星节点 1 (Local File) -->
+              <div class="absolute top-1/3 left-1/4 w-8 h-8 bg-slate-800/80 border border-cyan-500/30 rounded-lg flex items-center justify-center animate-bounce duration-[3000ms]">
+                <svg class="w-3 h-3 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <!-- 连线 1 -->
+              <div class="absolute top-[42%] left-[32%] w-12 h-[1px] bg-cyan-500/30 rotate-12 origin-right"></div>
+
+              <!-- 卫星节点 2 (Tools) -->
+              <div class="absolute bottom-1/3 right-1/4 w-8 h-8 bg-slate-800/80 border border-cyan-500/30 rounded-lg flex items-center justify-center animate-bounce duration-[4000ms]">
+                <svg class="w-3 h-3 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <!-- 连线 2 -->
+              <div class="absolute bottom-[42%] right-[32%] w-12 h-[1px] bg-cyan-500/30 -rotate-12 origin-left"></div>
+
+            </div>
+
+            <!-- 3. 内容区域 -->
+            <div class="p-6 relative z-20 h-full flex flex-col justify-between">
+
+              <!-- 顶部 Tag -->
+              <div class="flex items-center justify-between">
+                <div class="px-2 py-1 rounded-md bg-cyan-950/50 border border-cyan-500/30 backdrop-blur-md flex items-center gap-2">
+                  <span class="relative flex h-1.5 w-1.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span><span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-cyan-500"></span></span>
+                  <span class="text-[9px] font-mono font-bold text-cyan-400 tracking-wider">PROTOCOL_V2</span>
+                </div>
+                <!-- 连接数 -->
+                <span class="text-[9px] font-mono text-cyan-600/80 group-hover:text-cyan-400 transition-colors">LINKED: 3</span>
+              </div>
+
+              <!-- 底部文字 -->
+              <div class="bg-slate-900/60 backdrop-blur-sm p-3 rounded-xl border border-white/5 group-hover:bg-slate-900/80 transition-colors">
+                <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+                  MCP 智能体
+                  <svg class="w-3 h-3 text-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </h3>
+                <p class="text-[10px] text-slate-400 leading-snug group-hover:text-cyan-100/70 transition-colors">
+                  打通本地数据与 AI 的神经链路
+                </p>
               </div>
             </div>
           </router-link>
 
-          <!-- 7. 更多功能 (1x1) -->
-          <div class="group relative col-span-1 h-full rounded-[2.5rem] overflow-hidden border border-slate-200 border-dashed hover:border-indigo-300 hover:border-solid transition-all duration-300 bg-slate-50/50 hover:bg-white hover:shadow-xl flex flex-col items-center justify-center">
-            <div class="relative z-10 flex flex-col items-center transition-transform duration-300 group-hover:-translate-y-2">
-              <div class="mb-3 relative">
-                <div class="w-10 h-10 rounded-full border-2 border-slate-200 group-hover:border-indigo-200 transition-colors"></div>
-                <div class="absolute top-0 left-0 w-10 h-10 rounded-full border-t-2 border-indigo-500 animate-spin"></div>
-                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-indigo-500">
+
+          <!-- 7. 更多功能 (优化版：无冲突·状态切换) -->
+          <div class="group relative col-span-1 h-full rounded-[2.5rem] overflow-hidden border border-slate-800 bg-[#0F172A] hover:border-indigo-500/30 transition-all duration-500">
+
+            <!-- 1. 背景：深邃网格 -->
+            <div class="absolute inset-0">
+              <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)]" style="background-size: 20px 20px;"></div>
+              <!-- 默认微光 -->
+              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-indigo-500/10 rounded-full blur-xl group-hover:bg-indigo-500/20 transition-colors duration-500"></div>
+            </div>
+
+            <!-- 2. 核心内容容器 (Flex 居中) -->
+            <div class="absolute inset-0 flex flex-col items-center justify-center z-10">
+
+              <!-- A. 能量立方 (上浮 + 缩小) -->
+              <div class="relative w-12 h-12 perspective-1000 transition-all duration-500 ease-out group-hover:-translate-y-6 group-hover:scale-75">
+                <!-- 外壳 -->
+                <div class="absolute w-full h-full border border-indigo-500/30 bg-indigo-500/5 backdrop-blur-sm animate-[spin_8s_linear_infinite] transform-style-3d"></div>
+                <!-- 内核 -->
+                <div class="absolute w-8 h-8 top-2 left-2 border border-white/20 bg-white/5 animate-[spin_4s_linear_infinite_reverse]"></div>
+                <!-- 锁图标 -->
+                <div class="absolute inset-0 flex items-center justify-center text-indigo-300/50">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
                 </div>
               </div>
-              <h3 class="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">敬请期待</h3>
-              <p class="text-[10px] text-slate-500 text-center mt-1">语音克隆 · 视频生成</p>
+
+              <!-- B. 状态文字切换区 -->
+              <div class="relative h-8 mt-4 w-full flex justify-center">
+
+                <!-- 状态 1: 默认显示 (Hover 时消失) -->
+                <div class="absolute top-0 transition-all duration-300 group-hover:opacity-0 group-hover:-translate-y-2">
+                  <h3 class="text-xs font-bold text-slate-400 tracking-widest uppercase text-center">Coming Soon</h3>
+                  <div class="w-8 h-0.5 bg-slate-700 mx-auto mt-2 rounded-full"></div>
+                </div>
+
+                <!-- 状态 2: 悬浮显示 (Hover 时出现) -->
+                <div class="absolute top-0 flex flex-col items-center gap-2 transition-all duration-500 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0">
+                  <!-- 功能标签 1 -->
+                  <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20">
+                    <svg class="w-3 h-3 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
+                    <span class="text-[10px] text-indigo-300 font-mono">Voice Cloning</span>
+                  </div>
+                  <!-- 功能标签 2 -->
+                  <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                    <svg class="w-3 h-3 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <span class="text-[10px] text-purple-300 font-mono">Video Gen</span>
+                  </div>
+                </div>
+
+              </div>
             </div>
+
+            <!-- 3. 装饰：角落对角线 -->
+            <div class="absolute bottom-3 right-3 text-slate-800">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M20 20L10 20L20 10L20 20Z" fill="currentColor" />
+              </svg>
+            </div>
+
           </div>
 
         </div>
@@ -647,7 +868,7 @@
       </section>
 
       <!-- 5. 代码展示：IDE 风格窗口 -->
-      <section class="max-w-5xl mx-auto mb-16">
+   <section class="max-w-5xl mx-auto mb-8 relative z-20">
         <div class="bg-slate-900 rounded-[1.5rem] shadow-2xl shadow-slate-900/50 overflow-hidden ring-1 ring-white/10">
 
           <!-- 模拟 IDE 标题栏 -->
@@ -709,10 +930,96 @@
         </div>
       </section>
 
-      <!-- Footer Simple -->
-      <footer class="text-center text-slate-400 text-sm py-8 border-t border-slate-200/50">
-        <p>© 2025 AI Vista Platform. Design for Future.</p>
+         <!-- Footer Refactored: 增加内容密度，减少空洞感，保持极简科技风 -->
+      <footer class="relative z-10 border-t border-slate-200/60 bg-white/60 backdrop-blur-xl pt-12 pb-8 mt-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <!-- 上半部分：多列导航布局 -->
+          <div class="grid grid-cols-2 md:grid-cols-12 gap-8 mb-12">
+            
+            <!-- Column 1: 品牌核心 (占据较宽位置) -->
+            <div class="col-span-2 md:col-span-4">
+              <div class="flex items-center gap-2 mb-4">
+                <span class="relative flex h-3 w-3">
+                  <span class="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
+                </span>
+                <span class="text-lg font-bold text-slate-900 tracking-tight">AI Vista</span>
+              </div>
+              <p class="text-sm text-slate-500 leading-relaxed max-w-xs mb-6">
+                构建下一代认知智能基础设施。从大语言模型推理到多模态生成，探索数字创造力的无限边界。
+              </p>
+              <!-- 社交图标组 -->
+              <div class="flex gap-4">
+                <a href="#" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-indigo-500 hover:text-white transition-all duration-300">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+                </a>
+                <a href="#" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-black hover:text-white transition-all duration-300">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                </a>
+              </div>
+            </div>
+
+            <!-- Column 2: 产品 -->
+            <div class="col-span-1 md:col-span-2">
+              <h4 class="text-sm font-bold text-slate-900 mb-4 tracking-wide">产品矩阵</h4>
+              <ul class="space-y-3">
+                <li><a href="#" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">智能对话 (Chat)</a></li>
+                <li><a href="#" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">图像生成 (Image)</a></li>
+                <li><a href="#" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">互动游戏 (Game)</a></li>
+                <li><a href="#" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">API 服务</a></li>
+              </ul>
+            </div>
+
+            <!-- Column 3: 开发者 -->
+            <div class="col-span-1 md:col-span-2">
+              <h4 class="text-sm font-bold text-slate-900 mb-4 tracking-wide">开发者</h4>
+              <ul class="space-y-3">
+                <li><a href="#" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">文档中心</a></li>
+                <li><a href="#" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">SDK 下载</a></li>
+                <li><a href="#" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">Prompt 库</a></li>
+                <li><a href="#" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">状态监控</a></li>
+              </ul>
+            </div>
+
+            <!-- Column 4: 公司 -->
+            <div class="col-span-1 md:col-span-2">
+              <h4 class="text-sm font-bold text-slate-900 mb-4 tracking-wide">关于</h4>
+              <ul class="space-y-3">
+                <li><a href="#" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">关于我们</a></li>
+                <li><a href="#" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">官方博客</a></li>
+                <li><a href="#" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">加入我们</a></li>
+                <li><a href="#" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">联系方式</a></li>
+              </ul>
+            </div>
+
+            <!-- Column 5: 订阅 (紧凑版) -->
+            <div class="col-span-1 md:col-span-2">
+              <h4 class="text-sm font-bold text-slate-900 mb-4 tracking-wide">动态</h4>
+              <div class="flex flex-col gap-2">
+                <span class="text-xs text-slate-400">订阅我们的开发者周刊</span>
+                <div class="flex gap-2">
+                  <input type="email" placeholder="Email" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 transition-colors">
+                  <button class="px-3 py-2 bg-slate-900 text-white rounded-lg hover:bg-indigo-600 transition-colors">
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 下半部分：版权与法律条款 (更紧凑的分割线) -->
+          <div class="pt-8 border-t border-slate-200/50 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-xs text-slate-400 font-medium">© 2025 AI Vista Inc. Design for Future.</p>
+            <div class="flex gap-6">
+              <a href="#" class="text-xs text-slate-400 hover:text-indigo-600 transition-colors">隐私政策</a>
+              <a href="#" class="text-xs text-slate-400 hover:text-indigo-600 transition-colors">服务条款</a>
+              <a href="#" class="text-xs text-slate-400 hover:text-indigo-600 transition-colors">Cookies</a>
+            </div>
+          </div>
+        </div>
       </footer>
+
 
     </div>
   </div>
@@ -723,41 +1030,154 @@
 </script>
 
 <style scoped>
+/* 1. 缓慢缩放：让背景图看起来像是在缓缓移动 */
+@keyframes slowZoom {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+.animate-slow-zoom {
+  animation: slowZoom 20s ease-in-out infinite;
+}
+
+/* 2. 扫描线动画：模拟科幻扫描 */
+@keyframes scan {
+  0% { transform: translateY(-100%); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+.animate-scan {
+  animation: scan 4s linear infinite;
+}
+/* 按钮内部微光划过 */
+@keyframes shine {
+  100% { transform: translateX(100%); }
+}
+.group-hover\:animate-shine:hover {
+  animation: shine 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 基础淡入动画 */
+.animate-fade-in-up {
+  animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  transform: translateY(15px); /* 移动距离也变小了，更细腻 */
+}
+@keyframes fadeInUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 延迟 */
+.animation-delay-200 { animation-delay: 0.15s; }
+.animation-delay-400 { animation-delay: 0.3s; }
+.animation-delay-600 { animation-delay: 0.45s; }
+
+/* 文字流光 */
+.animate-gradient-x {
+  background-size: 200% auto;
+  animation: gradientX 3s linear infinite;
+}
+@keyframes gradientX {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* 2. 网格流动动画 (模拟前进感) */
+@keyframes gridFlow {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 0 40px;
+  }
+}
+
+.animate-grid-flow {
+  animation: gridFlow 3s linear infinite;
+}
+
+/* 3. 数据流下落动画 */
+@keyframes drop {
+  0% {
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(500%);
+  }
+
+  /* 跑出屏幕 */
+}
+
+.animate-drop {
+  animation: drop 4s cubic-bezier(0.4, 0.26, 0, 0.97) infinite;
+}
+
+/* 辅助延迟类 */
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
 /* 添加到你的 CSS 文件或 style 标签中 */
 @keyframes scan {
   0% {
     transform: translateY(-100%);
   }
+
   100% {
     transform: translateY(500%);
   }
 }
+
 .animate-scan {
   animation: scan 2s linear infinite;
 }
 
-/* 
-  高级动画与辅助样式 
-  使用 CSS Keyframes 增加灵动感
-*/
-
-@keyframes blob {
-  0% {
-    transform: translate(0px, 0px) scale(1);
-  }
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
-  }
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-  100% {
-    transform: translate(0px, 0px) scale(1);
-  }
+/* 1. 悬浮动画 (上下浮动) */
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0) rotate(-6deg); }
+  50% { transform: translateY(-15px) rotate(-3deg); }
+}
+.animate-float-slow {
+  animation: floatSlow 6s ease-in-out infinite;
 }
 
+/* 2. 极慢速旋转 (顺时针) */
+@keyframes spinSlower {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-spin-slower {
+  animation: spinSlower 20s linear infinite;
+}
+
+/* 3. 极慢速旋转 (逆时针) */
+@keyframes reverseSpin {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+.animate-reverse-spin {
+  animation: reverseSpin 25s linear infinite;
+}
+
+/* 之前的动画保持不变 */
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+@keyframes fadeInUp {
+  to { opacity: 1; transform: translateY(0); }
+}
 .animate-blob {
   animation: blob 7s infinite;
+}
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
 }
 
 .animation-delay-2000 {
@@ -785,9 +1205,11 @@
 pre::-webkit-scrollbar {
   height: 6px;
 }
+
 pre::-webkit-scrollbar-track {
   background: transparent;
 }
+
 pre::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.2);
   border-radius: 3px;
