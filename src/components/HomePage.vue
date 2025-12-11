@@ -306,66 +306,168 @@
               </div>
             </div>
           </router-link>
+          <!-- 4.5. 新增：第13号列车 (科幻 HUD 风格) -->
+          <router-link to="/scenario" class="group relative col-span-1 md:col-span-3 lg:col-span-4 h-[240px] bg-[#0B1120] rounded-[2.5rem] overflow-hidden border border-slate-800 hover:border-blue-500/50 hover:shadow-[0_0_30px_rgba(59,130,246,0.2)] transition-all duration-500">
 
-          <!-- 5. MCP 智能体 (科技极简风) -->
-          <router-link to="/mcp-agent" class="group relative col-span-1 md:col-span-3 lg:col-span-4 h-[240px] bg-white rounded-[2.5rem] overflow-hidden border border-slate-200 hover:border-cyan-300 transition-colors">
-            <!-- 科技连接线背景 -->
-            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-cyan-100 to-transparent rounded-bl-full opacity-50 transition-transform group-hover:scale-110"></div>
+            <!-- 1. 背景层：量子隧道 -->
+            <div class="absolute inset-0 overflow-hidden">
+              <!-- 图片：抽象科幻隧道/光速 -->
+              <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop" class="w-full h-full object-cover opacity-40 mix-blend-screen transition-transform duration-[3s] ease-out group-hover:scale-125 group-hover:rotate-1" alt="Sci-Fi Tunnel" />
 
-            <div class="p-8 relative z-10">
-              <div class="w-10 h-10 rounded-xl bg-cyan-50 flex items-center justify-center mb-3 text-cyan-600">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </div>
-              <h3 class="text-xl font-bold text-slate-900 mb-1">MCP 智能体</h3>
-              <p class="text-sm text-slate-500">Model Context Protocol 配置管理</p>
+              <!-- 渐变叠加：深邃蓝紫 -->
+              <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-[#0B1120]/80 to-blue-900/20"></div>
+
+              <!-- 动态扫描线 (Sci-Fi Scanline) -->
+              <div class="absolute inset-0 bg-gradient-to-b from-transparent via-blue-400/10 to-transparent w-full h-[20%] -translate-y-full group-hover:animate-scan"></div>
             </div>
 
-            <!-- 底部装饰: 节点图 -->
-            <div class="absolute bottom-6 right-8 flex gap-3 opacity-60">
-              <div class="w-3 h-3 rounded-full bg-cyan-400 group-hover:bg-cyan-500 transition-colors"></div>
-              <div class="w-3 h-3 rounded-full bg-cyan-200 group-hover:bg-cyan-300 transition-colors"></div>
-              <div class="w-3 h-3 rounded-full bg-slate-200"></div>
+            <!-- 2. HUD 装饰层 (四个角的科技边框) -->
+            <div class="absolute inset-4 border border-white/5 rounded-2xl pointer-events-none">
+              <!-- 左上角 -->
+              <div class="absolute -top-[1px] -left-[1px] w-4 h-4 border-t-2 border-l-2 border-blue-500 rounded-tl-lg transition-all group-hover:w-8 group-hover:h-8"></div>
+              <!-- 右上角 -->
+              <div class="absolute -top-[1px] -right-[1px] w-4 h-4 border-t-2 border-r-2 border-purple-500 rounded-tr-lg transition-all group-hover:w-8 group-hover:h-8"></div>
+              <!-- 左下角 -->
+              <div class="absolute -bottom-[1px] -left-[1px] w-4 h-4 border-b-2 border-l-2 border-blue-500 rounded-bl-lg transition-all group-hover:w-8 group-hover:h-8"></div>
+              <!-- 右下角 -->
+              <div class="absolute -bottom-[1px] -right-[1px] w-4 h-4 border-b-2 border-r-2 border-purple-500 rounded-br-lg transition-all group-hover:w-8 group-hover:h-8"></div>
+            </div>
+
+            <!-- 3. 内容区域 -->
+            <div class="p-8 relative z-10 h-full flex flex-col justify-between">
+
+              <!-- 顶部：全息标签 -->
+              <div class="flex justify-between items-start">
+                <div class="w-10 h-10 rounded-xl bg-blue-500/10 backdrop-blur-md flex items-center justify-center text-blue-400 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.3)] group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                  <!-- 图标：无限循环/量子 -->
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+
+                <!-- 状态指示灯 -->
+                <div class="flex items-center gap-2 px-2 py-1 bg-black/40 rounded-full border border-white/10 backdrop-blur-sm">
+                  <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                  <span class="text-[10px] font-mono text-blue-200 tracking-wider">ONLINE</span>
+                </div>
+              </div>
+
+              <!-- 底部：文字信息 -->
+              <div class="translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                <h3 class="text-xl font-bold text-white mb-1 tracking-tight drop-shadow-lg">
+                  <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-200 via-white to-blue-200">第13号列车</span>
+                </h3>
+
+                <div class="flex items-center justify-between">
+                  <p class="text-xs text-slate-400 font-sans tracking-wide group-hover:text-blue-200/80 transition-colors">
+                    沉浸式互动剧情体验
+                  </p>
+
+                  <!-- 箭头 -->
+                  <span class="text-blue-400 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </span>
+                </div>
+              </div>
             </div>
           </router-link>
+
+          <!-- 5. MCP 智能体 (深空数据流风格) -->
+          <router-link to="/mcp-agent" class="group relative col-span-1 md:col-span-3 lg:col-span-4 h-[240px] bg-slate-900 rounded-[2.5rem] overflow-hidden border border-slate-700/50 hover:border-cyan-400/50 hover:shadow-[0_0_40px_rgba(34,211,238,0.15)] transition-all duration-500">
+
+            <!-- 1. 背景：精密点阵网格 -->
+            <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#22d3ee 1px, transparent 1px); background-size: 20px 20px;">
+            </div>
+
+            <!-- 2. 动态光晕 (呼吸效果) -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-cyan-500/20 rounded-full blur-[60px] group-hover:bg-cyan-400/30 transition-all duration-700"></div>
+
+            <!-- 3. 右侧装饰：旋转的协议环 (模拟接口连接) -->
+            <div class="absolute -right-12 -bottom-12 w-64 h-64 border border-cyan-500/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-700">
+              <!-- 内环 -->
+              <div class="w-48 h-48 border border-cyan-500/20 rounded-full border-dashed animate-[spin_10s_linear_infinite]"></div>
+              <!-- 核心点 -->
+              <div class="absolute w-full h-full flex justify-center items-center">
+                <div class="w-24 h-24 bg-gradient-to-tr from-slate-800 to-slate-900 rounded-full border border-cyan-500/30 shadow-inner flex items-center justify-center z-10">
+                  <svg class="w-10 h-10 text-cyan-400 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. 内容区域 -->
+            <div class="p-8 relative z-20 h-full flex flex-col justify-between">
+
+              <!-- 顶部 Tag -->
+              <div class="flex items-start">
+                <div class="px-3 py-1 rounded-full bg-cyan-950/50 border border-cyan-500/30 backdrop-blur-md flex items-center gap-2">
+                  <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                  </span>
+                  <span class="text-[10px] font-mono font-bold text-cyan-400 tracking-wider">PROTOCOL_V2</span>
+                </div>
+              </div>
+
+              <!-- 底部文字 -->
+              <div>
+                <h3 class="text-2xl font-bold text-white mb-2 tracking-tight flex items-center gap-2">
+                  MCP 智能体
+                  <svg class="w-4 h-4 text-cyan-500 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </h3>
+                <p class="text-sm text-slate-400 group-hover:text-cyan-100/80 transition-colors leading-relaxed">
+                  构建 AI 与本地数据的<br>
+                  <span class="text-cyan-400 font-medium">标准化神经链路</span>
+                </p>
+              </div>
+            </div>
+
+            <!-- 5. 悬停时的光效线条 -->
+            <div class="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700"></div>
+          </router-link>
+
           <!-- 6. 更多/敬请期待 (修复居中版) -->
-<div class="group relative col-span-1 md:col-span-6 lg:col-span-4 h-[240px] rounded-[2.5rem] overflow-hidden border border-slate-200 border-dashed hover:border-indigo-300 hover:border-solid transition-all duration-300 bg-slate-50/50 hover:bg-white hover:shadow-xl flex flex-col items-center justify-center">
-  
-  <!-- 背景装饰 -->
-  <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
-  <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-100 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div class="group relative col-span-1 md:col-span-6 lg:col-span-4 h-[240px] rounded-[2.5rem] overflow-hidden border border-slate-200 border-dashed hover:border-indigo-300 hover:border-solid transition-all duration-300 bg-slate-50/50 hover:bg-white hover:shadow-xl flex flex-col items-center justify-center">
 
-  <!-- 内容区域容器：添加 group-hover 位移，给按钮腾出空间 -->
-  <div class="relative z-10 flex flex-col items-center transition-transform duration-300 group-hover:-translate-y-4">
-    
-    <!-- 动态图标 -->
-    <div class="mb-4 relative">
-      <div class="w-12 h-12 rounded-full border-2 border-slate-200 group-hover:border-indigo-200 transition-colors"></div>
-      <div class="absolute top-0 left-0 w-12 h-12 rounded-full border-t-2 border-indigo-500 animate-spin"></div>
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-indigo-500">
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-      </div>
-    </div>
+            <!-- 背景装饰 -->
+            <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-100 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
-    <!-- 文字内容 -->
-    <h3 class="text-lg font-bold text-slate-900 mb-2 group-hover:text-indigo-600 transition-colors">更多功能开发中</h3>
-    <p class="text-sm text-slate-500 px-4 group-hover:text-slate-600 text-center">
-      语音克隆、视频生成、知识库构建...
-      <br>
-      <span class="text-xs text-indigo-400 mt-2 inline-block font-medium tracking-wide">COMING SOON</span>
-    </p>
+            <!-- 内容区域容器：添加 group-hover 位移，给按钮腾出空间 -->
+            <div class="relative z-10 flex flex-col items-center transition-transform duration-300 group-hover:-translate-y-4">
 
-  </div>
+              <!-- 动态图标 -->
+              <div class="mb-4 relative">
+                <div class="w-12 h-12 rounded-full border-2 border-slate-200 group-hover:border-indigo-200 transition-colors"></div>
+                <div class="absolute top-0 left-0 w-12 h-12 rounded-full border-t-2 border-indigo-500 animate-spin"></div>
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-indigo-500">
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                </div>
+              </div>
 
-  <!-- 按钮：绝对定位 (不再占用布局空间，确保默认状态完美居中) -->
-  <button class="absolute bottom-6 px-6 py-2 rounded-full bg-white border border-slate-200 text-xs font-bold text-slate-600 shadow-lg shadow-indigo-500/10 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 z-20">
-    查看开发计划 &rarr;
-  </button>
+              <!-- 文字内容 -->
+              <h3 class="text-lg font-bold text-slate-900 mb-2 group-hover:text-indigo-600 transition-colors">更多功能开发中</h3>
+              <p class="text-sm text-slate-500 px-4 group-hover:text-slate-600 text-center">
+                语音克隆、视频生成、知识库构建...
+                <br>
+                <span class="text-xs text-indigo-400 mt-2 inline-block font-medium tracking-wide">COMING SOON</span>
+              </p>
 
-</div>
+            </div>
 
+            <!-- 按钮：绝对定位 (不再占用布局空间，确保默认状态完美居中) -->
+            <button class="absolute bottom-6 px-6 py-2 rounded-full bg-white border border-slate-200 text-xs font-bold text-slate-600 shadow-lg shadow-indigo-500/10 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 z-20">
+              查看开发计划 &rarr;
+            </button>
+
+          </div>
 
         </div>
       </section>
@@ -447,6 +549,19 @@
 </script>
 
 <style scoped>
+/* 添加到你的 CSS 文件或 style 标签中 */
+@keyframes scan {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(500%);
+  }
+}
+.animate-scan {
+  animation: scan 2s linear infinite;
+}
+
 /* 
   高级动画与辅助样式 
   使用 CSS Keyframes 增加灵动感
