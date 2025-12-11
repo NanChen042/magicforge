@@ -1,401 +1,506 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-7xl mx-auto">
-      <!-- 美观的标题区域 -->
-      <div class="text-center mb-16 relative">
-        <!-- 背景装饰 -->
-        <div class="absolute inset-0 -z-10">
-          <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-purple-400/20 to-blue-400/20 rounded-full blur-3xl"></div>
-          <div class="absolute top-1/4 left-1/4 w-32 h-32 bg-gradient-to-r from-indigo-400/30 to-purple-400/30 rounded-full blur-2xl"></div>
-          <div class="absolute bottom-1/4 right-1/4 w-24 h-24 bg-gradient-to-r from-blue-400/30 to-cyan-400/30 rounded-full blur-xl"></div>
+  <div class="min-h-screen bg-[#F8FAFC] selection:bg-indigo-500/30 text-slate-800 font-sans">
+
+    <!-- 全局背景装饰 - 更高级的极光效果 -->
+    <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+      <div class="absolute top-[-10%] left-[-10%] w-[50rem] h-[50rem] bg-indigo-500/10 rounded-full blur-[100px] mix-blend-multiply animate-blob"></div>
+      <div class="absolute top-[-10%] right-[-10%] w-[50rem] h-[50rem] bg-violet-500/10 rounded-full blur-[100px] mix-blend-multiply animate-blob animation-delay-2000"></div>
+      <div class="absolute bottom-[-20%] left-[20%] w-[60rem] h-[60rem] bg-blue-500/5 rounded-full blur-[100px] mix-blend-multiply animate-blob animation-delay-4000"></div>
+      <!-- 网格纹理叠加，增加科技感 -->
+      <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative">
+
+      <!-- 1. Hero 区域：更克制、更有力的排版 -->
+      <header class="text-center mb-24 max-w-4xl mx-auto">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 border border-indigo-100 shadow-sm mb-8 backdrop-blur-sm animate-fade-in-up">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+          </span>
+          <span class="text-xs font-semibold text-indigo-600 tracking-wide uppercase">AI Vista 2.0 Now Available</span>
         </div>
 
-        <div class="relative inline-block">
-          <div class="absolute -inset-2 bg-gradient-to-r from-indigo-600/20 to-purple-600/20 rounded-2xl blur-xl opacity-60"></div>
-          <h1 class="relative text-4xl sm:text-5xl lg:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600 mb-4">
-            AIVista 智能平台
-          </h1>
-          <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"></div>
-        </div>
-        <p class="mt-6 text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-          探索AI的无限可能，体验智能对话与创作的未来
+        <h1 class="text-5xl md:text-7xl font-bold tracking-tight text-slate-900 mb-6 leading-[1.1]">
+          探索 <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600 relative">AI 智能
+            <!-- 下划线装饰 -->
+            <svg class="absolute w-full h-3 -bottom-1 left-0 text-indigo-200/50 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
+              <path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="8" fill="none" />
+            </svg>
+          </span>
+          的无限边界
+        </h1>
+
+        <p class="text-xl text-slate-500 mb-10 max-w-2xl mx-auto leading-relaxed font-light">
+          下一代智能对话与创作平台。集成多种大模型接口，为您提供企业级的流式响应、思维链展示与多模态创作体验。
         </p>
 
-        <!-- 行动按钮 -->
-        <div class="flex flex-wrap gap-4 justify-center mt-8">
-          <router-link
-            to="/api-demo"
-            class="group relative inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:from-indigo-700 hover:to-purple-700 hover:shadow-lg hover:shadow-purple-500/25 hover:-translate-y-1"
-          >
-            <span class="relative z-10">开始体验</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="relative z-10 group-hover:translate-x-1 transition-transform">
-              <path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <div class="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"></div>
-          </router-link>
-          <router-link
-            to="/prompt-library"
-            class="group inline-flex items-center gap-2 border-2 border-indigo-200 bg-white/80 backdrop-blur-sm text-indigo-700 px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:border-indigo-300 hover:bg-indigo-50 hover:shadow-lg hover:-translate-y-1"
-          >
-            浏览提示库
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="group-hover:translate-x-1 transition-transform">
-              <path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </router-link>
-        </div>
-      </div>
-
-      <!-- 美观的API介绍区域 -->
-      <div class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border border-gray-100 p-8 mb-16 relative overflow-hidden">
-        <!-- 装饰性渐变条 -->
-        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-500"></div>
-
-        <!-- 背景装饰 -->
-        <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-purple-100/50 to-transparent rounded-full -translate-y-32 translate-x-32"></div>
-        <div class="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-blue-100/50 to-transparent rounded-full translate-y-24 -translate-x-24"></div>
-
-        <div class="relative max-w-4xl mx-auto text-center">
-          <div class="flex items-center justify-center gap-3 mb-6">
-            <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M2 17L12 22L22 17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M2 12L12 17L22 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <router-link to="/api-demo" class="group relative px-8 py-4 bg-slate-900 text-white rounded-2xl font-medium shadow-xl shadow-indigo-500/20 hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all duration-300 overflow-hidden">
+            <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-500 to-violet-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <span class="relative flex items-center gap-2">
+              开始构建
+              <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
+            </span>
+          </router-link>
+
+          <router-link to="/prompt-library" class="group px-8 py-4 bg-white text-slate-700 rounded-2xl font-medium border border-slate-200 shadow-sm hover:border-indigo-200 hover:text-indigo-600 hover:shadow-md transition-all duration-300">
+            浏览提示库
+          </router-link>
+        </div>
+      </header>
+
+      <!-- 2. API Showcase：采用 BENTO GRID 风格，更现代 -->
+      <section class="mb-24">
+        <div class="bg-white/60 backdrop-blur-xl rounded-[2.5rem] p-2 border border-white/40 shadow-2xl shadow-slate-200/50">
+          <div class="bg-white/50 rounded-[2rem] p-8 md:p-12 border border-slate-100/50 overflow-hidden relative">
+
+            <!-- 标题区 -->
+            <div class="relative z-10 text-center mb-12">
+              <h2 class="text-3xl font-bold text-slate-900 mb-4">开发者优先的接口设计</h2>
+              <p class="text-slate-500">统一的 API 规范，无缝对接 Deepseek 等主流模型</p>
             </div>
-            <h2 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">多样化AI接口支持</h2>
-          </div>
 
-          <p class="text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
-            兼容多种接口风格，满足不同开发需求，轻松集成到您的应用中
-          </p>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-            <div class="group bg-gradient-to-br from-white via-indigo-50/30 to-purple-50/30 p-8 rounded-2xl border border-indigo-100 transition-all duration-500 hover:shadow-2xl hover:shadow-indigo-500/20 hover:-translate-y-2 relative overflow-hidden">
-              <!-- 悬停时的光效 -->
-              <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-              <div class="relative">
-                <div class="mb-6 w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="white" stroke-width="2"/>
-                    <path d="M14 2V8H20" stroke="white" stroke-width="2"/>
+            <!-- 卡片网格 -->
+            <div class="grid md:grid-cols-2 gap-6 relative z-10">
+              <!-- Card 1 -->
+              <div class="group bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 hover:border-indigo-100 transition-all duration-500 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor" class="text-indigo-500">
+                    <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM12 7l-5 5 5 5 1.4-1.4L10.8 13H17v-2h-6.2l2.6-2.6L12 7z" />
                   </svg>
                 </div>
-                <h3 class="text-xl font-bold text-gray-800 mb-3">DeepseekClient</h3>
-                <p class="text-gray-600">兼容 OpenAI 格式的客户端，无缝迁移体验，支持流式输出与思维链展示</p>
-              </div>
-            </div>
-
-            <div class="group bg-gradient-to-br from-white via-purple-50/30 to-violet-50/30 p-8 rounded-2xl border border-purple-100 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/20 hover:-translate-y-2 relative overflow-hidden">
-              <!-- 悬停时的光效 -->
-              <div class="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-violet-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-              <div class="relative">
-                <div class="mb-6 w-16 h-16 bg-gradient-to-br from-purple-500 to-violet-500 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M16 18L22 12L16 6M8 6L2 12L8 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <div class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <svg class="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                   </svg>
                 </div>
-                <h3 class="text-xl font-bold text-gray-800 mb-3">DeepseekAdapter</h3>
-                <p class="text-gray-600">兼容 ai.createModel 风格的适配器接口，简化开发流程，提高开发效率</p>
+                <h3 class="text-xl font-bold text-slate-900 mb-2">DeepseekClient</h3>
+                <p class="text-sm text-slate-500 leading-relaxed mb-4">
+                  专为 OpenAI 格式兼容性打造。原生支持流式传输 (Stream) 与思维链 (Chain of Thought) 解析，迁移零成本。
+                </p>
+                <div class="flex gap-2">
+                  <span class="text-xs font-medium px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md">OpenAI 兼容</span>
+                  <span class="text-xs font-medium px-2.5 py-1 bg-indigo-50 text-indigo-600 rounded-md">流式支持</span>
+                </div>
+              </div>
+
+              <!-- Card 2 -->
+              <div class="group bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-violet-500/5 hover:border-violet-100 transition-all duration-500 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor" class="text-violet-500">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+                  </svg>
+                </div>
+                <div class="w-12 h-12 bg-violet-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <svg class="w-6 h-6 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                  </svg>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 mb-2">DeepseekAdapter</h3>
+                <p class="text-sm text-slate-500 leading-relaxed mb-4">
+                  面向 Vercel AI SDK 风格的适配器。使用 `createModel` 模式，为 Next.js/Nuxt 等现代框架提供极致的开发体验。
+                </p>
+                <div class="flex gap-2">
+                  <span class="text-xs font-medium px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md">Vercel 风格</span>
+                  <span class="text-xs font-medium px-2.5 py-1 bg-violet-50 text-violet-600 rounded-md">极简配置</span>
+                </div>
               </div>
             </div>
+
+            <!-- 背景装饰 -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-indigo-50/50 via-transparent to-violet-50/50 pointer-events-none -z-0 blur-3xl"></div>
           </div>
-
-          <div class="flex flex-wrap justify-center gap-4 mb-8">
-            <span class="px-5 py-2 bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 rounded-full text-sm font-semibold border border-indigo-200 shadow-sm">✨ 流式输出</span>
-            <span class="px-5 py-2 bg-gradient-to-r from-purple-100 to-violet-100 text-purple-700 rounded-full text-sm font-semibold border border-purple-200 shadow-sm">🧠 思维链展示</span>
-            <span class="px-5 py-2 bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 rounded-full text-sm font-semibold border border-blue-200 shadow-sm">🔄 实时响应</span>
-            <span class="px-5 py-2 bg-gradient-to-r from-violet-100 to-purple-100 text-violet-700 rounded-full text-sm font-semibold border border-violet-200 shadow-sm">⚙️ 完全可配置</span>
-          </div>
-
-          <router-link
-            to="/api-demo"
-            class="group inline-flex items-center gap-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:from-indigo-700 hover:to-purple-700 hover:shadow-xl hover:shadow-purple-500/30 hover:-translate-y-1 relative overflow-hidden"
-          >
-            <span class="relative z-10">查看完整文档</span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="relative z-10 group-hover:translate-x-1 transition-transform">
-              <path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <!-- 悬停光效 -->
-            <div class="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"></div>
-          </router-link>
-        </div>
-      </div>
-
-      <!-- 简洁的特性网格 -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-        <div class="group bg-white p-6 rounded-xl shadow-md border border-gray-100 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 text-center">
-          <div class="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">⚡</div>
-          <h3 class="text-lg font-semibold text-gray-800 mb-2">流式输出</h3>
-          <p class="text-gray-600 text-sm">实时显示生成内容，提供更好的用户体验</p>
-        </div>
-
-        <div class="group bg-white p-6 rounded-xl shadow-md border border-gray-100 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 text-center">
-          <div class="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">🧠</div>
-          <h3 class="text-lg font-semibold text-gray-800 mb-2">思维链展示</h3>
-          <p class="text-gray-600 text-sm">查看模型的推理过程，了解模型如何思考</p>
-        </div>
-
-        <div class="group bg-white p-6 rounded-xl shadow-md border border-gray-100 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 text-center">
-          <div class="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">🔌</div>
-          <h3 class="text-lg font-semibold text-gray-800 mb-2">简洁接口</h3>
-          <p class="text-gray-600 text-sm">兼容您熟悉的接口风格，减少学习成本</p>
-        </div>
-
-        <div class="group bg-white p-6 rounded-xl shadow-md border border-gray-100 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 text-center">
-          <div class="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">⚙️</div>
-          <h3 class="text-lg font-semibold text-gray-800 mb-2">完全可配置</h3>
-          <p class="text-gray-600 text-sm">调整温度、最大生成长度等参数</p>
-        </div>
-      </div>
-
-      <!-- 美观的功能导航 -->
-      <section class="mb-20">
-        <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">功能导航</h2>
-          <p class="text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            探索AIVista平台的各项AI功能，从对话到创作，满足您的多样化需求
-          </p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <!-- AI 对话测试 -->
-          <router-link to="/api-demo" class="group bg-gradient-to-br from-white via-indigo-50/30 to-purple-50/30 p-8 rounded-2xl shadow-lg border border-indigo-100 transition-all duration-500 hover:shadow-2xl hover:shadow-indigo-500/20 hover:-translate-y-3 relative overflow-hidden block">
-            <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <div class="relative">
-              <div class="mb-6 w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M8 12H.01M12 12H.01M16 12H.01M21 12C21 16.418 16.97 20 12 20C10.54 20 9.15 19.48 8 18.67L3 20L4.33 15C3.52 13.85 3 12.46 3 11C3 6.582 7.03 3 12 3S21 6.582 21 11Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </div>
-              <h3 class="text-xl font-bold text-gray-800 mb-3 group-hover:text-indigo-600 transition-colors">AI 对话测试</h3>
-              <p class="text-gray-600 leading-relaxed">体验智能对话，支持流式输出和思维链展示</p>
-            </div>
-          </router-link>
-
-          <!-- AI 图像生成 -->
-          <router-link to="/ai-image" class="group bg-gradient-to-br from-white via-purple-50/30 to-violet-50/30 p-8 rounded-2xl shadow-lg border border-purple-100 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/20 hover:-translate-y-3 relative overflow-hidden block">
-            <div class="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-violet-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <div class="relative">
-              <div class="mb-6 w-16 h-16 bg-gradient-to-br from-purple-500 to-violet-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke="white" stroke-width="2"/>
-                  <circle cx="8.5" cy="8.5" r="1.5" stroke="white" stroke-width="2"/>
-                  <path d="M21 15L16 10L5 21" stroke="white" stroke-width="2"/>
-                </svg>
-              </div>
-              <h3 class="text-xl font-bold text-gray-800 mb-3 group-hover:text-purple-600 transition-colors">AI 图像生成</h3>
-              <p class="text-gray-600 leading-relaxed">使用AI创建高质量图片，支持多种风格和尺寸</p>
-            </div>
-          </router-link>
-
-          <!-- 剑道传奇游戏 -->
-          <router-link to="/game" class="group bg-gradient-to-br from-white via-emerald-50/30 to-teal-50/30 p-8 rounded-2xl shadow-lg border border-emerald-100 transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-500/20 hover:-translate-y-3 relative overflow-hidden block">
-            <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-teal-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <div class="relative">
-              <div class="mb-6 w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M14.828 14.828A4 4 0 0 1 9.172 9.172M9 10H10.01M15 10H15.01M21 12A9 9 0 1 1 3 12A9 9 0 0 1 21 12Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </div>
-              <h3 class="text-xl font-bold text-gray-800 mb-3 group-hover:text-emerald-600 transition-colors">剑道传奇</h3>
-              <p class="text-gray-600 leading-relaxed">AI驱动的互动游戏，体验智能剧情生成</p>
-            </div>
-          </router-link>
-
-          <!-- 提示词库 -->
-          <router-link to="/prompt-library" class="group bg-gradient-to-br from-white via-orange-50/30 to-red-50/30 p-8 rounded-2xl shadow-lg border border-orange-100 transition-all duration-500 hover:shadow-2xl hover:shadow-orange-500/20 hover:-translate-y-3 relative overflow-hidden block">
-            <div class="absolute inset-0 bg-gradient-to-r from-orange-500/5 to-red-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <div class="relative">
-              <div class="mb-6 w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M19 11H5M14 0A2 2 0 0 1 16 2V6A2 2 0 0 1 14 8H10A2 2 0 0 1 8 6V2A2 2 0 0 1 10 0H14ZM5 11V9A2 2 0 0 1 7 7H17A2 2 0 0 1 19 9V11M7 7H10" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </div>
-              <h3 class="text-xl font-bold text-gray-800 mb-3 group-hover:text-orange-600 transition-colors">提示词库</h3>
-              <p class="text-gray-600 leading-relaxed">精选提示词模板，提升AI对话效果</p>
-            </div>
-          </router-link>
-
-          <!-- 热点话题 -->
-          <div class="group bg-gradient-to-br from-white via-gray-50/50 to-gray-100/30 p-8 rounded-2xl shadow-lg border border-gray-200 relative overflow-hidden opacity-60">
-            <div class="relative">
-              <div class="mb-6 w-16 h-16 bg-gradient-to-br from-gray-400 to-gray-500 rounded-2xl flex items-center justify-center shadow-lg">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </div>
-              <h3 class="text-xl font-bold text-gray-800 mb-3">热点话题</h3>
-              <p class="text-gray-600 leading-relaxed mb-4">实时热点资讯，AI智能分析解读</p>
-              <div class="inline-block">
-                <span class="px-3 py-1 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-600 rounded-full text-sm font-medium">即将推出</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- MCP 智能体 -->
-          <router-link to="/mcp-agent" class="group bg-gradient-to-br from-white via-cyan-50/30 to-blue-50/30 p-8 rounded-2xl shadow-lg border border-cyan-100 transition-all duration-500 hover:shadow-2xl hover:shadow-cyan-500/20 hover:-translate-y-3 relative overflow-hidden block">
-            <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <div class="relative">
-              <div class="mb-6 w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M2 17L12 22L22 17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M2 12L12 17L22 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </div>
-              <h3 class="text-xl font-bold text-gray-800 mb-3 group-hover:text-cyan-600 transition-colors">MCP 智能体</h3>
-              <p class="text-gray-600 leading-relaxed">智能体配置管理，自定义AI助手功能</p>
-            </div>
-          </router-link>
         </div>
       </section>
 
-      <!-- 代码示例区域 -->
-      <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-        <div class="bg-gray-50 border-b border-gray-100 p-6">
-          <h2 class="text-2xl font-semibold text-gray-800 mb-2">快速开始</h2>
-          <p class="text-gray-600">选择您喜欢的方式开始使用</p>
+      <!-- 3. 特性统计：更干净的数据展示 -->
+      <section class="mb-24 grid grid-cols-2 md:grid-cols-4 gap-8 border-y border-slate-200/60 py-12">
+        <div class="text-center">
+          <div class="text-3xl font-bold text-slate-900 mb-1">Stream</div>
+          <div class="text-sm font-medium text-slate-500 uppercase tracking-wider">实时流式输出</div>
         </div>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-slate-900 mb-1">CoT</div>
+          <div class="text-sm font-medium text-slate-500 uppercase tracking-wider">思维链可视化</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-slate-900 mb-1">REST</div>
+          <div class="text-sm font-medium text-slate-500 uppercase tracking-wider">标准接口协议</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-slate-900 mb-1">100%</div>
+          <div class="text-sm font-medium text-slate-500 uppercase tracking-wider">参数可配置</div>
+        </div>
+      </section>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-gray-100">
-          <div class="p-6">
-            <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-              <span class="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
-              使用 DeepseekClient
-            </h4>
-            <div class="bg-gray-900 rounded-xl p-6 overflow-x-auto">
-              <pre class="text-sm font-mono text-gray-300"><code>import DeepseekClient from './services/DeepseekClient';
+      <section class="mb-24 px-4 sm:px-6 lg:px-8">
 
-// 创建客户端
-const client = new DeepseekClient({
-  apiKey: 'YOUR_API_KEY', // 请替换为您的API密钥
-  baseURL: 'YOUR_API_ENDPOINT', // 请替换为您的API端点
-  model: 'deepseek-r1'
-});
-
-// 创建聊天完成请求
-const stream = await client.chat.completions.create({
-  messages: [
-    { role: 'user', content: '请介绍一下李白' }
-  ],
-  stream: true
-});
-
-// 处理流式响应
-for await (const chunk of stream) {
-  // 处理思维链内容
-  const reasoning = chunk.choices?.[0]?.delta?.reasoning_content;
-  if (reasoning) console.log('思考:', reasoning);
-
-  // 处理生成内容
-  const content = chunk.choices?.[0]?.delta?.content;
-  if (content) console.log('回答:', content);
-}</code></pre>
-            </div>
+        <!-- 标题区：增加更强的引导感 -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+          <div class="max-w-2xl">
+            <h2 class="text-4xl font-bold text-slate-900 mb-4 tracking-tight">
+              释放 AI 的
+              <span class="relative inline-block">
+                <span class="relative z-10 text-indigo-600">多元潜能</span>
+                <span class="absolute bottom-1 left-0 w-full h-3 bg-indigo-100 -z-0 -rotate-1"></span>
+              </span>
+            </h2>
+            <p class="text-lg text-slate-500 leading-relaxed">
+              精心打造的功能矩阵，从自然语言处理到多模态创作，为您提供一站式智能体验。
+            </p>
           </div>
 
-          <div class="p-6">
-            <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-              <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-              使用 DeepseekAdapter
-            </h4>
-            <div class="bg-gray-900 rounded-xl p-6 overflow-x-auto">
-              <pre class="text-sm font-mono text-gray-300"><code>import ai from './services/DeepseekAdapter';
-
-// 创建模型
-const aiModel = ai.createModel("deepseek", {
-  apiKey: 'YOUR_API_KEY', // 请替换为您的API密钥
-  baseURL: 'YOUR_API_ENDPOINT' // 请替换为您的API端点
-});
-
-// 流式文本生成
-const res = await aiModel.streamText({
-  model: "deepseek-r1",
-  messages: [
-    { role: "user", content: "请介绍一下李白" }
-  ]
-});
-
-// 处理流式响应
-for await (const data of res.dataStream) {
-  // 思维链内容
-  const think = (data?.choices?.[0]?.delta)?.reasoning_content;
-  if (think) console.log('思考:', think);
-
-  // 生成文本内容
-  const text = (data?.choices?.[0]?.delta)?.content;
-  if (text) console.log('回答:', text);
-}</code></pre>
-            </div>
-          </div>
+          <!-- 查看更多链接 -->
+          <a href="#" class="hidden md:flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors group">
+            查看完整文档
+            <span class="w-6 h-6 rounded-full bg-indigo-50 flex items-center justify-center group-hover:bg-indigo-100 group-hover:translate-x-1 transition-all">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </span>
+          </a>
         </div>
+
+        <!-- Bento Grid 布局：高度定制化 -->
+        <div class="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 grid-rows-auto gap-6">
+
+          <!-- 1. 核心卡片：AI 对话 (占据左侧大面积，强调 UI 模拟) -->
+          <router-link to="/api-demo" class="group relative col-span-1 md:col-span-6 lg:col-span-8 row-span-2 bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-2xl shadow-slate-200/50 hover:shadow-indigo-500/10 transition-all duration-500 border border-slate-800">
+            <!-- 背景光效 -->
+            <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-indigo-500/30 transition-colors duration-500"></div>
+
+            <div class="relative h-full flex flex-col md:flex-row">
+              <!-- 文字区 -->
+              <div class="p-10 md:p-12 md:w-1/2 flex flex-col justify-between z-10">
+                <div>
+                  <div class="w-12 h-12 rounded-2xl bg-indigo-500/20 flex items-center justify-center mb-6 backdrop-blur-sm border border-indigo-500/30">
+                    <svg class="w-6 h-6 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                    </svg>
+                  </div>
+                  <h3 class="text-3xl font-bold text-white mb-4">智能对话引擎</h3>
+                  <p class="text-slate-400 leading-relaxed mb-8">
+                    接入 Deepseek-R1 等顶尖模型，体验毫秒级流式响应。支持思维链可视化，让 AI 的思考过程触手可及。
+                  </p>
+                </div>
+                <div class="flex items-center gap-3 text-sm font-medium text-white/80 group-hover:text-white transition-colors">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  系统在线 · 响应时间 < 50ms </div>
+                </div>
+
+                <!-- 模拟 UI 展示区 (右侧/下方) -->
+                <div class="relative md:w-1/2 h-64 md:h-auto bg-slate-800/50 border-t md:border-t-0 md:border-l border-white/5 backdrop-blur-sm p-6 overflow-hidden">
+                  <!-- 模拟聊天气泡 -->
+                  <div class="space-y-4 absolute top-8 left-8 right-8 transition-transform duration-500 group-hover:-translate-y-4">
+                    <!-- User Bubble -->
+                    <div class="flex justify-end">
+                      <div class="bg-indigo-600 text-white px-4 py-3 rounded-2xl rounded-tr-sm text-sm shadow-lg max-w-[80%]">
+                        帮我写一个 Python 爬虫脚本
+                      </div>
+                    </div>
+                    <!-- AI Bubble -->
+                    <div class="flex justify-start">
+                      <div class="bg-slate-700 text-slate-200 px-4 py-3 rounded-2xl rounded-tl-sm text-sm shadow-lg max-w-[90%] border border-white/5">
+                        <p class="mb-2 text-xs text-indigo-400 font-mono">Thinking...</p>
+                        <div class="flex gap-1 items-center h-4">
+                          <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></span>
+                          <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-75"></span>
+                          <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-150"></span>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Code Snippet (Fake) -->
+                    <div class="flex justify-start opacity-50 group-hover:opacity-100 transition-opacity duration-700 delay-100">
+                      <div class="w-full bg-[#1e1e1e] rounded-xl p-3 border border-white/10">
+                        <div class="flex gap-1.5 mb-2">
+                          <div class="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>
+                          <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/50"></div>
+                          <div class="w-2.5 h-2.5 rounded-full bg-green-500/50"></div>
+                        </div>
+                        <div class="h-2 w-1/2 bg-slate-700 rounded mb-1.5"></div>
+                        <div class="h-2 w-3/4 bg-slate-700 rounded mb-1.5"></div>
+                        <div class="h-2 w-2/3 bg-slate-700 rounded"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          </router-link>
+          <!-- 2. AI 图像生成 (修复版) -->
+          <router-link to="/ai-image" class="group relative col-span-1 md:col-span-3 lg:col-span-4 h-[300px] md:h-full min-h-[300px] rounded-[2.5rem] overflow-hidden border border-slate-200 transition-all duration-300 hover:shadow-xl hover:border-purple-200">
+            <!-- 1. 动态放大背景图 -->
+            <img src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1974&auto=format&fit=crop" alt="AI Art" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+
+            <!-- 2. 渐变遮罩 (加深底部，确保文字清晰) -->
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
+
+            <!-- 3. 内容区域 -->
+            <div class="absolute bottom-0 left-0 p-8 w-full z-10">
+              <!-- 图标容器 -->
+              <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center mb-4 border border-white/20 shadow-lg group-hover:bg-purple-500 group-hover:border-purple-500 group-hover:text-white transition-all duration-300 text-purple-100">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+
+              <!-- 标题与描述 -->
+              <h3 class="text-2xl font-bold text-white mb-2 tracking-tight">灵感画板</h3>
+              <p class="text-sm text-slate-300 line-clamp-2 leading-relaxed opacity-90 group-hover:opacity-100 group-hover:text-white transition-opacity">
+                输入文字描述，AI 将为您即刻生成 4K 级艺术画作，支持多种艺术风格。
+              </p>
+            </div>
+          </router-link>
+
+          <!-- 3. 提示词库 (模拟卡片堆叠效果) -->
+          <router-link to="/prompt-library" class="group relative col-span-1 md:col-span-3 lg:col-span-4 h-[240px] bg-[#FFF8F0] rounded-[2.5rem] overflow-hidden border border-orange-100 hover:border-orange-200 transition-colors">
+            <div class="p-8 relative z-10">
+              <div class="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center mb-3 text-orange-600">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+              </div>
+              <h3 class="text-xl font-bold text-slate-900 mb-1">提示词宝库</h3>
+              <p class="text-sm text-slate-500">精选优质 Prompt 模板</p>
+            </div>
+
+            <!-- 装饰性卡片堆叠 -->
+            <div class="absolute bottom-[-40px] right-[-20px] w-48 h-40 transition-transform duration-300 group-hover:-translate-y-2 group-hover:-translate-x-2">
+              <!-- Card 3 -->
+              <div class="absolute top-0 left-8 w-full h-full bg-orange-200 rounded-2xl shadow-sm rotate-6"></div>
+              <!-- Card 2 -->
+              <div class="absolute top-2 left-4 w-full h-full bg-orange-100 rounded-2xl shadow-sm rotate-3"></div>
+              <!-- Card 1 -->
+              <div class="absolute top-4 left-0 w-full h-full bg-white border border-orange-100 rounded-2xl shadow-md p-4 flex flex-col gap-2">
+                <div class="h-2 w-1/3 bg-slate-200 rounded-full"></div>
+                <div class="h-2 w-full bg-slate-100 rounded-full"></div>
+                <div class="h-2 w-2/3 bg-slate-100 rounded-full"></div>
+              </div>
+            </div>
+          </router-link>
+
+          <!-- 4. 游戏 (Retro 风格) -->
+          <router-link to="/game" class="group relative col-span-1 md:col-span-3 lg:col-span-4 h-[240px] bg-slate-900 rounded-[2.5rem] overflow-hidden border border-slate-800 hover:ring-2 hover:ring-emerald-500/50 transition-all">
+            <!-- 像素网格背景 -->
+            <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgdmlld0JveD0iMCAwIDIwIDIwIiBmaWxsPSJub25lIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iMC41Ij48cGF0aCBkPSJNMCAwaDIwdjIwSDB6Ii8+PC9zdmc+')] opacity-20"></div>
+
+            <div class="absolute inset-0 bg-gradient-to-tr from-emerald-900/20 to-transparent"></div>
+
+            <div class="p-8 relative z-10 h-full flex flex-col justify-between">
+              <div>
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center mb-3 text-emerald-400 border border-emerald-500/30">
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
+                  </svg>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-1">剑道传奇</h3>
+              </div>
+
+              <div class="font-mono text-xs text-emerald-400 bg-black/40 p-3 rounded-lg border border-emerald-500/20 shadow-inner">
+                > START_GAME<br>
+                > 正在加载世界观...<br>
+                <span class="animate-pulse">> _</span>
+              </div>
+            </div>
+          </router-link>
+
+          <!-- 5. MCP 智能体 (科技极简风) -->
+          <router-link to="/mcp-agent" class="group relative col-span-1 md:col-span-3 lg:col-span-4 h-[240px] bg-white rounded-[2.5rem] overflow-hidden border border-slate-200 hover:border-cyan-300 transition-colors">
+            <!-- 科技连接线背景 -->
+            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-cyan-100 to-transparent rounded-bl-full opacity-50 transition-transform group-hover:scale-110"></div>
+
+            <div class="p-8 relative z-10">
+              <div class="w-10 h-10 rounded-xl bg-cyan-50 flex items-center justify-center mb-3 text-cyan-600">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <h3 class="text-xl font-bold text-slate-900 mb-1">MCP 智能体</h3>
+              <p class="text-sm text-slate-500">Model Context Protocol 配置管理</p>
+            </div>
+
+            <!-- 底部装饰: 节点图 -->
+            <div class="absolute bottom-6 right-8 flex gap-3 opacity-60">
+              <div class="w-3 h-3 rounded-full bg-cyan-400 group-hover:bg-cyan-500 transition-colors"></div>
+              <div class="w-3 h-3 rounded-full bg-cyan-200 group-hover:bg-cyan-300 transition-colors"></div>
+              <div class="w-3 h-3 rounded-full bg-slate-200"></div>
+            </div>
+          </router-link>
+          <!-- 6. 更多/敬请期待 (修复居中版) -->
+<div class="group relative col-span-1 md:col-span-6 lg:col-span-4 h-[240px] rounded-[2.5rem] overflow-hidden border border-slate-200 border-dashed hover:border-indigo-300 hover:border-solid transition-all duration-300 bg-slate-50/50 hover:bg-white hover:shadow-xl flex flex-col items-center justify-center">
+  
+  <!-- 背景装饰 -->
+  <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
+  <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-100 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+  <!-- 内容区域容器：添加 group-hover 位移，给按钮腾出空间 -->
+  <div class="relative z-10 flex flex-col items-center transition-transform duration-300 group-hover:-translate-y-4">
+    
+    <!-- 动态图标 -->
+    <div class="mb-4 relative">
+      <div class="w-12 h-12 rounded-full border-2 border-slate-200 group-hover:border-indigo-200 transition-colors"></div>
+      <div class="absolute top-0 left-0 w-12 h-12 rounded-full border-t-2 border-indigo-500 animate-spin"></div>
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-indigo-500">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
       </div>
+    </div>
+
+    <!-- 文字内容 -->
+    <h3 class="text-lg font-bold text-slate-900 mb-2 group-hover:text-indigo-600 transition-colors">更多功能开发中</h3>
+    <p class="text-sm text-slate-500 px-4 group-hover:text-slate-600 text-center">
+      语音克隆、视频生成、知识库构建...
+      <br>
+      <span class="text-xs text-indigo-400 mt-2 inline-block font-medium tracking-wide">COMING SOON</span>
+    </p>
+
+  </div>
+
+  <!-- 按钮：绝对定位 (不再占用布局空间，确保默认状态完美居中) -->
+  <button class="absolute bottom-6 px-6 py-2 rounded-full bg-white border border-slate-200 text-xs font-bold text-slate-600 shadow-lg shadow-indigo-500/10 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 z-20">
+    查看开发计划 &rarr;
+  </button>
+
+</div>
+
+
+        </div>
+      </section>
+
+      <!-- 5. 代码展示：IDE 风格窗口 -->
+      <section class="max-w-5xl mx-auto mb-16">
+        <div class="bg-slate-900 rounded-[1.5rem] shadow-2xl shadow-slate-900/50 overflow-hidden ring-1 ring-white/10">
+
+          <!-- 模拟 IDE 标题栏 -->
+          <div class="flex items-center justify-between px-6 py-4 bg-slate-800/50 border-b border-white/5 backdrop-blur-sm">
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
+              <div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
+              <div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
+            </div>
+            <div class="text-xs font-mono text-slate-400">DeepseekIntegration.ts</div>
+            <div class="w-10"></div> <!-- 占位 -->
+          </div>
+
+          <!-- 代码内容区，使用 grid 布局 -->
+          <div class="grid lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-white/10">
+            <!-- Left Code -->
+            <div class="p-6 md:p-8">
+              <div class="flex items-center gap-2 mb-6">
+                <span class="px-2 py-1 bg-indigo-500/20 text-indigo-300 text-xs font-mono rounded border border-indigo-500/30">Client Mode</span>
+              </div>
+              <div class="relative group">
+                <div class="absolute -inset-4 bg-indigo-500/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <pre class="relative text-sm font-mono leading-relaxed text-slate-300 overflow-x-auto"><code><span class="text-purple-400">import</span> DeepseekClient <span class="text-purple-400">from</span> <span class="text-green-400">'./services'</span>;
+
+<span class="text-slate-500">// Initialize Client</span>
+<span class="text-purple-400">const</span> client = <span class="text-purple-400">new</span> <span class="text-yellow-300">DeepseekClient</span>({
+  apiKey: <span class="text-green-400">'sk-...'</span>,
+  model: <span class="text-green-400">'deepseek-r1'</span>
+});
+
+<span class="text-purple-400">const</span> stream = <span class="text-purple-400">await</span> client.chat.completions.<span class="text-blue-400">create</span>({
+  messages: [{ role: <span class="text-green-400">'user'</span>, content: <span class="text-green-400">'Hi'</span> }],
+  stream: <span class="text-orange-400">true</span>
+});</code></pre>
+              </div>
+            </div>
+
+            <!-- Right Code -->
+            <div class="p-6 md:p-8">
+              <div class="flex items-center gap-2 mb-6">
+                <span class="px-2 py-1 bg-violet-500/20 text-violet-300 text-xs font-mono rounded border border-violet-500/30">Adapter Mode</span>
+              </div>
+              <div class="relative group">
+                <div class="absolute -inset-4 bg-violet-500/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <pre class="relative text-sm font-mono leading-relaxed text-slate-300 overflow-x-auto"><code><span class="text-purple-400">import</span> ai <span class="text-purple-400">from</span> <span class="text-green-400">'./adapter'</span>;
+
+<span class="text-slate-500">// Vercel AI SDK Style</span>
+<span class="text-purple-400">const</span> model = ai.<span class="text-blue-400">createModel</span>(<span class="text-green-400">"deepseek"</span>, {
+  apiKey: process.env.API_KEY
+});
+
+<span class="text-purple-400">const</span> { dataStream } = <span class="text-purple-400">await</span> model.<span class="text-blue-400">streamText</span>({
+  model: <span class="text-green-400">"deepseek-r1"</span>,
+  messages: history
+});</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer Simple -->
+      <footer class="text-center text-slate-400 text-sm py-8 border-t border-slate-200/50">
+        <p>© 2025 AI Vista Platform. Design for Future.</p>
+      </footer>
+
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-// 使用 router-link 进行导航，无需额外的脚本逻辑
+// Logic remains the same
 </script>
 
 <style scoped>
-/* 美观的渐变设计系统 */
-.bg-gradient-to-br {
-  background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
-}
+/* 
+  高级动画与辅助样式 
+  使用 CSS Keyframes 增加灵动感
+*/
 
-.bg-gradient-to-r {
-  background-image: linear-gradient(to right, var(--tw-gradient-stops));
-}
-
-.bg-gradient-to-bl {
-  background-image: linear-gradient(to bottom left, var(--tw-gradient-stops));
-}
-
-.bg-gradient-to-tr {
-  background-image: linear-gradient(to top right, var(--tw-gradient-stops));
-}
-
-.text-transparent {
-  color: transparent;
-}
-
-.bg-clip-text {
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* 简化的基础样式 */
-.backdrop-blur-sm {
-  backdrop-filter: blur(4px);
-}
-
-.shadow-2xl {
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-}
-
-.leading-relaxed {
-  line-height: 1.625;
-}
-
-/* 响应式调整 */
-@media (max-width: 768px) {
-  .grid {
-    grid-template-columns: 1fr;
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
   }
-
-  .text-4xl {
-    font-size: 2rem;
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
   }
-
-  .text-3xl {
-    font-size: 1.5rem;
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
   }
 }
 
+.animate-blob {
+  animation: blob 7s infinite;
+}
 
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 隐藏滚动条但保留功能，用于代码块 */
+pre::-webkit-scrollbar {
+  height: 6px;
+}
+pre::-webkit-scrollbar-track {
+  background: transparent;
+}
+pre::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
 </style>

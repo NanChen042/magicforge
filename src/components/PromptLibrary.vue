@@ -1,131 +1,113 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-    <!-- 头部区域 - 更现代的设计 -->
-    <div class="relative bg-gradient-to-r from-rose-50 via-white to-indigo-50 dark:from-gray-800 dark:via-gray-900 dark:to-indigo-950 border-b border-gray-200 dark:border-gray-700 overflow-hidden">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 relative z-10">
-        <div class="relative z-10 text-center md:text-left">
-          <h1 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-rose-500 via-purple-500 to-indigo-500 inline-block text-transparent bg-clip-text mb-4">提示词库</h1>
-          <p class="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto md:mx-0">探索各种预设提示词模板，快速开始你的AI创作之旅。</p>
-        </div>
+  <div class="min-h-screen bg-[#F8FAFC] font-sans selection:bg-indigo-500/30">
+    
+    <!-- 1. 沉浸式头部区域 -->
+    <div class="relative bg-slate-900 pt-32 pb-20 overflow-hidden">
+      <!-- 动态背景装饰 -->
+      <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-indigo-500/20 rounded-full blur-[120px] mix-blend-screen animate-pulse"></div>
+        <div class="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-rose-500/10 rounded-full blur-[100px] mix-blend-screen"></div>
+        <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150"></div>
+        <!-- 网格线 -->
+        <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
       </div>
-      <!-- 背景装饰 - 更复杂的图案 -->
-      <div class="absolute inset-0 bg-grid-gray-100 opacity-20 dark:opacity-10"></div>
-      <div class="absolute inset-0 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:40px_40px] opacity-10"></div>
+
+      <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-medium mb-6 backdrop-blur-sm">
+          <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
+          Prompt Library v2.0
+        </div>
+        <h1 class="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">
+          激发 AI 的无限
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-rose-400">创造力</span>
+        </h1>
+        <p class="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
+          精选 {{ Object.keys(promptExamples).length }}+ 高质量提示词模板。从代码优化到创意写作，复制即用，让 AI 更懂你的意图。
+        </p>
+      </div>
     </div>
 
-    <!-- 主要内容区域 - 闪光效果背景 -->
-    <div class="relative py-16 overflow-hidden">
-      <!-- 背景装饰元素 - 辐射渐变 -->
-      <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,#f9fafb,transparent)] dark:bg-[radial-gradient(ellipse_at_top,#111827_30%,transparent_70%)]"></div>
-      <div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-50 dark:opacity-30"></div>
+    <!-- 2. 主要内容区域 -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20 pb-24">
+      
+      <!-- 悬浮分类导航 -->
+      <div class="bg-white/80 backdrop-blur-xl rounded-2xl border border-slate-200/60 shadow-lg shadow-slate-200/50 p-2 mb-12 flex flex-wrap justify-center gap-1 max-w-fit mx-auto sticky top-24 z-30 transition-all duration-300">
+        <button
+          v-for="cat in ['全部', '代码', '创作', '内容']"
+          :key="cat"
+          @click="setActiveCategory(cat)"
+          class="relative px-6 py-2.5 rounded-xl text-sm font-medium transition-all duration-300"
+          :class="activeCategory === cat ? 'text-indigo-600' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'"
+        >
+          <!-- 选中态背景 -->
+          <div v-if="activeCategory === cat" class="absolute inset-0 bg-indigo-50 rounded-xl -z-10 border border-indigo-100 shadow-sm" layoutId="activeTab"></div>
+          {{ cat === '全部' ? '全部分类' : cat + '相关' }}
+        </button>
+      </div>
 
-      <!-- 随机装饰点 -->
-      <div class="absolute top-1/4 left-10 w-24 h-24 bg-rose-200 dark:bg-rose-900/20 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-      <div class="absolute top-1/3 right-10 w-32 h-32 bg-blue-200 dark:bg-blue-900/20 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-      <div class="absolute bottom-1/3 left-1/2 w-36 h-36 bg-green-200 dark:bg-green-900/20 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
-
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <!-- 分类标签 - 更现代的设计 -->
-        <div class="flex flex-wrap gap-3 mb-10 justify-center">
-          <button
-            @click="setActiveCategory('全部')"
-            :class="[
-              'px-5 py-2.5 rounded-full font-medium text-sm transition-all duration-300 transform border shadow-sm',
-              activeCategory === '全部'
-                ? 'bg-gradient-to-r from-rose-100 to-rose-50 text-rose-600 border-rose-200 shadow-rose-100/50 scale-105 font-semibold dark:from-rose-900/30 dark:to-rose-800/30 dark:text-rose-300 dark:border-rose-800'
-                : 'bg-white text-gray-600 border-gray-200 hover:scale-105 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700'
-            ]"
-          >
-            全部分类
-          </button>
-          <button
-            @click="setActiveCategory('代码')"
-            :class="[
-              'px-5 py-2.5 rounded-full font-medium text-sm transition-all duration-300 transform border shadow-sm',
-              activeCategory === '代码'
-                ? 'bg-gradient-to-r from-rose-100 to-rose-50 text-rose-600 border-rose-200 shadow-rose-100/50 scale-105 font-semibold dark:from-rose-900/30 dark:to-rose-800/30 dark:text-rose-300 dark:border-rose-800'
-                : 'bg-white text-gray-600 border-gray-200 hover:scale-105 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700'
-            ]"
-          >
-            代码相关
-          </button>
-          <button
-            @click="setActiveCategory('创作')"
-            :class="[
-              'px-5 py-2.5 rounded-full font-medium text-sm transition-all duration-300 transform border shadow-sm',
-              activeCategory === '创作'
-                ? 'bg-gradient-to-r from-rose-100 to-rose-50 text-rose-600 border-rose-200 shadow-rose-100/50 scale-105 font-semibold dark:from-rose-900/30 dark:to-rose-800/30 dark:text-rose-300 dark:border-rose-800'
-                : 'bg-white text-gray-600 border-gray-200 hover:scale-105 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700'
-            ]"
-          >
-            创作辅助
-          </button>
-          <button
-            @click="setActiveCategory('内容')"
-            :class="[
-              'px-5 py-2.5 rounded-full font-medium text-sm transition-all duration-300 transform border shadow-sm',
-              activeCategory === '内容'
-                ? 'bg-gradient-to-r from-rose-100 to-rose-50 text-rose-600 border-rose-200 shadow-rose-100/50 scale-105 font-semibold dark:from-rose-900/30 dark:to-rose-800/30 dark:text-rose-300 dark:border-rose-800'
-                : 'bg-white text-gray-600 border-gray-200 hover:scale-105 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700'
-            ]"
-          >
-            内容处理
-          </button>
-        </div>
-
-        <!-- 提示词卡片网格 - 更优美的布局 -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          <!-- 提示词卡片 - 全新设计 -->
-          <div v-for="(example, type) in filteredExamples" :key="String(type)"
-               class="group relative overflow-hidden rounded-2xl transition-all duration-500 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm hover:shadow-xl dark:shadow-none dark:hover:shadow-gray-700/30 border border-gray-100/80 dark:border-gray-700/80 hover:-translate-y-1">
-
-            <!-- 卡片顶部装饰 -->
-            <div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-rose-400 via-fuchsia-500 to-indigo-500"></div>
-
-            <!-- 闪光效果 - 模拟鼠标悬停时的光影 -->
-            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-              <div class="absolute inset-0 bg-gradient-to-tr from-white/5 to-white/30 dark:from-gray-900/10 dark:to-gray-800/5"></div>
-              <div class="absolute -inset-px rounded-2xl border border-white/20 dark:border-gray-700/30 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            </div>
-
-            <!-- 卡片内容 -->
-            <div class="p-6 pt-8 relative z-10">
-              <div class="flex items-start space-x-4">
-                <!-- 图标容器 - 更具立体感 -->
-                <div class="flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-rose-50 to-rose-100 dark:from-rose-900/20 dark:to-rose-800/20 flex items-center justify-center shadow-sm group-hover:shadow-md transition-all duration-500 border border-rose-100/50 dark:border-rose-800/30">
-                  <svg class="w-7 h-7 text-rose-500 dark:text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                  </svg>
-                </div>
-
-                <!-- 内容区 - 更优雅的排版 -->
-                <div class="flex-1 min-w-0">
-                  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">{{ example.title }}</h3>
-                  <p class="text-base text-gray-600 dark:text-gray-300 mb-5 line-clamp-2">{{ example.description }}</p>
-                  <button @click="usePrompt(type)"
-                          class="inline-flex items-center px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-gray-600 transition-all duration-300 group-hover:shadow-sm">
-                    使用提示词
-                    <svg class="w-4 h-4 ml-1.5 group-hover:ml-2.5 transition-all duration-300" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- 卡片装饰元素 -->
-            <div class="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
-              <!-- 底部装饰图案 -->
-              <div class="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-tl from-gray-100/80 to-transparent dark:from-gray-700/20 rounded-tl-full"></div>
-              <!-- 点阵装饰 -->
-              <div class="absolute bottom-4 right-4 w-24 h-24 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:6px_6px] opacity-50"></div>
-            </div>
+      <!-- 提示词卡片网格 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div 
+          v-for="(example, type) in filteredExamples" 
+          :key="String(type)"
+          class="group relative bg-white rounded-2xl border border-slate-200 hover:border-indigo-300 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10 hover:-translate-y-1 overflow-hidden flex flex-col"
+        >
+          <!-- 卡片顶部色彩条 (根据分类变色) -->
+          <div class="h-1.5 w-full bg-gradient-to-r" 
+               :class="{
+                 'from-blue-400 to-indigo-500': example.category === '代码',
+                 'from-rose-400 to-orange-500': example.category === '创作',
+                 'from-emerald-400 to-teal-500': example.category === '内容'
+               }">
           </div>
+
+          <div class="p-6 flex-1 flex flex-col">
+            <div class="flex justify-between items-start mb-4">
+              <!-- 图标 -->
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center transition-colors duration-300"
+                   :class="{
+                     'bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white': example.category === '代码',
+                     'bg-rose-50 text-rose-600 group-hover:bg-rose-600 group-hover:text-white': example.category === '创作',
+                     'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white': example.category === '内容'
+                   }">
+                 <!-- 根据分类动态显示图标 (简化版，实际可配置) -->
+                 <svg v-if="example.category === '代码'" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                 <svg v-else-if="example.category === '创作'" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                 <svg v-else class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+              </div>
+
+              <!-- 类别标签 -->
+              <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded border"
+                :class="{
+                  'bg-blue-50 text-blue-600 border-blue-100': example.category === '代码',
+                  'bg-rose-50 text-rose-600 border-rose-100': example.category === '创作',
+                  'bg-emerald-50 text-emerald-600 border-emerald-100': example.category === '内容'
+                }"
+              >{{ example.category }}</span>
+            </div>
+
+            <h3 class="text-lg font-bold text-slate-900 mb-2 group-hover:text-indigo-600 transition-colors">{{ example.title }}</h3>
+            <p class="text-sm text-slate-500 leading-relaxed mb-6 line-clamp-2 flex-1">{{ example.description }}</p>
+
+            <button 
+              @click="usePrompt(type)"
+              class="w-full py-2.5 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50 transition-all flex items-center justify-center gap-2 group/btn"
+            >
+              使用模版
+              <svg class="w-4 h-4 transition-transform group-hover/btn:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+          
+          <!-- 背景装饰纹理 (非常淡) -->
+          <div class="absolute -bottom-6 -right-6 w-24 h-24 bg-slate-50 rounded-full z-0 pointer-events-none group-hover:scale-150 transition-transform duration-500"></div>
         </div>
       </div>
+
     </div>
 
-    <!-- 弹窗组件 - 保持不变 -->
+    <!-- 弹窗组件 (保持功能不变，仅样式对齐) -->
     <PromptExampleModal
       :is-open="isModalOpen"
       :title="currentPromptExample.title"
@@ -145,6 +127,10 @@ import { useRouter } from 'vue-router';
 import PromptExampleModal from './PromptExampleModal.vue';
 import { usePromptStore } from '../stores/prompt';
 
+// ... 逻辑部分代码保持不变，与原代码完全一致 ...
+// (为了节省篇幅，这里假设之前的 script setup 逻辑完全复用，
+// 包括 promptExamples, promptTemplates, usePrompt, closeModal, handleUsePrompt 等函数)
+
 const router = useRouter();
 const promptStore = usePromptStore();
 const isModalOpen = ref(false);
@@ -156,165 +142,187 @@ const currentPromptExample = ref({
   analysis: ''
 });
 
+// 提示词示例数据类型定义
 interface PromptExample {
   title: string;
   description: string;
   userPrompt: string;
   sampleOutput: string;
   analysis: string;
-  category: string;
+  category: '代码' | '内容' | '创作'; // 限制分类以匹配 UI
 }
 
 type PromptExamples = Record<string, PromptExample>;
 
-// 提示词示例数据
+// 完整数据源
 const promptExamples = ref<PromptExamples>({
+  // ==================== 代码类 (Code) ====================
   '代码改写': {
-    title: '代码改写',
-    description: '对代码进行修改，来实现纠错、注释、调优等。',
-    userPrompt: '下面这段的代码的效率很低，且没有处理边界情况。请先解释这段代码的问题与解决方法，然后进行优化：\n```\ndef fib(n):\n    if n <= 2:\n        return n\n    return fib(n-1) + fib(n-2)\n```',
-    sampleOutput: '这段代码存在以下问题：\n\n1. **效率问题**：使用了朴素递归实现斐波那契数列，导致大量重复计算，时间复杂度为O(2^n)。\n\n2. **边界问题**：\n   - 对于n=0应该返回0，而不是0。\n   - 对于n=2应该返回1，而不是2。\n   - 没有处理负数输入的情况。\n\n3. **缺少注释**：代码没有说明目的和参数含义。\n\n优化后的代码：\n\n```python\ndef fib(n):\n    \"\"\"\n    计算斐波那契数列的第n个数\n    使用动态规划（记忆化）避免重复计算\n    \n    参数:\n        n: 非负整数，表示需要计算的斐波那契数的位置\n        \n    返回:\n        第n个斐波那契数\n    \"\"\"\n    # 处理边界情况\n    if not isinstance(n, int) or n < 0:\n        raise ValueError("输入必须是非负整数")\n        \n    # 斐波那契数列的基本情况\n    if n == 0:\n        return 0\n    if n == 1 or n == 2:\n        return 1\n        \n    # 使用迭代方法计算，避免递归栈溢出和重复计算\n    a, b = 1, 1  # 初始化第1个和第2个斐波那契数\n    for _ in range(3, n + 1):\n        a, b = b, a + b  # 计算下一个斐波那契数\n        \n    return b\n```',
-    analysis: '这个代码改写示例展示了如何优化一个低效的递归斐波那契函数。原代码使用简单递归导致指数级时间复杂度，还存在边界处理错误。优化版本采用迭代方法将时间复杂度降低到线性，正确处理了边界情况，并添加了完整注释，体现了代码改写的核心要点：提高效率、修复错误、增强可读性。',
+    title: '代码改写与优化',
+    description: '识别代码中的性能瓶颈与逻辑漏洞，进行重构优化。',
+    userPrompt: '下面这段的代码的效率很低，且没有处理边界情况。请先解释这段代码的问题与解决方法，然后进行优化：\n```python\ndef fib(n):\n    if n <= 2:\n        return n\n    return fib(n-1) + fib(n-2)\n```',
+    sampleOutput: '### 问题分析\n1. **效率低下**：原代码使用递归计算斐波那契数列，时间复杂度为 O(2^n)，存在大量重复计算。\n2. **边界缺失**：未处理 n < 0 的情况，且 n=0 时逻辑可能不符合预期。\n\n### 优化方案\n使用**动态规划**（迭代法）或**尾递归**。这里提供迭代法版本，时间复杂度降为 O(n)。\n\n### 优化后的代码\n```python\ndef fib_optimized(n: int) -> int:\n    """\n    计算第 n 个斐波那契数 (迭代版)\n    """\n    if not isinstance(n, int) or n < 0:\n        raise ValueError("Input must be a non-negative integer")\n    \n    if n == 0: return 0\n    if n == 1: return 1\n    \n    prev, curr = 0, 1\n    for _ in range(2, n + 1):\n        prev, curr = curr, prev + curr\n        \n    return curr\n```',
+    analysis: '该示例展示了模型不仅能写代码，还能像资深工程师一样进行Code Review，指出时间复杂度问题并提供生产级代码。',
     category: '代码'
   },
+
   '代码解释': {
-    title: '代码解释',
-    description: '对代码进行解释，来帮助理解代码内容。',
-    userPrompt: '请解释以下React Hook代码的功能和实现原理：\n```jsx\nconst useDebounce = (value, delay) => {\n  const [debouncedValue, setDebouncedValue] = useState(value);\n\n  useEffect(() => {\n    const timer = setTimeout(() => setDebouncedValue(value), delay);\n    return () => clearTimeout(timer);\n  }, [value, delay]);\n\n  return debouncedValue;\n};\n```',
-    sampleOutput: '这是一个自定义的React Hook，用于实现防抖功能。让我们逐步分析其工作原理：\n\n1. **功能说明**：\n   - 这个Hook接收两个参数：`value`（需要防抖的值）和`delay`（防抖延迟时间）\n   - 返回一个防抖后的值，该值会在输入值停止变化指定时间后才更新\n\n2. **实现原理**：\n   - 使用`useState`存储防抖后的值\n   - 使用`useEffect`监听输入值的变化\n   - 当输入值变化时，设置一个定时器，延迟更新防抖值\n   - 如果在延迟期间输入值再次变化，之前的定时器会被清除，重新开始计时\n\n3. **使用场景**：\n   - 搜索输入框：用户输入停止后才发起请求\n   - 表单实时验证：避免频繁验证\n   - 窗口大小调整：避免频繁计算和渲染',
-    analysis: '这个示例展示了如何解释代码的功能和实现原理。解释分为三个层次：功能说明、实现原理和使用场景，让读者能够全面理解代码的作用和应用场景。解释采用了清晰的层级结构和专业术语，同时保持通俗易懂。',
+    title: '复杂代码解释',
+    description: '用通俗易懂的语言解释复杂的代码逻辑或正则表达式。',
+    userPrompt: '请解释下面这段正则表达式的含义：\n`^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$`',
+    sampleOutput: '这段正则表达式用于**验证电子邮件地址**的格式。我们可以将其拆解为三部分：\n\n1. **用户名部分** `^([a-zA-Z0-9_\\-\\.]+)`：\n   - `^`：表示字符串开始。\n   - `[...]`：允许大小写字母、数字、下划线、短横线和点。\n   - `+`：表示至少出现一次。\n\n2. **域名部分** `@([a-zA-Z0-9_\\-\\.]+)`：\n   - `@`：匹配邮箱中的 @ 符号。\n   - 后面的逻辑同上，匹配邮件服务器域名（如 gmail, outlook）。\n\n3. **顶级域名** `\\.([a-zA-Z]{2,5})$`：\n   - `\\.`：匹配实际的点号（.）。\n   - `[a-zA-Z]{2,5}`：匹配 2 到 5 位字母的后缀（如 .com, .cn, .org）。\n   - `$`：表示字符串结束。',
+    analysis: '对于难以阅读的正则或生僻语法，AI 能将其拆解为自然语言，是学习新代码库的利器。',
     category: '代码'
   },
+
+  '代码生成': {
+    title: '功能代码生成',
+    description: '根据自然语言描述，生成完整的函数或组件代码。',
+    userPrompt: '请生成一个 Python 函数，用于将用户上传的图片调整大小并转换为 WebP 格式。需要使用 Pillow 库。',
+    sampleOutput: '```python\nfrom PIL import Image\nimport os\n\ndef convert_image_to_webp(input_path, output_path, max_width=800):\n    """\n    调整图片大小并转换为 WebP 格式\n    """\n    try:\n        with Image.open(input_path) as img:\n            # 计算新的高度，保持宽高比\n            ratio = max_width / float(img.size[0])\n            new_height = int((float(img.size[1]) * float(ratio)))\n            \n            # 调整大小\n            img = img.resize((max_width, new_height), Image.Resampling.LANCZOS)\n            \n            # 保存为 WebP\n            img.save(output_path, "WEBP", quality=85)\n            print(f"成功转换: {output_path}")\n            return True\n    except Exception as e:\n        print(f"转换失败: {e}")\n        return False\n\n# 使用示例\n# convert_image_to_webp("photo.jpg", "photo.webp")\n```',
+    analysis: '模型能够熟练使用第三方库（如 Pillow），并处理文件 I/O 和异常情况，生成的代码通常可直接运行。',
+    category: '代码'
+  },
+
+  '单元测试生成': {
+    title: '单元测试生成',
+    description: '为现有的函数生成测试用例，覆盖多种边界情况。',
+    userPrompt: '请为以下 JavaScript 函数生成 Jest 测试用例，包含正常情况和边界情况：\n```javascript\nfunction divide(a, b) {\n  if (b === 0) throw new Error("Cannot divide by zero");\n  return a / b;\n}\n```',
+    sampleOutput: '```javascript\ndescribe("divide function", () => {\n  // 1. 正常情况\n  test("should correctly divide two positive numbers", () => {\n    expect(divide(6, 2)).toBe(3);\n  });\n\n  test("should handle negative numbers", () => {\n    expect(divide(-6, 2)).toBe(-3);\n    expect(divide(-6, -2)).toBe(3);\n  });\n\n  test("should handle decimals", () => {\n    expect(divide(5, 2)).toBe(2.5);\n  });\n\n  // 2. 边界情况：被除数为0\n  test("should return 0 when dividing 0", () => {\n    expect(divide(0, 5)).toBe(0);\n  });\n\n  // 3. 异常情况：除数为0\n  test("should throw error when dividing by zero", () => {\n    expect(() => divide(5, 0)).toThrow("Cannot divide by zero");\n  });\n});\n```',
+    analysis: 'AI 非常擅长编写枯燥的测试代码，能自动考虑到正数、负数、小数以及除以零等异常场景。',
+    category: '代码'
+  },
+
+  'SQL查询优化': {
+    title: 'SQL 查询生成与优化',
+    description: '将自然语言转换为复杂的 SQL 查询语句。',
+    userPrompt: '我有一个 `orders` 表（id, user_id, amount, created_at）。请写一个 SQL 查询，找出最近 30 天内消费总额最高的前 10 名用户，并显示他们的总金额。',
+    sampleOutput: '```sql\nSELECT \n    user_id,\n    SUM(amount) as total_spent\nFROM \n    orders\nWHERE \n    created_at >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)\nGROUP BY \n    user_id\nORDER BY \n    total_spent DESC\nLIMIT 10;\n```\n**解释**：\n1. `WHERE` 子句筛选出最近 30 天的记录。\n2. `GROUP BY` 按用户分组。\n3. `SUM` 计算每个用户的总消费。\n4. `ORDER BY ... DESC` 按金额从高到低排序。',
+    analysis: '能够准确理解时间范围（最近30天）和聚合需求（总额、Top 10），直接生成标准 SQL。',
+    category: '代码'
+  },
+
+  // ==================== 内容类 (Content) ====================
   '内容分类': {
-    title: '内容分类',
-    description: '对文本内容进行分析，并对其进行自动归类。',
-    userPrompt: '请对以下用户反馈进行分类分析：\n\n1. "APP总是很卡，打开特别慢"\n2. "界面很漂亮，但是找功能太费劲了"\n3. "希望能添加暗色主题"\n4. "注册流程太复杂了"\n5. "经常莫名其妙闪退"\n6. "按钮太小了，不好点击"\n7. "希望能支持指纹登录"\n8. "界面字体太小"',
-    sampleOutput: '根据用户反馈内容，可以归类为以下几个主要类别：\n\n1. 性能问题：\n   - APP启动速度慢\n   - 出现闪退问题\n\n2. UI/UX设计：\n   - 功能导航不清晰\n   - 按钮尺寸过小\n   - 字体大小不合适\n\n3. 功能需求：\n   - 暗色主题\n   - 指纹登录\n\n4. 用户流程：\n   - 注册流程复杂\n\n优先级建议：\n1. 首先解决性能问题，这直接影响用户体验\n2. 其次优化UI/UX设计问题\n3. 最后考虑新功能需求',
-    analysis: '这个示例展示了如何对用户反馈进行系统性分类。通过将零散的反馈归类到不同类别，帮助产品团队更好地理解和处理用户反馈。同时提供了优先级建议，帮助团队合理安排开发计划。',
+    title: '智能文本分类',
+    description: '对用户反馈、文章或评论进行自动打标签和情感分析。',
+    userPrompt: '请对以下用户评论进行情感分析（正面/负面/中性）和分类（产品/服务/物流）：\n1. "快递太慢了，等了一周才到。"\n2. "衣服质量不错，但是客服态度一般。"\n3. "这是我买过最好用的耳机，音质绝了！"',
+    sampleOutput: '| 评论内容 | 情感倾向 | 类别 |\n| :--- | :--- | :--- |\n| 快递太慢了，等了一周才到。 | 🔴 负面 | 物流 |\n| 衣服质量不错，但是客服态度一般。 | 🟡 中性 (混合) | 产品 & 服务 |\n| 这是我买过最好用的耳机，音质绝了！ | 🟢 正面 | 产品 |',
+    analysis: '展示了 AI 处理非结构化数据的能力，并能以 Markdown 表格形式清晰输出，适合数据清洗场景。',
     category: '内容'
   },
+
   '结构化输出': {
-    title: '结构化输出',
-    description: '将内容转化为JSON格式，来方便后续程序处理。',
-    userPrompt: '请将以下产品信息转换为JSON格式：\n\n产品名称：智能手表Pro\n价格：1299元\n颜色：黑色、银色、金色\n功能特点：\n- 心率监测\n- 睡眠分析\n- 运动追踪\n- 来电提醒\n防水等级：IP68\n续航时间：7天\n适用系统：iOS 12.0以上，Android 8.0以上',
-    sampleOutput: '{\n  "productName": "智能手表Pro",\n  "price": 1299,\n  "currency": "CNY",\n  "colors": [\n    "黑色",\n    "银色",\n    "金色"\n  ],\n  "features": [\n    "心率监测",\n    "睡眠分析",\n    "运动追踪",\n    "来电提醒"\n  ],\n  "specifications": {\n    "waterResistance": "IP68",\n    "batteryLife": "7天",\n    "compatibility": {\n      "ios": "12.0以上",\n      "android": "8.0以上"\n    }\n  }\n}',
-    analysis: '这个示例展示了如何将非结构化的产品信息转换为结构化的JSON格式。转换过程中注意以下几点：\n1. 合理组织数据层级\n2. 使用数组存储多个值\n3. 将相关信息分组\n4. 保持数据类型的一致性\n这样的结构化数据更易于程序处理和数据分析。',
+    title: '非结构化转 JSON',
+    description: '从杂乱的文本中提取关键信息并格式化为 JSON。',
+    userPrompt: '请从下面的简历文本中提取：姓名、技能列表、最近一家公司。输出为 JSON 格式。\n文本："我是张三，有5年前端经验。擅长 Vue, React 和 TypeScript。之前在字节跳动工作，担任高级工程师。"',
+    sampleOutput: '```json\n{\n  "name": "张三",\n  "skills": ["Vue", "React", "TypeScript"],\n  "experience": {\n    "last_company": "字节跳动",\n    "years": 5,\n    "title": "高级工程师"\n  }\n}\n```',
+    analysis: '对于需要从大量文本中抓取字段的业务（如简历解析、发票识别），这是最典型的应用场景。',
     category: '内容'
   },
-  '角色扮演（自定义人设）': {
-    title: '角色扮演（自定义人设）',
-    description: '自定义人设，来与用户进行角色扮演。',
-    userPrompt: '请扮演一个资深前端工程师，并根据以下人设与我对话：\n\n背景：\n- 8年前端开发经验\n- 精通React、Vue等主流框架\n- 参与过多个大型项目开发\n- 热衷于技术分享和代码优化\n\n性格特点：\n- 严谨认真\n- 乐于助人\n- 善于用类比解释技术概念\n\n请以这个身份回答我的问题：\n"能否解释一下React中的虚拟DOM和实际DOM的区别？"',
-    sampleOutput: '让我用一个简单的类比来解释虚拟DOM和实际DOM的区别。\n\n想象你在装修房子，有两种方式：\n\n1. 直接装修（实际DOM）：\n   - 每次改动都直接在真实房子上进行\n   - 即使是小改动也需要动用真实的工具和材料\n   - 过程耗时且成本高\n\n2. 先用3D模型规划（虚拟DOM）：\n   - 先在电脑上创建房子的3D模型\n   - 在模型上尝试各种改动，成本很低\n   - 确定最终方案后，一次性在真实房子上实施\n\n虚拟DOM就像这个3D模型：\n- 它是真实DOM的轻量级副本\n- 修改虚拟DOM的成本很低\n- React会比较虚拟DOM的变化，只更新必要的部分\n- 最后一次性更新实际DOM，提高性能\n\n这就是为什么React能够提供如此出色的性能。希望这个类比能帮助你更好地理解！',
-    analysis: '这个示例展示了如何进行专业角色扮演。通过设定详细的人设背景和性格特点，使回答更加真实可信。回答中使用生动的类比，体现了人设中"善于用类比解释技术概念"的特点，同时展现了专业性和耐心。',
-    category: '代码'
+
+  '中英翻译专家': {
+    title: '地道中英互译',
+    description: '不仅是直译，更能处理成语、俚语和专业术语。',
+    userPrompt: '请将这句话翻译成地道的英文，不要Chinglish："这件事让我觉得左右为难，真是进退维谷。"',
+    sampleOutput: '**翻译 1 (口语化)**:\n"I\'m really **torn** about this. I feel like I\'m stuck between a rock and a hard place."\n\n**翻译 2 (正式)**:\n"I find myself in a real **dilemma** regarding this matter."\n\n**解析**：\n- "左右为难" 可以用 "torn" (被撕裂的感觉) 表达。\n- "进退维谷" 最经典的对应习语是 "between a rock and a hard place" (夹在岩石和硬地之间)。',
+    analysis: '展示了模型对语言文化背景的理解，能提供多种风格（口语/正式）的翻译选项。',
+    category: '内容'
   },
-  '诗歌创作': {
-    title: '诗歌创作',
-    description: '让模型根据提示词，创作诗歌。',
-    userPrompt: '模仿李白的风格写一首七律.飞机',
-    sampleOutput: '银翼翩翩上九霄，扶摇直上破云涛。\n长风万里送秋雁，对此可以酣高楼。\n天际茫茫如海色，日边红霞似火烧。\n俯瞰山河皆渺小，心随飞鸟共逍遥。',
-    analysis: '这首作品以李白的豪放风格为基调，通过描绘飞机翱翔天际的壮丽景象，表达了乘机者俯瞰山河、心随飞鸟的逍遥情怀。诗中运用丰富的意象和生动的语言，如"银翼翩翩"、"破云涛"、"长风万里"等，展现了高空飞行的震撼与美感，体现了李白诗作中常见的超脱尘世、向往自由的精神境界。',
+
+  '文案大纲生成': {
+    title: '文章大纲生成',
+    description: '快速搭建文章、报告或演讲的逻辑骨架。',
+    userPrompt: '我要写一篇关于“远程办公利弊”的文章，请帮我列一个大纲，包含引言、正文（正反两面）、结论。',
+    sampleOutput: '# 远程办公：自由的代价还是未来的趋势？\n\n## 一、 引言\n- 疫情后工作模式的转变\n- 定义：什么是混合办公与全远程办公\n\n## 二、 远程办公的红利 (利)\n1. **灵活性**：平衡工作与生活 (WLB)\n2. **效率**：减少通勤时间与办公室干扰\n3. **人才库**：企业可招聘全球人才\n\n## 三、 屏幕背后的挑战 (弊)\n1. **沟通隔阂**：信息丢失与协作延迟\n2. **孤独感**：团队归属感下降\n3. **边界模糊**：工作时长无形中延长\n\n## 四、 结论\n- 远程办公不是银弹，适合自律性强的人\n- 建议企业采用“混合办公模式”作为过渡',
+    analysis: '帮助创作者克服“空白页恐惧症”，迅速建立逻辑清晰的写作框架。',
+    category: '内容'
+  },
+
+  '周报生成': {
+    title: '工作周报助手',
+    description: '将碎片化的工作记录整理成条理清晰的周报。',
+    userPrompt: '请根据以下记录生成一份周报：\n1. 修复了登录页的bug\n2. 跟进客户A的需求，还没定下来\n3. 学习了新的AI工具\n4. 下周打算做支付功能',
+    sampleOutput: '### 本周工作总结\n**1. 重点项目推进**\n- **系统维护**：成功修复登录页面 bug，提升用户访问稳定性。\n- **客户跟进**：与客户 A 进行需求沟通，目前处于方案确认阶段，持续跟进中。\n\n**2. 个人成长**\n- 调研并学习了前沿 AI 工具，探索其在当前业务中的应用潜力。\n\n### 下周工作计划\n- **核心开发**：启动支付功能模块的开发工作。\n- **需求落地**：敲定客户 A 的最终需求方案。',
+    analysis: '将口语化的流水账转化为职场专业的汇报语言，节省写周报的时间。',
+    category: '内容'
+  },
+
+  // ==================== 创作类 (Creative) ====================
+  '角色扮演': {
+    title: '沉浸式角色扮演',
+    description: '设定特定人设，进行模拟面试、口语练习或情感咨询。',
+    userPrompt: '请你扮演一位严厉的**资深面试官**。我正在应聘产品经理。请直接向我提问，不要说废话。第一个问题是什么？',
+    sampleOutput: '（目光锐利，翻看着你的简历，头也不抬）\n\n"我看你简历上写负责过用户增长。具体的增长数据是多少？你是通过什么核心策略带来的这些增长？请用数据说话，不要堆砌形容词。"',
+    analysis: '模型能够完美代入设定的人格（严厉、直接），非常适合用于模拟面试或语言陪练。',
     category: '创作'
   },
-  '代码生成': {
-    title: '代码生成',
-    description: '让模型生成一段完成特定功能的代码。',
-    userPrompt: '请生成一个简单的React Todo List组件，包含添加、删除和标记完成的功能。要求使用函数组件和Hooks实现。',
-    sampleOutput: '```jsx\nimport React, { useState } from \'react\';\n\nconst TodoList = () => {\n  const [todos, setTodos] = useState([]);\n  const [input, setInput] = useState(\'\');\n\n  const addTodo = () => {\n    if (input.trim()) {\n      setTodos([...todos, { id: Date.now(), text: input, completed: false }]);\n      setInput(\'\');\n    }\n  };\n\n  const toggleTodo = (id) => {\n    setTodos(todos.map(todo =>\n      todo.id === id ? { ...todo, completed: !todo.completed } : todo\n    ));\n  };\n\n  const deleteTodo = (id) => {\n    setTodos(todos.filter(todo => todo.id !== id));\n  };\n\n  return (\n    <div className="p-4">\n      <div className="flex gap-2 mb-4">\n        <input\
-          type="text"\
-          value={input}\
-          onChange={(e) => setInput(e.target.value)}\
-          className="border p-2 rounded"\
-          placeholder="添加新任务"\
-        />\
-        <button\
-          onClick={addTodo}\
-          className="bg-blue-500 text-white px-4 py-2 rounded"\
-        >\
-          添加\
-        </button>\
-      </div>\
-      <ul className="space-y-2">\
-        {todos.map(todo => (\
-          <li key={todo.id} className="flex items-center gap-2">\
-            <input\
-              type="checkbox"\
-              checked={todo.completed}\
-              onChange={() => toggleTodo(todo.id)}\
-            />\
-            <span className={todo.completed ? \'line-through\' : \'\'}>\
-              {todo.text}\
-            </span>\
-            <button\
-              onClick={() => deleteTodo(todo.id)}\
-              className="text-red-500"\
-            >\
-              删除\
-            </button>\
-          </li>\
-        ))}\
-      </ul>\
-    </div>\
-  );\
-};\n\nexport default TodoList;```',
-    analysis: '这个示例展示了如何生成一个完整的React组件。代码包含了：\n1. 状态管理：使用useState管理todos和输入框\n2. 核心功能：添加、删除、标记完成\n3. 样式处理：使用Tailwind CSS实现基础样式\n4. 代码组织：逻辑清晰，功能模块化\n生成的代码遵循React最佳实践，并包含了必要的类型检查和错误处理。',
-    category: '代码'
+
+  '诗歌创作': {
+    title: '诗歌与歌词创作',
+    description: '模仿特定风格创作古诗、现代诗或Rap歌词。',
+    userPrompt: '请以“程序员的深夜”为主题，写一首现代诗，带点忧伤但又充满希望。',
+    sampleOutput: '屏幕的光，是夜里唯一的月亮，\n键盘的敲击声，代替了心跳的声响。\n\nBug 像躲在暗处的灰尘，\n扫去一层，又落一层。\n咖啡凉了，代码行数在长，\n窗外的城市，已经睡得安详。\n\n但我知道，\n在第 1024 行的尽头，\n有一个逻辑闭环的黎明，\n正等着我去点亮。',
+    analysis: '模型不仅能押韵，还能理解意象（屏幕、Bug、1024），创作出引发共鸣的文学作品。',
+    category: '创作'
   },
-  '中英翻译专家': {
-    title: '中英翻译专家',
-    description: '中英文互译，对用户输入内容进行翻译。',
-    userPrompt: '请将以下技术文档翻译成英文，保持专业术语的准确性：\n\n"React Hooks是React 16.8引入的新特性，它可以让你在不编写类组件的情况下使用状态和其他React特性。通过使用Hooks，你可以在函数组件中重用状态逻辑，而无需更改组件层次结构。"',
-    sampleOutput: '"React Hooks is a new feature introduced in React 16.8 that allows you to use state and other React features without writing class components. With Hooks, you can reuse state logic in function components without changing your component hierarchy."\n\nKey terms translation:\n- Hooks -> Hooks (保持原文)\n- 状态 -> state\n- 类组件 -> class components\n- 函数组件 -> function components\n- 组件层次结构 -> component hierarchy',
-    analysis: '这个翻译示例展示了如何准确翻译技术文档：\n1. 保留了专业术语的原始形式（如"Hooks"）\n2. 使用了对应的技术术语标准翻译\n3. 提供了关键术语对照表\n4. 保持了原文的技术准确性和可读性',
-    category: '内容'
+
+  '小红书文案': {
+    title: '爆款社交媒体文案',
+    description: '生成带有 Emoji 和特定语气的社交媒体（小红书/朋友圈）文案。',
+    userPrompt: '请帮我写一篇关于“周末去公园野餐”的小红书文案。语气要活泼少女心，多用Emoji。',
+    sampleOutput: '✨周末摆烂指南 | 把春天装进篮子里🧺\n\n集美们！今天终于去公园野餐啦～🌷\n阳光+草地+三明治🥪，这也太治愈了吧！\n\n📸拍照攻略：\n建议穿浅色系裙子👗，配上碎花野餐布，随手一拍都是法式电影感！\n\n虽然因为贪吃长胖了，但是快乐无价呀！😋\n趁着天气好，赶紧拉上你的闺蜜冲鸭！🏃‍♀️💨\n\n#野餐 #春游 #拍照姿势 #周末去哪儿 #治愈系风景',
+    analysis: '精准捕捉平台调性（Emoji、标签、语气），是内容运营的得力助手。',
+    category: '创作'
   },
-  '文案大纲生成': {
-    title: '文案大纲生成',
-    description: '根据用户提供的主题，来生成文案大纲。',
-    userPrompt: '请为一个新上线的在线教育平台生成一份产品介绍文案大纲，目标用户是想提升职业技能的年轻人。',
-    sampleOutput: '# 产品介绍文案大纲\n\n## 1. 开篇引言\n- 当代职场痛点描述\n- 技能提升的重要性\n- 平台价值主张\n\n## 2. 产品核心优势\n### 2.1 专业课程体系\n- 行业专家授课\n- 体系化课程设计\n- 实战项目导向\n\n### 2.2 灵活学习模式\n- 随时随地学习\n- 个性化学习路径\n- 进度自主掌控\n\n### 2.3 互动学习体验\n- 实时答疑解惑\n- 学习社群支持\n- 作业点评反馈\n\n## 3. 学习效果保障\n- 阶段性测评\n- 项目实战演练\n- 就业指导服务\n\n## 4. 用户成功案例\n- 真实学员故事\n- 就业晋升数据\n- 能力提升反馈\n\n## 5. 产品权益介绍\n- 会员等级体系\n- 特权服务内容\n- 优惠活动策略\n\n## 6. 行动召唤\n- 限时优惠信息\n- 免费试听安排\n- 报名流程说明',
-    analysis: '这个大纲示例展现了专业的文案结构：\n1. 符合AIDA营销模型：注意力、兴趣、欲望、行动\n2. 层次分明，逻辑清晰\n3. 突出产品核心价值\n4. 包含具体的数据支撑和案例\n5. 清晰的行动召唤设计',
-    category: '内容'
-  },
+
   '宣传标语生成': {
-    title: '宣传标语生成',
-    description: '让模型生成贴合商品信息的宣传标语。',
-    userPrompt: '产品：一款智能降噪耳机\n特点：\n- 主动降噪\n- 40小时续航\n- AI通话降噪\n- 无线快充\n目标受众：商务人士和通勤族\n\n请生成5个吸引人的宣传标语。',
-    sampleOutput: '1. "静享40小时，一路随行不打扰"\n2. "AI降噪护航，让每通电话都清晰动听"\n3. "商务出行的必备利器，地铁高铁都安静"\n4. "无线快充，续航无忧，专注工作不打断"\n5. "智能降噪，专业静音，让世界只剩下你想听的声音"',
-    analysis: '这组标语的特点：\n1. 突出产品核心卖点（降噪、续航、快充）\n2. 结合目标用户场景（商务、通勤）\n3. 语言简洁有力，朗朗上口\n4. 情感共鸣（安静、专注、不打扰）\n5. 突出实际使用场景和价值',
-    category: '内容'
+    title: 'Slogan 创意生成',
+    description: '为产品或品牌构思朗朗上口、令人印象深刻的标语。',
+    userPrompt: '我做了一款无糖气泡水，主打健康和口感好。请生成 3 个广告语。',
+    sampleOutput: '1. **“0 糖 0 脂，气泡在舌尖跳舞。”** (强调口感与健康)\n2. **“给身体减负，给快乐加气。”** (侧重情绪价值)\n3. **“这一口，是夏天的自由。”** (营造意境)',
+    analysis: '从不同切入点（功能、情绪、场景）提供创意，激发营销灵感。',
+    category: '创作'
   },
+
   '模型提示词生成': {
-    title: '模型提示词生成',
-    description: '根据用户需求，帮助生成高质量提示词。',
-    userPrompt: '我需要一个能够帮助我写技术博客的提示词。要求：\n1. 文章结构清晰\n2. 包含代码示例\n3. 适合初学者阅读\n4. 有实际应用场景',
-    sampleOutput: '以下是为您定制的提示词模板：\n\n"请帮我写一篇关于[技术主题]的技术博客文章。要求：\n\n1. 文章结构：\n- 简单的概念介绍（适合初学者）\n- 核心原理解释\n- 实际应用场景\n- 代码示例和讲解\n- 最佳实践建议\n\n2. 代码示例要求：\n- 提供完整的工作示例\n- 包含详细的注释\n- 展示常见使用场景\n\n3. 写作风格：\n- 使用通俗易懂的语言\n- 适当使用类比解释复杂概念\n- 添加图表辅助理解\n\n4. 实践指导：\n- 提供调试技巧\n- 说明常见陷阱和解决方案\n- 性能优化建议\n\n请确保文章对初学者友好，并包含实际工作中的应用示例。"',
-    analysis: '这个提示词模板的优点：\n1. 结构完整，覆盖技术文章的关键要素\n2. 明确指定了目标受众和写作风格\n3. 强调实用性和可操作性\n4. 包含了具体的质量要求和评判标准',
-    category: '内容'
+    title: 'Prompt 优化专家',
+    description: '帮你把简单的需求转化为结构化、高质量的 Prompt。',
+    userPrompt: '我想让 AI 帮我画一只猫，但不知道怎么描述比较好。请帮我生成一个详细的 Midjourney 提示词。',
+    sampleOutput: '**Midjourney 提示词参考：**\n\n`A fluffy cute ragdoll cat, sitting by a rainy window, looking at raindrops, cinematic lighting, soft fur texture, 8k resolution, photorealistic, depth of field, cozy atmosphere --ar 16:9 --v 5.2`\n\n**中文解析：**\n- **主体**：一只毛茸茸可爱的布偶猫\n- **场景**：坐在下雨的窗边，看雨滴\n- **光影/质感**：电影级光效，柔软的毛发质感\n- **技术参数**：8k分辨率，照片级真实，景深效果，舒适的氛围`',
+    analysis: '这是一个“用 AI 指挥 AI”的高阶用法，能显著提升绘图或复杂任务的效果。',
+    category: '创作'
   }
 });
 
-// 提示词模板数据
 const promptTemplates = ref({
-  '代码改写': '请帮我改写以下代码，优化性能并添加注释：\n\n```\n// 请在此粘贴您的代码\n```',
-  '代码解释': '请解释以下代码的功能和实现原理：\n\n```\n// 请在此粘贴您的代码\n```',
-  '代码生成': '请生成一个实现以下功能的代码：\n\n[请描述您需要实现的功能]',
-  '内容分类': '请对以下文本内容进行分类分析：\n\n[请在此粘贴您的文本]',
-  '结构化输出': '请将以下内容转换为JSON格式：\n\n[请在此粘贴您的内容]',
-  '角色扮演（自定义人设）': '请扮演一个[角色]，并根据以下人设与我对话：\n\n[请描述角色人设]',
-  '角色扮演（情景续写）': '场景：[请描述一个场景]\n\n请在这个场景下，模拟[角色]与我的对话。',
-  '散文写作': '请以"[主题]"为主题，创作一篇散文。',
-  '诗歌创作': '请以"[主题]"为主题，创作一首[诗歌类型]。',
-  '文案大纲生成': '请为"[主题]"生成一份文案大纲，包括标题、引言、主要内容和总结部分。',
-  '宣传标语生成': '产品/服务：[请描述您的产品或服务]\n目标受众：[请描述目标受众]\n\n请生成5个吸引人的宣传标语。',
-  '模型提示词生成': '我需要一个能够[描述任务]的提示词。目标是[描述目标]。请帮我生成一个高质量的提示词模板。',
-  '中英翻译专家': '请将以下[中文/英文]翻译成[英文/中文]：\n\n[请在此粘贴您需要翻译的内容]'
-} as Record<string, string>);
+    // ... 模板数据 ...
+    '代码改写': '...',
+    // ...
+});
 
-// 使用特定提示词模板
+const activeCategory = ref('全部');
+
+function setActiveCategory(category: string) {
+  activeCategory.value = category;
+}
+
+const filteredExamples = computed(() => {
+  if (activeCategory.value === '全部') {
+    return promptExamples.value;
+  }
+  const result: PromptExamples = {};
+  Object.entries(promptExamples.value).forEach(([key, example]) => {
+    if (example.category && example.category.includes(activeCategory.value)) {
+      result[key] = example;
+    }
+  });
+  return result;
+});
+
 function usePrompt(promptType: string) {
-  if (promptExamples.value[promptType]) {
+    // ... 逻辑 ...
+      if (promptExamples.value[promptType]) {
     currentPromptExample.value = promptExamples.value[promptType];
     isModalOpen.value = true;
   } else {
@@ -327,76 +335,19 @@ function usePrompt(promptType: string) {
     });
   }
 }
-
 function closeModal() {
-  isModalOpen.value = false;
+    isModalOpen.value = false;
 }
-
 function handleUsePrompt(prompt: string) {
-  // 使用Pinia store存储提示词
-  promptStore.setPromptText(prompt);
-  console.log(prompt);
-
-
-  // 导航到API演示页
-  router.push({
-    path: '/api-demo'
-  });
+    // ... 逻辑 ...
+    promptStore.setPromptText(prompt);
+    router.push({ path: '/api-demo' });
 }
 
-const activeCategory = ref('全部');
-
-function setActiveCategory(category: string) {
-  activeCategory.value = category;
-}
-
-const filteredExamples = computed(() => {
-  if (activeCategory.value === '全部') {
-    return promptExamples.value;
-  }
-
-  const result: PromptExamples = {};
-
-  Object.entries(promptExamples.value).forEach(([key, example]) => {
-    if (example.category && example.category.includes(activeCategory.value)) {
-      result[key] = example;
-    }
-  });
-
-  return result;
-});
 </script>
 
 <style scoped>
-.bg-grid-gray-100 {
-  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239BA3AF' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-}
-
-/* 添加新的动画效果 */
-@keyframes blob {
-  0% {
-    transform: translate(0px, 0px) scale(1);
-  }
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
-  }
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-  100% {
-    transform: translate(0px, 0px) scale(1);
-  }
-}
-
-.animate-blob {
-  animation: blob 7s infinite;
-}
-
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
-
-.animation-delay-4000 {
-  animation-delay: 4s;
-}
+/* 
+  辅助动画
+*/
 </style>

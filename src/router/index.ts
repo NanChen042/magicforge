@@ -39,6 +39,13 @@ const router = createRouter({
       component: () => import('../views/McpAgentView.vue'),
       meta: { title: 'MCP智能体' }
     },
+        // 🔥 新增：情景模拟页面
+    {
+      path: '/scenario',
+      name: 'scenario',
+      component: () => import('../views/ScenarioView.vue'),
+      meta: { title: '第13号列车' }
+    },
 
     // 捕获所有未匹配路由，重定向到首页
     {
