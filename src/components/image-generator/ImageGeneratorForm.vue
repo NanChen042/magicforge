@@ -1,37 +1,58 @@
 <template>
-  <!-- 
-    修复点：
-    1. 添加 shrink-0：防止在父级 Flex 布局中被右侧内容挤压导致宽度变窄
-    2. 维持 w-full h-full：占满父组件分配的容器空间
+  <!--
+    主容器：
+    h-full: 占满父级容器高度
+    border-r: 右侧分割线
+    bg-white: 基底
   -->
-  <div class="sidebar-root flex flex-col w-full h-full shrink-0 bg-[var(--bg-color)] border-r border-[var(--border-color)] text-[var(--text-main)] font-sans box-border">
-    
-    <!-- 1. 顶部固定区 -->
-    <div class="shrink-0 flex justify-between items-center px-5 py-4 border-b border-[var(--surface-color)] bg-white/80 backdrop-blur-sm z-10">
-      <div class="flex items-center gap-2 text-sm font-bold text-[var(--text-main)] tracking-wide">
-        <div class="w-6 h-6 rounded-md bg-[#4E54C8]/10 flex items-center justify-center text-[var(--primary-color)]">
-          <el-icon><Operation /></el-icon>
-        </div>
-        <span>配置参数</span>
-      </div>
-      
-      <el-tooltip content="重置随机种子" placement="bottom">
-        <button class="p-1 rounded bg-transparent text-[var(--text-secondary)] border-none cursor-pointer transition-colors duration-200 hover:bg-[var(--surface-color)] hover:text-[var(--primary-color)]" @click="$emit('randomize-seed')">
-          <el-icon><Refresh /></el-icon>
-        </button>
-      </el-tooltip>
-    </div>
+  <div class="flex flex-col w-full h-full bg-white border-r border-slate-200 font-sans text-slate-700 relative shrink-0">
 
-    <!-- 2. 中间滚动区 -->
-    <div class="flex-1 overflow-y-auto p-5 flex flex-col gap-6 custom-scrollbar w-full">
-      
-      <!-- 提示词 Prompt -->
-      <section class="w-full">
-        <div class="flex justify-between items-center mb-2">
-          <label class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-[0.5px]">提示词 (PROMPT)</label>
+<div class="shrink-0 h-[72px] flex items-center justify-between px-6 border-b border-slate-100 bg-gradient-to-r from-white via-slate-50/50 to-white z-20">
+  
+  <div class="flex items-center gap-4">
+    <!-- 自定义元素：半透明的巨大编号 -->
+    <div class="relative h-full flex items-center">
+      <span class="text-3xl font-black text-slate-200/80 font-mono italic select-none -ml-1">JIA</span>
+    </div>
+    
+    <div class="relative pl-4 border-l border-slate-200">
+      <h2 class="text-[13px] font-bold text-slate-800 uppercase tracking-widest">
+        Config
+      </h2>
+      <p class="text-[10px] text-slate-400 leading-tight mt-0.5">
+        Image Synthesis
+      </p>
+    </div>
+  </div>
+
+  <!-- 右侧：圆形按钮 -->
+  <button 
+    class="w-9 h-9 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:border-indigo-500 hover:text-indigo-600 hover:shadow-md hover:shadow-indigo-500/10 transition-all duration-300 bg-white"
+    @click="$emit('randomize-seed')"
+  >
+    <el-icon><Refresh /></el-icon>
+  </button>
+
+</div>
+
+
+    <!-- ==========================================
+         2. 滚动内容区 (Scrollable)
+         ========================================== -->
+    <div class="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-6 w-full ">
+
+      <!-- A. 提示词 (Prompt) -->
+      <section class="space-y-3 group">
+        <div class="flex justify-between items-end">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+            <span class="w-1 h-3 bg-[#4E54C8] rounded-full"></span>
+            提示词
+          </label>
           <el-dropdown trigger="click" @command="applyTemplate">
-            <span class="flex items-center gap-0.5 text-xs font-medium text-[var(--primary-color)] cursor-pointer">
-              快速模板 <el-icon><ArrowDown /></el-icon>
+            <span class="text-[10px] font-medium text-[#4E54C8] bg-[#4E54C8]/5 px-2 py-1 rounded-full cursor-pointer hover:bg-[#4E54C8]/10 transition-colors flex items-center gap-1">
+              <el-icon>
+                <MagicStick />
+              </el-icon> 灵感模板
             </span>
             <template #dropdown>
               <el-dropdown-menu>
@@ -40,174 +61,180 @@
             </template>
           </el-dropdown>
         </div>
-        
-        <div class="w-full">
-          <el-input
-            v-model="formData.prompt"
-            type="textarea"
-            :rows="5"
-            resize="none"
-            placeholder="描述您脑海中的画面..."
-            class="sidebar-textarea w-full"
-          />
+
+        <div class="relative">
+          <el-input v-model="formData.prompt" type="textarea" :rows="5" resize="none" placeholder="描述您脑海中的画面，例如：赛博朋克风格的街道，霓虹灯光，雨夜..." class="atomic-textarea transition-all duration-300" />
+          <!-- 聚焦光晕装饰 -->
+          <div class="absolute inset-0 rounded-xl border-2 border-[#4E54C8]/0 pointer-events-none transition-all duration-300 group-focus-within:border-[#4E54C8]/10 group-focus-within:shadow-[0_0_20px_rgba(78,84,200,0.1)]"></div>
         </div>
 
         <!-- 负面提示词 (折叠) -->
-        <div class="mt-2 w-full">
-          <el-collapse class="sidebar-collapse w-full" v-model="activeNames">
-            <el-collapse-item name="negative">
-              <template #title>
-                <div class="flex items-center gap-1 text-[11px] text-[var(--text-secondary)]">
-                  <el-icon><SemiSelect /></el-icon> 排除元素 (Negative)
-                </div>
-              </template>
-              <el-input
-                v-model="formData.negative_prompt"
-                type="textarea"
-                :rows="2"
-                resize="none"
-                placeholder="不需要出现的元素，如：模糊、低质量..."
-                class="sidebar-textarea sm-textarea w-full"
-              />
-            </el-collapse-item>
-          </el-collapse>
+        <el-collapse v-model="activeNames" class="!border-none">
+          <el-collapse-item name="negative" class="group/neg">
+            <template #title>
+              <div class="flex items-center gap-1.5 text-[11px] font-medium text-slate-400 group-hover/neg:text-slate-600 transition-colors">
+                <el-icon>
+                  <CircleClose />
+                </el-icon> 排除元素 (Negative Prompt)
+              </div>
+            </template>
+            <el-input v-model="formData.negative_prompt" type="textarea" :rows="2" resize="none" placeholder="不需要出现的元素，如：模糊、低质量..." class="atomic-textarea-sm mt-1" />
+          </el-collapse-item>
+        </el-collapse>
+      </section>
+
+      <div class="w-full h-px bg-slate-100"></div>
+
+      <!-- 外层容器：模拟设计工作台面板 -->
+      <section class="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-50/50 p-5">
+
+        <!-- 装饰：背景点阵纹理 (CSS 绘制) -->
+        <div class="absolute inset-0 opacity-[0.4]" style="background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 20px 20px;">
+        </div>
+
+        <!-- 头部：极简工业风 -->
+        <div class="relative flex items-center justify-between mb-4 z-10">
+          <div class="flex items-center gap-2">
+            <div class="p-1.5 bg-white rounded-md shadow-sm border border-slate-100 text-indigo-500">
+              <!-- 图标：画幅/裁剪 -->
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+            <label class="text-xs font-bold text-slate-700 uppercase tracking-widest">
+              画幅比例
+            </label>
+          </div>
+          <!-- 装饰性的小标签 -->
+          <span class="text-[10px] text-slate-400 font-mono bg-slate-200/50 px-1.5 py-0.5 rounded">FIT</span>
+        </div>
+
+        <!-- 选项网格 -->
+        <div class="relative z-10 grid grid-cols-3 gap-2">
+          <button v-for="(value, key) in imageSizeOptions" :key="key" @click="formData.image_size = value.value" class="group relative flex flex-col items-center justify-center py-4 rounded-xl border transition-all duration-300" :class="[
+            formData.image_size === value.value
+              ? 'bg-white border-indigo-500/30 shadow-lg shadow-indigo-500/10 scale-[1.02]'
+              : 'bg-slate-100/80 border-transparent hover:bg-white hover:border-slate-200 hover:shadow-sm'
+          ]">
+            <!-- 选中态的高级装饰：边框流光效果 (伪元素) -->
+            <div v-if="formData.image_size === value.value" class="absolute inset-0 rounded-xl border-2 border-indigo-500/10 pointer-events-none"></div>
+
+            <!-- 取景框四角装饰 (仅在 Hover 或 选中时出现) -->
+            <div class="absolute inset-1.5 pointer-events-none transition-opacity duration-300" :class="formData.image_size === value.value || 'group-hover:opacity-100' ? 'opacity-100' : 'opacity-0'">
+              <span class="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-slate-300 transition-colors" :class="formData.image_size === value.value ? 'border-indigo-400' : ''"></span>
+              <span class="absolute top-0 right-0 w-1.5 h-1.5 border-t border-r border-slate-300 transition-colors" :class="formData.image_size === value.value ? 'border-indigo-400' : ''"></span>
+              <span class="absolute bottom-0 left-0 w-1.5 h-1.5 border-b border-l border-slate-300 transition-colors" :class="formData.image_size === value.value ? 'border-indigo-400' : ''"></span>
+              <span class="absolute bottom-0 right-0 w-1.5 h-1.5 border-b border-r border-slate-300 transition-colors" :class="formData.image_size === value.value ? 'border-indigo-400' : ''"></span>
+            </div>
+
+            <!-- 核心预览图形 -->
+            <div class="w-10 h-10 flex items-center justify-center mb-2">
+              <div class="transition-all duration-500 ease-out border shadow-sm relative overflow-hidden" :class="[
+                formData.image_size === value.value
+                  ? 'bg-indigo-50 border-indigo-500'
+                  : 'bg-white border-slate-300 group-hover:border-slate-400'
+              ]" :style="getRatioPreviewStyle(value.ratio)">
+                <!-- 选中时内部增加一道扫光 -->
+                <div v-if="formData.image_size === value.value" class="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-transparent"></div>
+              </div>
+            </div>
+
+            <!-- 文字：使用等宽字体增加数据感 -->
+            <span class="text-[11px] font-mono font-medium tracking-tight transition-colors" :class="formData.image_size === value.value ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600'">
+              {{ value.ratio }}
+            </span>
+
+          </button>
         </div>
       </section>
 
-      <div class="h-px w-full bg-[var(--surface-color)]"></div>
-
-   <!-- 画幅比例选择器 (Visual Aspect Ratio Selector) -->
-<section class="space-y-3 w-full">
-  
-  <!-- 标题栏 -->
-  <div class="flex items-center justify-between px-1">
-    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-      画幅比例
-      <!-- 这是一个小的提示 Tooltip -->
-      <el-tooltip content="决定生成图片的形状" placement="top">
-        <div class="w-3.5 h-3.5 rounded-full border border-slate-300 flex items-center justify-center text-[8px] text-slate-400 cursor-help">?</div>
-      </el-tooltip>
-    </label>
-    <!-- 显示当前选中的值 -->
-    <span class="text-[10px] font-mono font-medium text-[#4E54C8] bg-[#4E54C8]/5 px-1.5 py-0.5 rounded">
-      {{ formData.image_size || '1:1' }}
-    </span>
-  </div>
-
-  <!-- 比例网格 -->
-  <div class="grid grid-cols-3 gap-2.5">
-    <button
-      v-for="(value, key) in imageSizeOptions"
-      :key="key"
-      @click="formData.image_size = value.value"
-      class="group relative flex flex-col items-center justify-center gap-2 py-3 px-1 rounded-xl border transition-all duration-300"
-      :class="[
-        formData.image_size === value.value 
-          ? 'bg-white border-[#4E54C8] shadow-md shadow-[#4E54C8]/10 ring-1 ring-[#4E54C8]/20' 
-          : 'bg-[#f8f9fc] border-transparent hover:bg-white hover:border-slate-200 hover:shadow-sm hover:-translate-y-0.5'
-      ]"
-    >
-      <!-- 动态图形容器 (固定 24x24 区域) -->
-      <div class="w-8 h-8 flex items-center justify-center">
-        <!-- 核心图形：根据比例动态计算宽高 -->
-        <div 
-          class="border-2 rounded-[2px] transition-all duration-300"
-          :class="[
-            formData.image_size === value.value 
-              ? 'border-[#4E54C8] bg-[#4E54C8]/10' 
-              : 'border-slate-300 bg-white group-hover:border-[#8F94FB]'
-          ]"
-          :style="getRatioPreviewStyle(value.ratio)"
-        ></div>
-      </div>
-
-      <!-- 文字标签 -->
-      <span 
-        class="text-[10px] font-medium transition-colors"
-        :class="formData.image_size === value.value ? 'text-[#4E54C8] font-bold' : 'text-slate-500 group-hover:text-slate-700'"
-      >
-        {{ value.ratio }}
-      </span>
-
-      <!-- 选中时的右上角角标 (可选装饰) -->
-      <div v-if="formData.image_size === value.value" class="absolute top-1 right-1 w-1.5 h-1.5 bg-[#4E54C8] rounded-full"></div>
-    </button>
-  </div>
-
-</section>
-
-
-      <!-- 参数滑块组 -->
-      <section class="w-full">
+      <!-- C. 高级参数 (Control Panel) -->
+      <section class="p-4 rounded-2xl bg-slate-50/80 border border-slate-100 space-y-5">
         <!-- 数量 -->
-        <div class="flex flex-col gap-1.5 mb-4 w-full">
-          <div class="flex justify-between text-xs text-[var(--text-secondary)]">
-            <label>生成数量</label>
-            <span class="font-mono bg-white/80 px-1.5 py-0.5 rounded">{{ formData.batch_size }}</span>
+        <div class="space-y-2">
+          <div class="flex justify-between items-center text-[11px] font-medium text-slate-500">
+            <span>生成数量</span>
+            <span class="bg-white px-2 py-0.5 rounded text-[#4E54C8] font-bold shadow-sm">{{ formData.batch_size }}</span>
           </div>
-          <el-slider v-model="formData.batch_size" :min="1" :max="4" :step="1" size="small" :show-tooltip="false" class="custom-slider w-full" />
+          <el-slider v-model="formData.batch_size" :min="1" :max="4" :step="1" size="small" :show-tooltip="false" class="atomic-slider" />
         </div>
 
-        <div class="bg-[var(--surface-color)] rounded-xl p-4 flex flex-col gap-4 w-full box-border">
-          <!-- 创造性 -->
-          <div class="flex flex-col gap-1.5">
-            <div class="flex justify-between text-xs text-[var(--text-secondary)]">
-              <label>创造性 (CFG)</label>
-              <span class="font-mono bg-white/80 px-1.5 py-0.5 rounded font-semibold text-[var(--primary-color)]">{{ formData.guidance_scale }}</span>
-            </div>
-            <el-slider v-model="formData.guidance_scale" :min="1" :max="20" :step="0.5" size="small" class="custom-slider w-full" />
+        <!-- 创造性 -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center text-[11px] font-medium text-slate-500">
+            <span>创造性 (CFG Scale)</span>
+            <span class="bg-white px-2 py-0.5 rounded text-[#4E54C8] font-bold shadow-sm">{{ formData.guidance_scale }}</span>
           </div>
+          <el-slider v-model="formData.guidance_scale" :min="1" :max="20" :step="0.5" size="small" class="atomic-slider" />
+        </div>
 
-          <!-- 步数 -->
-          <div class="flex flex-col gap-1.5">
-            <div class="flex justify-between text-xs text-[var(--text-secondary)]">
-              <label>细节步数 (Steps)</label>
-              <span class="font-mono bg-white/80 px-1.5 py-0.5 rounded font-semibold text-[var(--primary-color)]">{{ formData.num_inference_steps }}</span>
-            </div>
-            <el-slider v-model="formData.num_inference_steps" :min="10" :max="50" :step="1" size="small" class="custom-slider w-full" />
+        <!-- 步数 -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center text-[11px] font-medium text-slate-500">
+            <span>细节步数 (Steps)</span>
+            <span class="bg-white px-2 py-0.5 rounded text-[#4E54C8] font-bold shadow-sm">{{ formData.num_inference_steps }}</span>
           </div>
+          <el-slider v-model="formData.num_inference_steps" :min="10" :max="50" :step="1" size="small" class="atomic-slider" />
         </div>
       </section>
 
-      <!-- 参考图 -->
-      <section class="w-full">
-        <label class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-[0.5px]">参考底图</label>
-        <el-upload
-          class="sidebar-uploader mt-2 w-full block"
-          :show-file-list="false"
-          :before-upload="beforeImageUpload"
-          :http-request="handleCustomUpload"
-          action="#"
-        >
-          <div v-if="imageUrl" class="group relative w-full h-[100px] rounded-lg overflow-hidden border border-[var(--border-color)] box-border">
+      <!-- D. 参考底图 (Image Upload) -->
+      <section class="space-y-3 pb-4">
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+          <span class="w-1 h-3 bg-slate-300 rounded-full"></span>
+          参考底图
+        </label>
+
+        <el-upload class="w-full group" :show-file-list="false" :before-upload="beforeImageUpload" :http-request="handleCustomUpload" action="#" drag>
+          <!-- 状态：已上传 -->
+          <div v-if="imageUrl" class="relative w-full h-32 rounded-xl overflow-hidden border border-slate-200 group-hover:border-[#4E54C8]/50 transition-all">
             <img :src="imageUrl" class="w-full h-full object-cover" />
-            <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer text-white" @click.stop="removeImage">
-              <el-icon><Delete /></el-icon>
+            <!-- 遮罩操作层 -->
+            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 backdrop-blur-[2px]" @click.stop>
+              <span class="text-white text-xs font-medium">Image Loaded</span>
+              <button class="px-3 py-1 bg-white/20 hover:bg-red-500/80 text-white rounded-full text-[10px] backdrop-blur-md transition-colors flex items-center gap-1" @click.stop="removeImage">
+                <el-icon>
+                  <Delete />
+                </el-icon> 移除
+              </button>
             </div>
           </div>
-          <div v-else class="w-full h-10 border border-dashed border-slate-300 rounded-lg flex items-center justify-center gap-2 text-xs text-[var(--text-secondary)] cursor-pointer transition-all duration-200 bg-[var(--surface-color)] hover:border-[var(--primary-color)] hover:text-[var(--primary-color)] hover:bg-[#4E54C8]/[0.02] box-border">
-            <el-icon><Plus /></el-icon>
-            <span>上传图片</span>
+
+          <!-- 状态：未上传 -->
+          <div v-else class="w-full h-24 border border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center gap-2 bg-slate-50/50 hover:bg-[#4E54C8]/5 hover:border-[#4E54C8] transition-all duration-300">
+            <div class="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-[#4E54C8] group-hover:scale-110 transition-all">
+              <el-icon class="text-lg">
+                <Plus />
+              </el-icon>
+            </div>
+            <span class="text-xs text-slate-400 group-hover:text-[#4E54C8] font-medium">点击或拖拽上传</span>
           </div>
         </el-upload>
       </section>
 
     </div>
 
-    <!-- 3. 底部固定区 -->
-    <div class="shrink-0 p-5 border-t border-[var(--border-color)] bg-white w-full box-border">
-      <button
-        @click="$emit('generate')"
-        :disabled="!formData.prompt || loading"
-        class="relative w-full h-12 border-none rounded-3xl bg-gradient-to-br from-[var(--primary-color)] to-[var(--secondary-color)] text-white text-[15px] font-semibold cursor-pointer overflow-hidden transition-all duration-300 shadow-[0_4px_15px_rgba(78,84,200,0.3)] hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(78,84,200,0.4)] hover:brightness-105 disabled:opacity-70 disabled:cursor-not-allowed disabled:grayscale-[0.5]"
-        :class="{ 'is-loading': loading }"
-      >
-        <div class="relative z-[2] flex items-center justify-center gap-2">
-          <el-icon v-if="loading" class="animate-spin"><Loading /></el-icon>
-          <el-icon v-else><MagicStick /></el-icon>
-          <span>{{ loading ? '正在绘制...' : '立即生成' }}</span>
+    <!-- ==========================================
+         3. 底部操作区 (Fixed Footer)
+         ========================================== -->
+    <div class="shrink-0 p-5 bg-white border-t border-slate-100 z-20 w-full">
+      <button @click="$emit('generate')" :disabled="!formData.prompt || loading" class="group relative w-full h-12 rounded-full overflow-hidden transition-all duration-300 shadow-lg shadow-[#4E54C8]/30 hover:shadow-[#4E54C8]/50 hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed disabled:shadow-none">
+        <!-- 渐变背景 -->
+        <div class="absolute inset-0 bg-gradient-to-r from-[#4E54C8] to-[#8F94FB]"></div>
+
+        <!-- 动态流光 -->
+        <div v-if="!loading" class="absolute inset-0 w-1/2 h-full bg-white/20 skew-x-[-20deg] -translate-x-[150%] group-hover:animate-shine"></div>
+
+        <!-- 按钮内容 -->
+        <div class="relative flex items-center justify-center gap-2 text-white font-bold tracking-wide text-sm">
+          <el-icon v-if="loading" class="animate-spin text-lg">
+            <Loading />
+          </el-icon>
+          <el-icon v-else class="text-lg group-hover:rotate-12 transition-transform">
+            <MagicStick />
+          </el-icon>
+          <span>{{ loading ? '正在绘制中...' : '立即生成' }}</span>
         </div>
-        <div class="absolute top-0 -left-full w-1/2 h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-[20deg] animate-[glow-anim_3s_infinite]" :class="{ hidden: loading }"></div>
       </button>
     </div>
 
@@ -217,18 +244,19 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { ElMessage } from "element-plus";
-import { 
-  Operation, Refresh, MagicStick, Loading, ArrowDown, SemiSelect, Delete, Plus 
+import {
+  Operation, Refresh, MagicStick, Loading, ArrowDown,
+  CircleClose, Delete, Plus
 } from "@element-plus/icons-vue";
 import { imageService } from "../../services/imageService";
 import { imageSizeOptions, promptTemplates } from "../../constants/imageGeneratorConfig";
 import type { FormData } from "../../composables/useImageGenerator";
 
-// Props, Emits 和 Logic 保持不变
 interface Props {
   formData: FormData;
   loading: boolean;
 }
+
 const props = defineProps<Props>();
 const emit = defineEmits<{
   (e: 'generate'): void;
@@ -237,12 +265,6 @@ const emit = defineEmits<{
 
 const imageUrl = ref("");
 const activeNames = ref([]);
-
-const getRatioPercent = (ratioStr: string) => {
-  const [w, h] = ratioStr.split(':').map(Number);
-  if (!w || !h) return '50%';
-  return `${(w / (w + h)) * 100}%`;
-};
 
 const applyTemplate = (template: any) => {
   props.formData.prompt = template.prompt;
@@ -254,6 +276,7 @@ const applyTemplate = (template: any) => {
   ElMessage.success("已应用模板");
 };
 
+// ... 其他上传逻辑保持不变 ...
 const handleCustomUpload = async (options: any) => {
   const { file } = options;
   try {
@@ -275,136 +298,125 @@ const removeImage = () => {
   props.formData.image = undefined;
 };
 
-// 计算缩略图的 CSS 宽高，模拟真实比例
-const getRatioPreviewStyle = (ratioStr: string) => {
-  // 定义最大边界 (px)
-  const MAX_SIZE = 24; 
-  
-  try {
-    const [w, h] = ratioStr.split(':').map(Number);
-    if (!w || !h) return { width: '20px', height: '20px' };
-    
-    // 算法：保持长边为 MAX_SIZE，短边按比例缩放
-    let width, height;
-    
-    if (w > h) {
-      // 宽图 (如 16:9)
-      width = MAX_SIZE;
-      height = Math.round((h / w) * MAX_SIZE);
-    } else if (h > w) {
-      // 长图 (如 9:16)
-      height = MAX_SIZE;
-      width = Math.round((w / h) * MAX_SIZE);
-    } else {
-      // 方图 (1:1) - 稍微做小一点点，视觉上更平衡
-      width = 20;
-      height = 20;
-    }
-    
-    return {
-      width: `${width}px`,
-      height: `${height}px`
-    };
-  } catch (e) {
-    return { width: '20px', height: '20px' };
+const getRatioPreviewStyle = (ratioStr) => {
+  const [w, h] = ratioStr.split(':').map(Number);
+  const maxDim = 24;
+  // 这里的逻辑保持不变，确保图形比例正确
+  if (w > h) {
+    return { width: `${maxDim}px`, height: `${maxDim * (h / w)}px`, borderRadius: '2px' };
+  } else {
+    return { width: `${maxDim * (w / h)}px`, height: `${maxDim}px`, borderRadius: '2px' };
   }
 };
 
 </script>
-<style scoped>
-/* 定义 CSS 变量供 Atomic CSS 引用 */
-.sidebar-root {
-  --primary-color: #4E54C8;
-  --secondary-color: #8F94FB;
-  --bg-color: #ffffff;
-  --surface-color: #f8f9fc;
-  --text-main: #2c3e50;
-  --text-secondary: #64748b;
-  --border-color: #edf2f7;
-}
 
+<style scoped>
 /* 
   ---------------------------
-  Element Plus 深度样式覆盖
+  Atomic Style Overrides 
   ---------------------------
 */
 
-/* Textarea 样式重写 */
-:deep(.sidebar-textarea .el-textarea__inner) {
-  background: var(--surface-color);
+/* 1. 深度定制 Textarea */
+:deep(.atomic-textarea .el-textarea__inner) {
+  background-color: #f8f9fc;
   border: 1px solid transparent;
   border-radius: 12px;
-  padding: 12px;
+  padding: 14px;
   font-size: 13px;
-  color: var(--text-main);
+  color: #334155;
   transition: all 0.3s ease;
   box-shadow: none !important;
-  width: 100%; /* 确保输入框撑满 */
 }
 
-:deep(.sidebar-textarea .el-textarea__inner:hover) {
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(78, 84, 200, 0.08) !important;
+:deep(.atomic-textarea .el-textarea__inner:hover) {
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
 }
 
-:deep(.sidebar-textarea .el-textarea__inner:focus) {
-  background: #fff;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(78, 84, 200, 0.1) !important;
+:deep(.atomic-textarea .el-textarea__inner:focus) {
+  background-color: #fff;
+  border-color: #4E54C8;
 }
 
-:deep(.sm-textarea .el-textarea__inner) {
+/* 2. 负面提示词小号输入框 */
+:deep(.atomic-textarea-sm .el-textarea__inner) {
+  background-color: #fff;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  padding: 8px 10px;
   font-size: 12px;
-  padding: 8px 12px;
+  transition: all 0.3s;
 }
 
-/* Collapse 去除默认边框 */
-:deep(.sidebar-collapse) {
-  border: none;
-  --el-collapse-header-bg-color: transparent;
-  --el-collapse-content-bg-color: transparent;
+:deep(.atomic-textarea-sm .el-textarea__inner:focus) {
+  border-color: #94a3b8;
+  border-style: solid;
 }
-:deep(.sidebar-collapse .el-collapse-item__header) {
-  height: 32px;
-  border: none;
-  background: transparent;
-}
-:deep(.sidebar-collapse .el-collapse-item__wrap) {
+
+/* 3. 折叠面板去边框 */
+:deep(.el-collapse),
+:deep(.el-collapse-item__header),
+:deep(.el-collapse-item__wrap) {
   border: none;
   background: transparent;
 }
-:deep(.sidebar-collapse .el-collapse-item__content) {
+
+:deep(.el-collapse-item__header) {
+  height: 28px;
+}
+
+:deep(.el-collapse-item__content) {
   padding-bottom: 0;
 }
 
-/* Slider 定制 */
-:deep(.custom-slider) {
-  --el-slider-main-bg-color: var(--primary-color);
-  --el-slider-runway-bg-color: #e0e0e0;
+/* 4. 滑块定制 */
+:deep(.atomic-slider) {
+  --el-slider-main-bg-color: #4E54C8;
+  --el-slider-runway-bg-color: #e2e8f0;
   --el-slider-button-size: 14px;
 }
 
-/* Upload 宽度修复 */
-:deep(.sidebar-uploader .el-upload) {
+:deep(.el-slider__button) {
+  border: 2px solid #4E54C8;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 5. 上传控件宽度修复 */
+:deep(.el-upload),
+:deep(.el-upload-dragger) {
   width: 100%;
-  display: block;
+  border: none;
+  /* 移除 dragger 默认边框，使用外层 div 控制 */
+  background: transparent;
+  padding: 0;
+  height: auto;
 }
 
-/* 动画 & 滚动条 */
-@keyframes glow-anim {
-  0% { left: -100%; }
-  20% { left: 200%; }
-  100% { left: 200%; }
-}
-
+/* 6. 滚动条 */
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background-color: #cbd5e1;
   border-radius: 4px;
+}
+
+/* 7. 按钮流光动画 */
+@keyframes shine {
+  100% {
+    left: 125%;
+  }
+}
+
+.animate-shine {
+  animation: shine 2s infinite;
 }
 </style>

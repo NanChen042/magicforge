@@ -1,60 +1,118 @@
 <template>
-  <div class="image-gen-view">
-    <div class="page-header">
-      <h1>AIVista Image Studio</h1>
-      <p class="subtitle">使用人工智能创建高质量图片 - AI Image Generation</p>
+  <!-- 主容器：全屏，禁止整体滚动，柔和背景 -->
+  <div class="relative flex flex-col h-screen overflow-hidden bg-slate-50 text-slate-800 font-sans selection:bg-indigo-500/30">
+    
+    <!-- 装饰背景：顶部左侧光晕 -->
+    <div class="absolute top-0 left-0 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none mix-blend-multiply"></div>
+    <!-- 装饰背景：底部右侧光晕 -->
+    <div class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[100px] pointer-events-none mix-blend-multiply"></div>
+    <!-- 装饰背景：点阵纹理 -->
+    <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
+
+<!-- 替换 <header> -->
+<!-- 增加 px-4 md:px-6 确保和下方内容对齐 -->
+<header class="relative z-10 shrink-0 pt-10 pb-6 px-4 md:px-6 max-w-[1920px] mx-auto w-full">
+  <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200/60 pb-4">
+    
+    <!-- 左侧：巨型排版 -->
+    <div class="relative">
+      <!-- 装饰性的小上标 -->
+      <span class="absolute -top-4 left-0 text-[10px] font-mono text-indigo-500 font-bold tracking-widest uppercase">
+        // AI Workspace
+      </span>
+      <h1 class="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter">
+        Image<span class="text-slate-300">Gen</span>.
+      </h1>
     </div>
 
-    <div class="content-container">
-      <!-- 左侧表单 -->
-      <ImageGeneratorForm
-        :form-data="formData"
-        :loading="loading"
-        @generate="generateImage"
-        @randomize-seed="randomizeSeed"
-      />
-
-      <!-- 右侧结果 -->
-      <ImageGeneratorResults
-        :generated-images="generatedImages"
-        :loading="loading"
-        :progress="progress"
-        :estimated-time="estimatedTime"
-        :generation-time="generationTime"
-        :last-seed="lastSeed"
-        :image-size="formData.image_size"
-        @show-preview="(url) => showPreview(url, lastSeed)"
-        @download-image="downloadImage"
-        @use-seed="() => useSeed(lastSeed, formData)"
-        @regenerate="() => regenerateWithSeed(lastSeed)"
-        @apply-random-template="applyRandomTemplate"
-      />
+    <!-- 右侧：功能性副标题 (沉底对齐) -->
+    <div class="flex items-center gap-3 text-sm text-slate-500 font-medium">
+      <span class="hidden md:inline-block h-px w-8 bg-slate-300"></span>
+      <p>Transform text into visual masterpieces.</p>
     </div>
 
-    <!-- 图片预览对话框 -->
-    <el-dialog v-model="previewVisible" :title="previewTitle" class="preview-dialog" :append-to-body="true">
-      <div class="flex">
-        <img :src="previewImage" class="preview-image" alt="预览图片" />
+  </div>
+</header>
+
+
+    <!-- 2. 内容区域：自适应高度，内部 Grid 布局 -->
+    <main class="relative z-10 flex-1 min-h-0 w-full max-w-[1920px] mx-auto p-4 md:p-6 pt-0">
+      
+      <!-- Grid 容器：移动端单列，大屏双列 (左侧固定宽，右侧自适应) -->
+      <div class="h-full grid grid-cols-1 lg:grid-cols-[400px_1fr] xl:grid-cols-[440px_1fr] gap-6 items-start">
+        
+        <!-- 左侧：表单区 (自带滚动) -->
+        <div class="h-full overflow-y-auto hidden-scrollbar rounded-2xl bg-white/60 backdrop-blur-xl border border-white/50 shadow-xl shadow-indigo-500/5 ring-1 ring-slate-900/5">
+          <ImageGeneratorForm
+            :form-data="formData"
+            :loading="loading"
+            @generate="generateImage"
+            @randomize-seed="randomizeSeed"
+          />
+        </div>
+
+        <!-- 右侧：结果展示区 (自带滚动) -->
+        <div class="h-full min-h-0 flex flex-col rounded-2xl bg-white/40 backdrop-blur-md border border-white/40 shadow-xl shadow-indigo-500/5 ring-1 ring-slate-900/5 overflow-hidden">
+          <ImageGeneratorResults
+            :generated-images="generatedImages"
+            :loading="loading"
+            :progress="progress"
+            :estimated-time="estimatedTime"
+            :generation-time="generationTime"
+            :last-seed="lastSeed"
+            :image-size="formData.image_size"
+            @show-preview="(url) => showPreview(url, lastSeed)"
+            @download-image="downloadImage"
+            @use-seed="() => useSeed(lastSeed, formData)"
+            @regenerate="() => regenerateWithSeed(lastSeed)"
+            @apply-random-template="applyRandomTemplate"
+          />
+        </div>
+
+      </div>
+    </main>
+
+    <!-- 3. 图片预览对话框 -->
+    <!-- 注意：modal-class 用于自定义覆盖 Element Plus 样式 -->
+    <el-dialog 
+      v-model="previewVisible" 
+      :title="previewTitle" 
+      :append-to-body="true"
+      width="90%"
+      class="!rounded-2xl !bg-slate-900/95 !backdrop-blur-md !border !border-white/10 !shadow-2xl overflow-hidden glass-dialog"
+    >
+      <!-- 预览内容 -->
+      <div class="flex items-center justify-center bg-black/50 rounded-xl p-4 min-h-[400px]">
+        <img :src="previewImage" class="max-h-[70vh] w-auto object-contain rounded-lg shadow-2xl" alt="预览图片" />
       </div>
 
+      <!-- 底部操作栏 -->
       <template #footer>
-        <div class="preview-actions">
-          <el-button @click="previewVisible = false">关闭</el-button>
-          <el-button type="primary" @click="downloadCurrentPreview(lastSeed)">
-            <el-icon><Download /></el-icon>
+        <div class="flex flex-wrap items-center justify-end gap-3 pt-4 border-t border-white/10">
+          <el-button @click="previewVisible = false" class="!bg-transparent !border-white/20 !text-slate-300 hover:!text-white hover:!border-white">
+            关闭
+          </el-button>
+          
+          <el-button type="primary" @click="downloadCurrentPreview(lastSeed)" class="!bg-indigo-600 !border-indigo-600">
+            <el-icon class="mr-1"><Download /></el-icon>
             下载图片
           </el-button>
-          <el-button type="primary" @click="copySeedToClipboard(lastSeed)" v-if="lastSeed !== null">
-            <el-icon><CopyDocument /></el-icon>
-            复制种子 ({{ lastSeed }})
-          </el-button>
-          <el-button type="primary" @click="useCurrentSeedAndClose(lastSeed, formData)" v-if="lastSeed !== null">
-            <el-icon><Edit /></el-icon>
-            使用此种子重新生成
-          </el-button>
+          
+          <template v-if="lastSeed !== null">
+            <el-button type="info" @click="copySeedToClipboard(lastSeed)" class="!bg-slate-700 !border-slate-600">
+              <el-icon class="mr-1"><CopyDocument /></el-icon>
+              复制种子
+            </el-button>
+            
+            <el-button type="success" @click="useCurrentSeedAndClose(lastSeed, formData)" class="!bg-teal-600 !border-teal-600">
+              <el-icon class="mr-1"><Edit /></el-icon>
+              使用此种子重绘
+            </el-button>
+          </template>
         </div>
       </template>
     </el-dialog>
+
   </div>
 </template>
 
@@ -68,7 +126,7 @@ import { useImageGenerator } from "../composables/useImageGenerator";
 import { useImageActions } from "../composables/useImageActions";
 import { promptTemplates } from "../constants/imageGeneratorConfig";
 
-// 使用 composables
+// 保持原本的逻辑代码完全不变
 const {
   formData,
   loading,
@@ -95,7 +153,6 @@ const {
   useCurrentSeedAndClose,
 } = useImageActions();
 
-// 随机应用一个模板
 const applyRandomTemplate = () => {
   const randomIndex = Math.floor(Math.random() * promptTemplates.length);
   const template = promptTemplates[randomIndex];
@@ -105,251 +162,45 @@ const applyRandomTemplate = () => {
     formData.guidance_scale = template.parameters.guidance_scale;
     formData.num_inference_steps = template.parameters.num_inference_steps;
   }
-  ElMessage.success("已应用模板");
+  ElMessage.success("已应用灵感模板");
 };
 
-// 组件卸载时清理
 onUnmounted(() => {
   cleanup();
 });
 </script>
 
 <style scoped>
-/* 现代化高级配色方案 */
-.image-gen-view {
-  /* 主色调 - 优雅的紫蓝渐变 */
-  --primary-color: #6366f1;
-  --primary-light: #a5b4fc;
-  --primary-dark: #4338ca;
-  --primary-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
-
-  /* 辅助色 - 温暖的渐变 */
-  --secondary-color: #f59e0b;
-  --accent-color: #06b6d4;
-  --accent-light: #67e8f9;
-
-  /* 现代中性色调 */
-  --neutral-50: #fafafa;
-  --neutral-100: #f5f5f5;
-  --neutral-200: #e5e5e5;
-  --neutral-300: #d4d4d4;
-  --neutral-400: #a3a3a3;
-  --neutral-500: #737373;
-  --neutral-600: #525252;
-  --neutral-700: #404040;
-  --neutral-800: #262626;
-  --neutral-900: #171717;
-
-  /* 功能色彩 */
-  --success-color: #22c55e;
-  --warning-color: #f59e0b;
-  --error-color: #ef4444;
-  --info-color: #3b82f6;
-
-  /* 现代化阴影系统 */
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-
-  /* 彩色阴影 */
-  --shadow-primary: 0 10px 25px -5px rgba(99, 102, 241, 0.2);
-  --shadow-accent: 0 10px 25px -5px rgba(6, 182, 212, 0.2);
-
-  /* 现代圆角系统 */
-  --border-radius-sm: 0.375rem;
-  --border-radius-md: 0.5rem;
-  --border-radius-lg: 0.75rem;
-  --border-radius-xl: 1rem;
-  --border-radius-2xl: 1.5rem;
-  --border-radius-full: 9999px;
-
-  /* 间距变量 */
-  --spacing-1: 0.25rem;
-  --spacing-2: 0.5rem;
-  --spacing-3: 0.75rem;
-  --spacing-4: 1rem;
-  --spacing-5: 1.25rem;
-  --spacing-6: 1.5rem;
-  --spacing-8: 2rem;
-  --spacing-10: 2.5rem;
-  --spacing-12: 3rem;
-  --spacing-16: 4rem;
-
-  /* 现代化基础样式 */
-  padding: var(--spacing-6);
-  background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 50%, #f0f0f0 100%);
-  min-height: calc(100vh - 64px);
-  box-sizing: border-box;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  color: var(--neutral-800);
-  position: relative;
-  overflow-x: hidden;
+/* 
+  仅保留极少量无法通过 Tailwind utility 完美覆盖的样式 
+  主要是为了隐藏滚动条但保留滚动功能
+*/
+.hidden-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+.hidden-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
 }
 
-/* 添加微妙的背景纹理 */
-.image-gen-view::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: radial-gradient(circle at 25% 25%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
-                    radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: 0;
+/* 
+  Element Plus Dialog 的深度覆盖 
+  因为 el-dialog 渲染在 body 下，且内部结构较深，
+  虽然用了 class 传递 Tailwind 类，部分内部元素（如 header 标题颜色）仍需强制覆盖
+*/
+:deep(.glass-dialog .el-dialog__header) {
+  margin-right: 0;
+  padding: 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
-
-.page-header {
-  text-align: center;
-  margin-bottom: var(--spacing-10);
-  position: relative;
-  z-index: 1;
+:deep(.glass-dialog .el-dialog__title) {
+  color: #e2e8f0; /* slate-200 */
+  font-weight: 600;
 }
-
-.page-header h1 {
-  font-size: 3rem;
-  font-weight: 800;
-  margin-bottom: var(--spacing-3);
-  background: var(--primary-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-  position: relative;
+:deep(.glass-dialog .el-dialog__headerbtn .el-dialog__close) {
+  color: #94a3b8;
 }
-
-.page-header h1::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 4px;
-  background: var(--primary-gradient);
-  border-radius: var(--border-radius-full);
-}
-
-.subtitle {
-  font-size: 1.125rem;
-  color: var(--neutral-600);
-  margin: 0;
-  font-weight: 500;
-  max-width: 600px;
-  margin: 0 auto;
-  line-height: 1.6;
-}
-
-.content-container {
-  display: grid;
-  grid-template-columns: minmax(360px, 420px) 1fr;
-  gap: var(--spacing-8);
-  max-width: 1800px;
-  margin: 0 auto;
-  position: relative;
-  z-index: 1;
-}
-
-/* 预览对话框样式 */
-.preview-dialog :deep(.el-dialog) {
-  border-radius: var(--border-radius-xl);
-  overflow: hidden;
-  box-shadow: var(--shadow-xl);
-}
-
-.preview-dialog :deep(.el-dialog__header) {
-  padding: var(--spacing-4) var(--spacing-6);
-  margin: 0;
-  border-bottom: 1px solid var(--neutral-200);
-  background: var(--neutral-50);
-}
-
-.preview-dialog :deep(.el-dialog__body) {
-  padding: var(--spacing-6);
-  text-align: center;
-  background: var(--neutral-900);
-}
-
-.preview-image {
-  max-width: 100%;
-  max-height: 70vh;
-  object-fit: contain;
-  border-radius: var(--border-radius-md);
-  box-shadow: var(--shadow-xl);
-}
-
-.preview-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-2);
-}
-
-.flex {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-}
-
-/* 响应式设计 */
-@media (max-width: 1024px) {
-  .content-container {
-    grid-template-columns: minmax(300px, 360px) 1fr;
-    gap: var(--spacing-5);
-  }
-  .page-header h1 {
-    font-size: 2rem;
-  }
-  .subtitle {
-    font-size: 1rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .image-gen-view {
-    padding: var(--spacing-4);
-  }
-
-  .page-header {
-    margin-bottom: var(--spacing-6);
-  }
-
-  .content-container {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-5);
-    max-width: 100%;
-  }
-
-  .page-header h1 {
-    font-size: 1.8rem;
-  }
-  .subtitle {
-    font-size: 0.9rem;
-  }
-
-  .preview-dialog :deep(.el-dialog) {
-    width: 90%;
-    max-width: 500px;
-  }
-  .preview-actions {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .image-gen-view {
-    padding: var(--spacing-3);
-  }
-  .page-header h1 {
-    font-size: 1.5rem;
-  }
-  .subtitle {
-    font-size: 0.85rem;
-  }
+:deep(.glass-dialog .el-dialog__headerbtn:hover .el-dialog__close) {
+  color: #fff;
 }
 </style>
