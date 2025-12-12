@@ -7,8 +7,15 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#3B82F6',
-        secondary: '#1F2937',
+        primary: '#4E54C8',
+        secondary: '#8F94FB',
+        'text-main': '#2c3e50',
+        'text-secondary': '#64748b',
+        'surface': '#f8f9fc',
+        'border': '#edf2f7',
+      },
+      backgroundImage: {
+        'gradient-main': 'linear-gradient(135deg, #4E54C8, #8F94FB)',
       },
     },
   },

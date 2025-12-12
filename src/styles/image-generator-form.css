@@ -1,0 +1,574 @@
+/* 表单容器 */
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: calc(100vh - 140px);
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  scrollbar-width: thin;
+}
+
+/* 滚动条样式 */
+.form-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.form-container::-webkit-scrollbar-track {
+  background: #f5f5f5;
+  border-radius: 9999px;
+}
+
+.form-container::-webkit-scrollbar-thumb {
+  background: #d4d4d4;
+  border-radius: 9999px;
+}
+
+.form-container::-webkit-scrollbar-thumb:hover {
+  background: #a3a3a3;
+}
+
+.generation-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* 现代化参数卡片样式 */
+.modern-parameter-card {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: white;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: slideInUp 0.6s ease-out;
+  margin-bottom: 1.5rem;
+}
+
+.modern-parameter-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.modern-parameter-card-last {
+  margin-bottom: 0;
+}
+
+.parameter-icon-modern {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #6366f1;
+}
+
+/* 现代化样式变量 */
+.modern-parameter-card {
+  --primary: #6366f1;
+  --primary-foreground: #ffffff;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #f8fafc;
+  --accent-foreground: #0f172a;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --background: #ffffff;
+  --foreground: #0f172a;
+}
+
+/* Element Plus 组件现代化定制 */
+.modern-select :deep(.el-select__wrapper) {
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--background);
+  transition: all 0.2s;
+}
+
+.modern-select :deep(.el-select__wrapper:hover) {
+  border-color: var(--primary);
+}
+
+.modern-select :deep(.el-select__wrapper.is-focused) {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.modern-slider-custom :deep(.el-slider__runway) {
+  background-color: #e2e8f0;
+  border-radius: 9999px;
+  height: 6px;
+}
+
+.modern-slider-custom :deep(.el-slider__bar) {
+  background: var(--primary);
+  border-radius: 9999px;
+}
+
+.modern-slider-custom :deep(.el-slider__button) {
+  width: 18px;
+  height: 18px;
+  background: white;
+  border: 3px solid var(--primary);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modern-slider-custom :deep(.el-slider__button:hover) {
+  transform: scale(1.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.modern-slider-custom :deep(.el-slider__marks-text) {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  font-weight: 500;
+}
+
+.modern-input :deep(.el-input__wrapper) {
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--background);
+  transition: all 0.2s;
+}
+
+.modern-input :deep(.el-input__wrapper:hover) {
+  border-color: var(--primary);
+}
+
+.modern-input :deep(.el-input__wrapper.is-focus) {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.modern-button-secondary {
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--foreground);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.modern-button-secondary:hover {
+  background: var(--accent);
+  border-color: var(--primary);
+}
+
+/* 现代化文本域样式 */
+.modern-textarea :deep(.el-textarea__inner) {
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--background);
+  transition: all 0.2s;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.modern-textarea :deep(.el-textarea__inner:hover) {
+  border-color: var(--primary);
+}
+
+.modern-textarea :deep(.el-textarea__inner:focus) {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  outline: none;
+}
+
+/* 现代化图片上传器 */
+.modern-image-uploader {
+  width: 100%;
+}
+
+.modern-image-uploader :deep(.el-upload) {
+  width: 100%;
+  border: 2px dashed var(--border);
+  border-radius: 0.75rem;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--background);
+}
+
+.modern-image-uploader :deep(.el-upload:hover) {
+  border-color: var(--primary);
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.modern-upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  min-height: 160px;
+}
+
+.upload-icon-modern {
+  font-size: 2rem;
+  color: var(--muted-foreground);
+  margin-bottom: 0.5rem;
+  transition: all 0.3s;
+}
+
+.modern-image-uploader :deep(.el-upload:hover) .upload-icon-modern {
+  color: var(--primary);
+  transform: scale(1.1);
+}
+
+.upload-text-modern {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+  margin-bottom: 0.25rem;
+}
+
+.upload-hint-modern {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.upload-tip-modern {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  text-align: center;
+  margin-top: 0.5rem;
+  line-height: 1.4;
+}
+
+/* 现代化图片预览 */
+.modern-image-preview {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.uploaded-image-modern {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.remove-image-modern {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 2rem;
+  height: 2rem;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.remove-image-modern:hover {
+  background: rgba(239, 68, 68, 0.8);
+  transform: scale(1.1);
+}
+
+/* 尺寸预览样式 */
+.size-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 0.5rem;
+}
+
+.size-preview-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 2px solid var(--border);
+  background: var(--background);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  min-height: 85px;
+}
+
+.size-preview-inactive {
+  border-color: var(--border);
+  color: var(--muted-foreground);
+}
+
+.size-preview-inactive:hover {
+  border-color: var(--primary);
+  background: rgba(99, 102, 241, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+}
+
+.size-preview-active {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+}
+
+.size-preview-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 45px;
+}
+
+.size-preview-box {
+  border: 1.5px solid currentColor;
+  border-radius: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.size-preview-active .size-preview-box {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+.size-preview-inner {
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.size-preview-active .size-preview-inner {
+  opacity: 0.9;
+}
+
+.size-preview-info {
+  text-align: center;
+  min-height: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.size-preview-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.1;
+  margin-bottom: 0.0625rem;
+}
+
+.size-preview-ratio {
+  font-size: 0.5625rem;
+  opacity: 0.7;
+  font-weight: 500;
+}
+
+.size-preview-active .size-preview-ratio {
+  opacity: 0.9;
+}
+
+/* 工具类 */
+.text-foreground {
+  color: var(--foreground);
+}
+
+.text-muted-foreground {
+  color: var(--muted-foreground);
+}
+
+.bg-muted {
+  background-color: var(--muted);
+}
+
+.bg-primary {
+  background-color: var(--primary);
+}
+
+.text-white {
+  color: white;
+}
+
+.bg-background {
+  background-color: var(--background);
+}
+
+.bg-accent {
+  background-color: var(--accent);
+}
+
+.text-accent-foreground {
+  color: var(--accent-foreground);
+}
+
+.border-input {
+  border-color: var(--input);
+}
+
+/* 间距工具类 */
+.space-y-2 > * + * {
+  margin-top: 0.5rem;
+}
+
+.space-y-3 > * + * {
+  margin-top: 0.75rem;
+}
+
+.space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+/* 布局工具类 */
+.flex {
+  display: flex;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.grid {
+  display: grid;
+}
+
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.w-full {
+  width: 100%;
+}
+
+.flex-1 {
+  flex: 1 1 0%;
+}
+
+/* 文字样式 */
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+/* 圆角 */
+.rounded {
+  border-radius: 0.25rem;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+/* 内边距 */
+.px-2 {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.px-3 {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+.py-1 {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+/* 阴影 */
+.shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* 过渡 */
+.transition-all {
+  transition-property: all;
+}
+
+.duration-200 {
+  transition-duration: 200ms;
+}
+
+/* 动画 */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 高度类 */
+.h-12 {
+  height: 3rem;
+}
+
+/* 响应式调整 */
+@media (max-width: 640px) {
+  .size-preview-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .size-preview-card {
+    padding: 0.75rem;
+    min-height: 100px;
+  }
+
+  .size-preview-container {
+    width: 50px;
+    height: 50px;
+  }
+}
