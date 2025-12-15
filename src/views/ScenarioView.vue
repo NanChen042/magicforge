@@ -168,21 +168,24 @@ interface Fragment {
   id: string;
   name: string;
 }
+/** 场景选项接口 */
 interface Option {
-  text: string;
-  nextSceneId: string;
-  reqFragment?: string;
-  locked?: boolean;
+  text: string; // 选项显示的文本
+  nextSceneId: string; // 选择此选项后跳转的场景 ID
+  reqFragment?: string; // 解锁此选项所需的碎片 ID
+  locked?: boolean; // 选项是否被锁定
 }
+
+/** 场景接口 */
 interface Scene {
-  id: string;
-  text: string;
+  id: string; // 场景唯一标识
+  text: string; // 场景的对话或描述文本
   speaker?: string; // 发言者
   character?: string; // 立绘 ID (protagonist, lin, oldman...)
   bgImage?: string; // 背景图 URL
-  options: Option[];
-  unlockFragment?: Fragment;
-  isEnding?: boolean;
+  options: Option[]; // 该场景的所有选项
+  unlockFragment?: Fragment; // 完成此场景后解锁的碎片
+  isEnding?: boolean; // 是否为结局场景
 }
 
 // --- 静态资源映射 (模拟立绘) ---
