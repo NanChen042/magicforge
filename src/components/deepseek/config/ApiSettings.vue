@@ -1,42 +1,51 @@
 <template>
-  <div class="space-y-5 mb-6">
-    <div>
-      <label for="api-key" class="block text-sm font-medium text-gray-700 mb-1">API KEY</label>
-      <div class="relative">
+  <div class="space-y-6 mb-8">
+    
+    <!-- API KEY -->
+    <div class="group">
+      <label for="api-key" class="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2 pl-1">
+        API Secret Key
+      </label>
+      <div class="relative transition-all duration-300 ease-out">
         <input
           type="password"
           id="api-key"
           :value="apiKey"
           @input="$emit('update:apiKey', ($event.target as HTMLInputElement).value)"
-          placeholder="输入您的 Deepseek API Key"
-          class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none text-sm"
+          placeholder="sk-..."
+          class="peer w-full pl-4 pr-10 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-sm font-mono text-zinc-900 placeholder:text-zinc-300 focus:bg-white focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 focus:outline-none transition-all duration-200 hover:bg-white hover:border-zinc-300 shadow-sm"
         />
-        <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v-1l1-1 1-1-.257-.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z" clip-rule="evenodd" />
+        <!-- 图标：默认灰色，输入框聚焦时变黑 -->
+        <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-zinc-400 peer-focus:text-zinc-900 transition-colors duration-200 pointer-events-none">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
           </svg>
         </span>
       </div>
     </div>
 
-    <div>
-      <label for="api-url" class="block text-sm font-medium text-gray-700 mb-1">API 地址</label>
-      <div class="relative">
+    <!-- API URL -->
+    <div class="group">
+      <label for="api-url" class="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2 pl-1">
+        Endpoint URL
+      </label>
+      <div class="relative transition-all duration-300 ease-out">
         <input
           type="text"
           id="api-url"
           :value="apiUrl"
           @input="$emit('update:apiUrl', ($event.target as HTMLInputElement).value)"
-          placeholder="输入 API 地址"
-          class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none text-sm"
+          placeholder="https://api.deepseek.com"
+          class="peer w-full pl-4 pr-10 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-sm font-mono text-zinc-900 placeholder:text-zinc-300 focus:bg-white focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 focus:outline-none transition-all duration-200 hover:bg-white hover:border-zinc-300 shadow-sm"
         />
-        <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd" />
+        <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-zinc-400 peer-focus:text-zinc-900 transition-colors duration-200 pointer-events-none">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
           </svg>
         </span>
       </div>
     </div>
+
   </div>
 </template>
 

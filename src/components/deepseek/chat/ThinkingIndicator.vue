@@ -1,21 +1,48 @@
 <template>
-  <div class="flex flex-col space-y-2 mb-2">
-    <div class="flex items-center space-x-2 text-sm text-blue-600 font-medium">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-      </svg>
-      <span>正在思考...</span>
-    </div>
-    <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 text-sm text-blue-700 leading-relaxed">
-      <div class="flex items-center space-x-1.5 mb-2">
-        <div class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></div>
-        <div class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse" style="animation-delay: 300ms"></div>
-        <div class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse" style="animation-delay: 600ms"></div>
+  <div class="flex flex-col space-y-3 mb-4 animate-in fade-in duration-300">
+    
+    <!-- 状态指示行 -->
+    <div class="flex items-center gap-2.5">
+      <!-- 自定义呼吸灯动画图标 -->
+      <div class="relative flex h-2.5 w-2.5">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-zinc-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-zinc-900"></span>
       </div>
-      <p class="text-xs">AI正在分析您的问题，并构建解答思路，请稍候...</p>
+      
+      <span class="text-xs font-mono font-medium text-zinc-900 tracking-wide uppercase">
+        Processing
+      </span>
     </div>
+
+    <!-- 详情卡片 -->
+    <div class="relative overflow-hidden bg-white border border-zinc-100 rounded-lg p-4 shadow-sm ring-1 ring-zinc-50">
+      <!-- 动态微光背景 -->
+      <div class="absolute inset-0 bg-gradient-to-r from-transparent via-zinc-50/50 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
+
+      <div class="relative flex flex-col gap-3">
+        <!-- 骨架屏模拟文本生成 -->
+        <div class="space-y-2">
+          <div class="h-1.5 w-3/4 bg-zinc-100 rounded-full animate-pulse"></div>
+          <div class="h-1.5 w-1/2 bg-zinc-100 rounded-full animate-pulse delay-150"></div>
+        </div>
+        
+        <p class="text-[11px] text-zinc-400 font-mono leading-relaxed mt-1">
+          Analyzing request context & generating response...
+        </p>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script setup lang="ts">
 </script>
+
+<style scoped>
+/* 自定义 Shimmer 动画 */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+</style>

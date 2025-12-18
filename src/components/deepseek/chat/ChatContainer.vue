@@ -1,50 +1,52 @@
 <template>
-  <div class="chat-container h-full max-h-[650px]" ref="containerRef" @scroll="handleScroll">
-    <!-- 思考提示 -->
-    <div v-if="isThinking" class="flex items-center space-x-3 p-4 mb-4 bg-blue-50 rounded-lg border border-blue-100 animate-pulse thinking-indicator">
-      <div class="relative w-8 h-8 flex-shrink-0">
-        <div class="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full animate-ping opacity-75"></div>
-        <div class="relative bg-white rounded-full p-1.5 flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947z" clip-rule="evenodd" />
-          </svg>
+  <div class="chat-container h-full max-h-[650px] relative bg-white" ref="containerRef" @scroll="handleScroll">
+
+    <!-- 背景装饰：极其微弱的网格背景，增加质感 -->
+    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9IiNmNGY0ZjUiLz48L3N2Zz4=')] [mask-image:linear-gradient(to_bottom,white,transparent)] pointer-events-none"></div>
+
+    <div class="relative z-10 min-h-full flex flex-col p-6 sm:p-8">
+
+      <!-- 思考提示：重构为系统状态栏风格 -->
+      <transition enter-active-class="transition duration-300 ease-out" enter-from-class="opacity-0 -translate-y-2" enter-to-class="opacity-100 translate-y-0" leave-active-class="transition duration-200 ease-in" leave-from-class="opacity-100 translate-y-0" leave-to-class="opacity-0 -translate-y-2">
+        <div v-if="isThinking" class="sticky top-0 z-20 mb-8 mx-auto max-w-fit">
+          <div class="relative overflow-hidden flex items-center gap-3 px-4 py-2 bg-white/80 backdrop-blur-md rounded-full border border-zinc-200 shadow-sm ring-1 ring-zinc-900/5">
+            <!-- 流光动画背景 -->
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-zinc-100/50 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
+
+            <div class="relative flex items-center gap-2.5">
+              <div class="flex h-2.5 w-2.5">
+                <span class="animate-ping absolute inline-flex h-2.5 w-2.5 rounded-full bg-zinc-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-zinc-900"></span>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-[10px] font-bold text-zinc-900 uppercase tracking-widest leading-none">AI Processing</span>
+              </div>
+            </div>
+          </div>
         </div>
+      </transition>
+
+      <!-- 消息列表 -->
+      <div class="flex-1 space-y-2">
+        <MessageItem v-for="(item, index) in conversationHistory" :key="index" :message="item" :index="index" :isLast="index === conversationHistory.length - 1" :isThinking="isThinking" :isStopped="isLastMessageStopped" />
       </div>
-      <div>
-        <div class="text-sm font-medium text-blue-700">AI正在思考中</div>
-        <div class="text-xs text-blue-500">正在分析您的问题，并构建解答思路，请稍候...</div>
+
+      <!-- 空状态 -->
+      <div v-if="conversationHistory.length === 0" class="flex-1 flex flex-col justify-center">
+        <EmptyState :hotTopics="hotTopics" :isLoadingTopics="isLoadingTopics" @select-question="$emit('select-question', $event)" @refresh-topics="$emit('refresh-topics')" />
       </div>
+
     </div>
-
-    <!-- 消息列表 -->
-    <MessageItem
-      v-for="(item, index) in conversationHistory"
-      :key="index"
-      :message="item"
-      :index="index"
-      :isLast="index === conversationHistory.length - 1"
-      :isThinking="isThinking"
-      :isStopped="isLastMessageStopped"
-    />
-
-    <!-- 空状态 -->
-    <EmptyState
-      v-if="conversationHistory.length === 0"
-      :hotTopics="hotTopics"
-      :isLoadingTopics="isLoadingTopics"
-      @select-question="$emit('select-question', $event)"
-      @refresh-topics="$emit('refresh-topics')"
-    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import MessageItem from './MessageItem.vue';
-import EmptyState from './EmptyState.vue';
+import { ref } from "vue";
+import MessageItem from "./MessageItem.vue";
+import EmptyState from "./EmptyState.vue";
 
 interface Message {
-  role: 'user' | 'assistant' | 'system';
+  role: "user" | "assistant" | "system";
   content: string;
 }
 
@@ -57,42 +59,56 @@ defineProps<{
 }>();
 
 const emit = defineEmits<{
-  'select-question': [question: string];
-  'refresh-topics': [];
+  "select-question": [question: string];
+  "refresh-topics": [];
   scroll: [event: Event];
 }>();
 
 const containerRef = ref<HTMLElement | null>(null);
 
 const handleScroll = (event: Event) => {
-  emit('scroll', event);
+  emit("scroll", event);
 };
 
 defineExpose({
-  containerRef
+  containerRef,
 });
 </script>
 
 <style scoped>
+/* 容器基础滚动行为 */
 .chat-container {
-  padding: 1.75rem;
   overflow-y: auto;
-  height: 100%;
+  scroll-behavior: smooth;
+  /* 隐藏 Firefox 滚动条，使用自定义样式 */
   scrollbar-width: thin;
-  scrollbar-color: rgba(203, 213, 225, 0.5) transparent;
+  scrollbar-color: #e4e4e7 transparent;
 }
 
+/* Webkit (Chrome, Safari, Edge) 自定义滚动条 */
 .chat-container::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
 }
 
 .chat-container::-webkit-scrollbar-track {
   background: transparent;
+  margin: 4px;
 }
 
 .chat-container::-webkit-scrollbar-thumb {
-  background-color: rgba(203, 213, 225, 0.5);
-  border-radius: 6px;
+  background-color: #e4e4e7; /* zinc-200 */
+  border-radius: 20px;
+  transition: background-color 0.3s;
+}
+
+.chat-container::-webkit-scrollbar-thumb:hover {
+  background-color: #d4d4d8; /* zinc-300 */
+}
+
+/* Shimmer 动画定义 */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
 }
 </style>

@@ -1,60 +1,93 @@
 <template>
-  <div>
-    <span class="block text-sm font-medium text-gray-700 mb-2">API 风格</span>
-    <div class="grid grid-cols-2 gap-3">
+  <div class="mb-8">
+    <span class="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3 pl-1">
+      Interface Style
+    </span>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      
+      <!-- Option 1: OpenAI -->
       <div
         @click="$emit('update:apiStyle', 'openai')"
-        class="cursor-pointer relative p-4 rounded-lg border transition-all duration-200"
+        class="group relative p-4 rounded-xl border cursor-pointer transition-all duration-200"
         :class="apiStyle === 'openai'
-          ? 'border-purple-500 bg-purple-50 shadow-sm'
-          : 'border-gray-200 hover:border-purple-300'
+          ? 'bg-zinc-50/50 border-zinc-900 ring-1 ring-zinc-900 shadow-sm' 
+          : 'bg-white border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 hover:shadow-sm'
         "
       >
-        <span class="absolute -top-1.5 -right-1.5" v-if="apiStyle === 'openai'">
-          <span class="flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+        <div class="flex items-start justify-between mb-3">
+          <!-- Icon -->
+          <div 
+            class="p-2 rounded-lg transition-colors duration-200"
+            :class="apiStyle === 'openai' ? 'bg-zinc-900 text-white' : 'bg-zinc-100 text-zinc-500 group-hover:bg-zinc-200 group-hover:text-zinc-700'"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-          </span>
-        </span>
-        <div class="mb-2 inline-flex items-center justify-center rounded-lg bg-purple-100 p-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-700" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L7.586 10 5.293 7.707a1 1 0 010-1.414zM11 12a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
-          </svg>
+          </div>
+
+          <!-- Radio Indicator -->
+          <div class="relative flex items-center justify-center w-5 h-5">
+            <div 
+              class="w-4 h-4 rounded-full border transition-all duration-200 flex items-center justify-center"
+              :class="apiStyle === 'openai' ? 'border-zinc-900 bg-zinc-900' : 'border-zinc-300 bg-transparent'"
+            >
+              <svg v-if="apiStyle === 'openai'" class="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+          </div>
         </div>
-        <h3 class="text-sm font-medium text-gray-900">
-          OpenAI 兼容格式
-        </h3>
-        <p class="mt-1 text-xs text-gray-500">
-          兼容标准OpenAI接口的客户端
-        </p>
+
+        <div>
+          <h3 class="text-sm font-bold text-zinc-900 font-mono mb-1">Standard OpenAI</h3>
+          <p class="text-xs text-zinc-500 leading-relaxed">
+            Standard client compatibility. Direct endpoint access.
+          </p>
+        </div>
       </div>
 
+      <!-- Option 2: Adapter -->
       <div
         @click="$emit('update:apiStyle', 'adapter')"
-        class="cursor-pointer relative p-4 rounded-lg border transition-all duration-200"
+        class="group relative p-4 rounded-xl border cursor-pointer transition-all duration-200"
         :class="apiStyle === 'adapter'
-          ? 'border-purple-500 bg-purple-50 shadow-sm'
-          : 'border-gray-200 hover:border-purple-300'
+          ? 'bg-zinc-50/50 border-zinc-900 ring-1 ring-zinc-900 shadow-sm' 
+          : 'bg-white border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 hover:shadow-sm'
         "
       >
-        <span class="absolute -top-1.5 -right-1.5" v-if="apiStyle === 'adapter'">
-          <span class="flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+        <div class="flex items-start justify-between mb-3">
+          <!-- Icon -->
+          <div 
+            class="p-2 rounded-lg transition-colors duration-200"
+            :class="apiStyle === 'adapter' ? 'bg-zinc-900 text-white' : 'bg-zinc-100 text-zinc-500 group-hover:bg-zinc-200 group-hover:text-zinc-700'"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
             </svg>
-          </span>
-        </span>
-        <div class="mb-2 inline-flex items-center justify-center rounded-lg bg-purple-100 p-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-700" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd" />
-          </svg>
+          </div>
+
+          <!-- Radio Indicator -->
+          <div class="relative flex items-center justify-center w-5 h-5">
+            <div 
+              class="w-4 h-4 rounded-full border transition-all duration-200 flex items-center justify-center"
+              :class="apiStyle === 'adapter' ? 'border-zinc-900 bg-zinc-900' : 'border-zinc-300 bg-transparent'"
+            >
+              <svg v-if="apiStyle === 'adapter'" class="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+          </div>
         </div>
-        <h3 class="text-sm font-medium text-gray-900">
-          ai.createModel
-        </h3>
-        <p class="mt-1 text-xs text-gray-500">简洁的适配器风格接口</p>
+
+        <div>
+          <h3 class="text-sm font-bold text-zinc-900 font-mono mb-1">ai.createModel</h3>
+          <p class="text-xs text-zinc-500 leading-relaxed">
+            Vercel AI SDK adapter style. Streamlined integration.
+          </p>
+        </div>
       </div>
+
     </div>
   </div>
 </template>

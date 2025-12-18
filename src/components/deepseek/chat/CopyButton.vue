@@ -1,16 +1,40 @@
 <template>
   <button
     @click="handleCopy"
-    class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1.5 rounded-lg hover:bg-black/5 text-gray-500 hover:text-gray-700"
-    :title="copySuccess ? '复制成功！' : '复制内容'"
+    :class="[
+      'flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all duration-200 border',
+      copySuccess 
+        ? 'bg-emerald-50 text-emerald-600 border-emerald-100' 
+        : 'bg-transparent text-zinc-400 border-transparent hover:bg-zinc-100 hover:text-zinc-900 active:scale-95'
+    ]"
+    :title="copySuccess ? '复制成功' : '复制内容'"
   >
-    <svg v-if="!copySuccess" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-      <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-      <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
-    </svg>
-    <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500" viewBox="0 0 20 20" fill="currentColor">
-      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-    </svg>
+    <!-- 使用 Transition 实现图标丝滑切换 -->
+    <Transition
+      mode="out-in"
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0 scale-50"
+      enter-to-class="opacity-100 scale-100"
+      leave-active-class="transition duration-150 ease-in"
+      leave-from-class="opacity-100 scale-100"
+      leave-to-class="opacity-0 scale-50"
+    >
+      <svg v-if="!copySuccess" class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+      </svg>
+      
+      <svg v-else class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+      </svg>
+    </Transition>
+
+    <!-- 复制成功时显示文字标签，增加反馈清晰度 -->
+    <span v-if="copySuccess" class="animate-in fade-in duration-200">
+      Copied
+    </span>
+    <span v-else class="hidden sm:inline-block opacity-0 group-hover:opacity-100 transition-opacity duration-200 delay-100">
+      Copy
+    </span>
   </button>
 </template>
 
@@ -26,14 +50,17 @@ const props = defineProps<{
 const copySuccess = ref(false);
 
 const handleCopy = async () => {
+  // 防止重复点击
+  if (copySuccess.value) return;
+
   const plainText = extractPlainText(formatMarkdown(props.content));
   const success = await copyToClipboard(plainText);
-
+  
   if (success) {
     copySuccess.value = true;
     setTimeout(() => {
       copySuccess.value = false;
-    }, 3000);
+    }, 2000); // 2秒后恢复，比3秒更利落
   }
 };
 </script>

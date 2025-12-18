@@ -23,7 +23,6 @@ declare module 'vue' {
     ConfigPanel: typeof import('./src/components/deepseek/ConfigPanel.vue')['default']
     CopyButton: typeof import('./src/components/deepseek/chat/CopyButton.vue')['default']
     DeepseekDemo: typeof import('./src/components/DeepseekDemo.vue')['default']
-    DeepseekDemoRefactored: typeof import('./src/components/DeepseekDemoRefactored.vue')['default']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCollapse: typeof import('element-plus/es')['ElCollapse']
