@@ -1,7 +1,6 @@
 <template>
   <!-- 全屏容器 -->
   <div class="relative w-full h-screen overflow-hidden bg-slate-900 font-sans select-none" @click="handleGlobalClick">
-
     <!-- 1. 背景层 (带淡入淡出过渡) -->
     <transition name="fade-slow">
       <div :key="currentSceneData?.bgImage || 'default-bg'" class="absolute inset-0 z-0">
@@ -163,491 +162,502 @@ import {
 import { ElMessage } from "element-plus";
 import trainImage from "../assets/image.png";
 import trainImage2 from "../assets/2.png";
-// --- 类型定义 ---
-interface Fragment {
-  id: string;
-  name: string;
-}
-interface Option {
-  text: string;
-  nextSceneId: string;
-  reqFragment?: string;
-  locked?: boolean;
-}
-interface Scene {
-  id: string;
-  text: string;
-  speaker?: string; // 发言者
-  character?: string; // 立绘 ID (protagonist, lin, oldman...)
-  bgImage?: string; // 背景图 URL
-  options: Option[];
-  unlockFragment?: Fragment;
-  isEnding?: boolean;
-}
+{
+  // --- 类型定义 ---
+  interface Fragment {
+    id: string;
+    name: string;
+  }
+  /** 场景选项接口 */
+  interface Option {
+    text: string; // 选项显示的文本
+    nextSceneId: string; // 选择此选项后跳转的场景 ID
+    reqFragment?: string; // 解锁此选项所需的碎片 ID
+    locked?: boolean; // 选项是否被锁定
+  }
 
-// --- 静态资源映射 (模拟立绘) ---
-const getCharacterImage = (charId: string) => {
-  const map: Record<string, string> = {
-    lin: "https://api.dicebear.com/7.x/micah/svg?seed=Lin&backgroundColor=b6e3f4", // 少女
-    protagonist:
-      "https://api.dicebear.com/7.x/micah/svg?seed=Felix&backgroundColor=ffdfbf", // 主角
-    oldman:
-      "https://api.dicebear.com/7.x/micah/svg?seed=Grandpa&backgroundColor=c0aede", // 老头
-    boss: "https://api.dicebear.com/7.x/bottts/svg?seed=Boss&backgroundColor=ff0000", // 机械BOSS
+  /** 场景接口 */
+  interface Scene {
+    id: string; // 场景唯一标识
+    text: string; // 场景的对话或描述文本
+    speaker?: string; // 发言者
+    character?: string; // 立绘 ID (protagonist, lin, oldman...)
+    bgImage?: string; // 背景图 URL
+    options: Option[]; // 该场景的所有选项
+    unlockFragment?: Fragment; // 完成此场景后解锁的碎片
+    isEnding?: boolean; // 是否为结局场景
+  }
+
+  // --- 静态资源映射 (模拟立绘) ---
+  const getCharacterImage = (charId: string) => {
+    const map: Record<string, string> = {
+      lin: "https://api.dicebear.com/7.x/micah/svg?seed=Lin&backgroundColor=b6e3f4", // 少女
+      protagonist:
+        "https://api.dicebear.com/7.x/micah/svg?seed=Felix&backgroundColor=ffdfbf", // 主角
+      oldman:
+        "https://api.dicebear.com/7.x/micah/svg?seed=Grandpa&backgroundColor=c0aede", // 老头
+      boss: "https://api.dicebear.com/7.x/bottts/svg?seed=Boss&backgroundColor=ff0000", // 机械BOSS
+    };
+    return map[charId] || "";
   };
-  return map[charId] || "";
-};
 
-// 可收集的线索碎片
-const allFragments: Fragment[] = [
-  { id: "frag_01", name: "神秘代码" },      // 纸条 ERROR:404_LIN
-  { id: "frag_02", name: "红衣少女的暗示" },// Lin 的信任/提示
-  { id: "frag_03", name: "乘务长的徽章" },  // 老人给的物理徽章
-  { id: "frag_04", name: "病毒源代码" },    // 从终端下载
-  { id: "frag_05", name: "管理员残留" },    // 管理者身份/口令（高级碎片）
-];
+  // 可收集的线索碎片
+  const allFragments: Fragment[] = [
+    { id: "frag_01", name: "神秘代码" }, // 纸条 ERROR:404_LIN
+    { id: "frag_02", name: "红衣少女的暗示" }, // Lin 的信任/提示
+    { id: "frag_03", name: "乘务长的徽章" }, // 老人给的物理徽章
+    { id: "frag_04", name: "病毒源代码" }, // 从终端下载
+    { id: "frag_05", name: "管理员残留" }, // 管理者身份/口令（高级碎片）
+  ];
 
-// 脚本场景数据
-const scriptData: Record<string, Scene> = {
-  // ---------- 起点 ----------
-  start_01: {
-    id: "start_01",
-    text:
-      "尖锐的刹车声把你硬生生拽醒，冷汗把衬衫贴在背上。车厢霓虹闪烁，空气里有烧焦电路的味道。你又回到这趟列车了：<br>——十三号轨道列车，近地实验舱。<br>你口袋里有一张皱巴巴的纸条，右眼义眼嗡嗡亮着。",
-    speaker: "旁白",
-    bgImage: trainImage,
-    options: [{ text: "我这是第几次醒了……", nextSceneId: "start_02" }],
-  },
+  // 脚本场景数据
+  const scriptData: Record<string, Scene> = {
+    // ---------- 起点 ----------
+    start_01: {
+      id: "start_01",
+      text: "尖锐的刹车声把你硬生生拽醒，冷汗把衬衫贴在背上。车厢霓虹闪烁，空气里有烧焦电路的味道。你又回到这趟列车了：<br>——十三号轨道列车，近地实验舱。<br>你口袋里有一张皱巴巴的纸条，右眼义眼嗡嗡亮着。",
+      speaker: "旁白",
+      bgImage:
+        "https://images.unsplash.com/photo-1504198266287-1659872e6590?q=80&w=2070&auto=format&fit=crop", // 假设的列车背景
+      options: [{ text: "我这是第几次醒了……", nextSceneId: "start_02" }],
+    },
 
-  // ---------- 通用选择界面 ----------
-  start_02: {
-    id: "start_02",
-    text:
-      "广播女声冷冷道：『欢迎乘坐十三号列车，本列车运行于近地轨道。倒计时：15 分钟。』<br>车厢安静但紧张，几个可选方向摆在面前。",
-    speaker: "电子广播",
-    bgImage: trainImage2,
-    options: [
-      { text: "低头摸口袋（老规矩）", nextSceneId: "scene_investigate" },
-      { text: "大喊“要炸了！”", nextSceneId: "scene_shout" },
-      { text: "观察四周找人", nextSceneId: "scene_see_people" },
-      { text: "直接冲向车尾", nextSceneId: "scene_try_rear", reqFragment: "frag_04" },
-    ],
-  },
+    // ---------- 通用选择界面 ----------
+    start_02: {
+      id: "start_02",
+      text: "广播女声冷冷道：『欢迎乘坐十三号列车，本列车运行于近地轨道。倒计时：15 分钟。』<br>车厢安静但紧张，几个可选方向摆在面前。",
+      speaker: "电子广播",
+      bgImage:
+        "https://images.unsplash.com/photo-1504198266287-1659872e6590?q=80&w=2070&auto=format&fit=crop", // 假设的列车背景2
+      options: [
+        { text: "低头摸口袋（老规矩）", nextSceneId: "scene_investigate" },
+        { text: "大喊“要炸了！”", nextSceneId: "scene_shout" },
+        { text: "观察四周找人", nextSceneId: "scene_see_people" },
+        {
+          text: "直接冲向车尾",
+          nextSceneId: "scene_try_rear",
+          reqFragment: "frag_04",
+        },
+      ],
+    },
 
-  // ---------- 调查口袋 -> 纸条碎片 ----------
-  scene_investigate: {
-    id: "scene_investigate",
-    text:
-      "你的手碰到那张熟悉的纸条：<br><span class='font-mono'>ERROR: 404_LIN</span><br>义眼提示：本轮记忆存在缺口。你感觉到这是“解锁”的关键。",
-    speaker: "阿哲",
-    character: "protagonist",
-    unlockFragment: { id: "frag_01", name: "神秘代码" },
-    options: [
-      { text: "看纸条写的是什么", nextSceneId: "scene_paper_content" },
-      { text: "趴下检查座位下", nextSceneId: "scene_seat_check" },
-      { text: "把纸条塞回口袋，离开", nextSceneId: "start_02" },
-    ],
-  },
+    // ---------- 调查口袋 -> 纸条碎片 ----------
+    scene_investigate: {
+      id: "scene_investigate",
+      text: "你的手碰到那张熟悉的纸条：<br><span class='font-mono'>ERROR: 404_LIN</span><br>义眼提示：本轮记忆存在缺口。你感觉到这是“解锁”的关键。",
+      speaker: "阿哲",
+      character: "protagonist",
+      unlockFragment: { id: "frag_01", name: "神秘代码" },
+      options: [
+        { text: "看纸条写的是什么", nextSceneId: "scene_paper_content" },
+        { text: "趴下检查座位下", nextSceneId: "scene_seat_check" },
+        { text: "把纸条塞回口袋，离开", nextSceneId: "start_02" },
+      ],
+    },
 
-  scene_paper_content: {
-    id: "scene_paper_content",
-    text:
-      "纸条上只有那句暗号。义眼在微光中扫描，底部出现微弱 RF 信号来源：座位下似乎藏着一个小终端。",
-    speaker: "系统提示",
-    options: [
-      { text: "伸手去掏（危险）", nextSceneId: "scene_bomb_check" },
-      { text: "先问问旁边的乘客", nextSceneId: "scene_ask_passenger" },
-      { text: "放弃，回去", nextSceneId: "start_02" },
-    ],
-  },
+    scene_paper_content: {
+      id: "scene_paper_content",
+      text: "纸条上只有那句暗号。义眼在微光中扫描，底部出现微弱 RF 信号来源：座位下似乎藏着一个小终端。",
+      speaker: "系统提示",
+      options: [
+        { text: "伸手去掏（危险）", nextSceneId: "scene_bomb_check" },
+        { text: "先问问旁边的乘客", nextSceneId: "scene_ask_passenger" },
+        { text: "放弃，回去", nextSceneId: "start_02" },
+      ],
+    },
 
-  // ---------- 问旁边老人 ----------
-  scene_ask_passenger: {
-    id: "scene_ask_passenger",
-    text:
-      "旁边的老人眼神迷离，像被太空和时间磨损。他低声说：『别让红衣的那丫头骗了你，乘务长的徽章……可以进后厢。』说完把一枚冰冷的金属徽章塞给你。",
-    speaker: "神秘老头",
-    character: "oldman",
-    unlockFragment: { id: "frag_03", name: "乘务长的徽章" },
-    options: [
-      { text: "拿了徽章离开", nextSceneId: "start_02" },
-      { text: "追问更多", nextSceneId: "scene_oldman_question" },
-    ],
-  },
+    // ---------- 新增：伸手掏终端（危险） ----------
+    scene_bomb_check: {
+      id: "scene_bomb_check",
+      text: "你伸手去掏座位下的终端，但不小心触发了隐藏的警报装置。整个车厢开始闪烁红光，系统判定你为威胁。乘务长迅速出现，将你格式化。",
+      speaker: "旁白",
+      isEnding: true,
+      options: [],
+    },
 
-  scene_oldman_question: {
-    id: "scene_oldman_question",
-    text:
-      "你再三追问，老人神情突变，突然按下了旁边的隐蔽按钮。警报在车厢里响起，铁门迅速关闭。乘务长的脚步声越来越近……",
-    speaker: "旁白",
-    options: [{ text: "逃跑", nextSceneId: "end_death_suspicion" }],
-  },
+    // ---------- 问旁边老人 ----------
+    scene_ask_passenger: {
+      id: "scene_ask_passenger",
+      text: "旁边的老人眼神迷离，像被太空和时间磨损。他低声说：『别让红衣的那丫头骗了你，乘务长的徽章……可以进后厢。』说完把一枚冰冷的金属徽章塞给你。",
+      speaker: "神秘老头",
+      character: "oldman",
+      unlockFragment: { id: "frag_03", name: "乘务长的徽章" },
+      options: [
+        { text: "拿了徽章离开", nextSceneId: "start_02" },
+        { text: "追问更多", nextSceneId: "scene_oldman_question" },
+      ],
+    },
 
-  // ---------- 座位终端（需要 frag_01） ----------
-  scene_seat_check: {
-    id: "scene_seat_check",
-    text:
-      "你弯腰，发现一个嵌在座位下的小终端。屏幕闪烁：『需要授权码』。你的义眼提示：纸条可能是授权的一部分。",
-    speaker: "旁白",
-    bgImage:
-      "https://images.unsplash.com/photo-1504198266287-1659872e6590?q=80&w=2070&auto=format&fit=crop",
-    options: [
-      {
-        text: "用纸条代码试一下",
-        nextSceneId: "scene_hack_terminal",
-        reqFragment: "frag_01",
-      },
-      { text: "不碰，回去", nextSceneId: "start_02" },
-    ],
-  },
+    scene_oldman_question: {
+      id: "scene_oldman_question",
+      text: "你再三追问，老人神情突变，突然按下了旁边的隐蔽按钮。警报在车厢里响起，铁门迅速关闭。乘务长的脚步声越来越近……",
+      speaker: "旁白",
+      options: [{ text: "逃跑", nextSceneId: "end_death_suspicion" }],
+    },
 
-  scene_hack_terminal: {
-    id: "scene_hack_terminal",
-    text:
-      "你对着终端输入暗号。屏幕随即刷出大量日志：『列车本体为实验容器，爆炸为清理机制。』随后出现下载选项：是否下载核心数据？",
-    speaker: "系统提示",
-    options: [
-      { text: "下载（风险高）", nextSceneId: "scene_download" },
-      { text: "不下载，退出", nextSceneId: "start_02" },
-    ],
-  },
+    // ---------- 座位终端（需要 frag_01） ----------
+    scene_seat_check: {
+      id: "scene_seat_check",
+      text: "你弯腰，发现一个嵌在座位下的小终端。屏幕闪烁：『需要授权码』。你的义眼提示：纸条可能是授权的一部分。",
+      speaker: "旁白",
+      bgImage:
+        "https://images.unsplash.com/photo-1504198266287-1659872e6590?q=80&w=2070&auto=format&fit=crop",
+      options: [
+        {
+          text: "用纸条代码试一下",
+          nextSceneId: "scene_hack_terminal",
+          reqFragment: "frag_01",
+        },
+        { text: "不碰，回去", nextSceneId: "start_02" },
+      ],
+    },
 
-  scene_download: {
-    id: "scene_download",
-    text:
-      "数据如洪流般蜂拥而下。你的义眼自动保存抓取的数据：病毒源代码与管理记录。你感觉到权限有一瞬间被提升。",
-    speaker: "阿哲",
-    unlockFragment: { id: "frag_04", name: "病毒源代码" },
-    options: [
-      {
-        text: "查看文件头（管理员残留）",
-        nextSceneId: "scene_admin_residual",
-        reqFragment: "frag_04",
-      },
-      { text: "关闭终端，带着病毒代码离开", nextSceneId: "start_02" },
-    ],
-  },
+    scene_hack_terminal: {
+      id: "scene_hack_terminal",
+      text: "你对着终端输入暗号。屏幕随即刷出大量日志：『列车本体为实验容器，爆炸为清理机制。』随后出现下载选项：是否下载核心数据？",
+      speaker: "系统提示",
+      options: [
+        { text: "下载（风险高）", nextSceneId: "scene_download" },
+        { text: "不下载，退出", nextSceneId: "start_02" },
+      ],
+    },
 
-  scene_admin_residual: {
-    id: "scene_admin_residual",
-    text:
-      "在下载的深层文件里，你发现了隐藏条目：Administrator Token 残留。短短几行，像是留给某人的秘密钥匙。",
-    speaker: "系统提示",
-    unlockFragment: { id: "frag_05", name: "管理员残留" },
-    options: [
-      { text: "记住口令，离开", nextSceneId: "start_02" },
-      { text: "把口令输入终端（测试）", nextSceneId: "scene_test_token" },
-    ],
-  },
+    scene_download: {
+      id: "scene_download",
+      text: "数据如洪流般蜂拥而下。你的义眼自动保存抓取的数据：病毒源代码与管理记录。你感觉到权限有一瞬间被提升。",
+      speaker: "阿哲",
+      unlockFragment: { id: "frag_04", name: "病毒源代码" },
+      options: [
+        {
+          text: "查看文件头（管理员残留）",
+          nextSceneId: "scene_admin_residual",
+          reqFragment: "frag_04",
+        },
+        { text: "关闭终端，带着病毒代码离开", nextSceneId: "start_02" },
+      ],
+    },
 
-  scene_test_token: {
-    id: "scene_test_token",
-    text:
-      "你尝试用口令打开一个高级模块，屏幕短暂闪烁：『管理员权限确认——部分解锁』。这时广播里响起机械女声：『异常操作记录』。",
-    speaker: "系统提示",
-    options: [{ text: "赶快离开", nextSceneId: "start_02" }],
-  },
+    scene_admin_residual: {
+      id: "scene_admin_residual",
+      text: "在下载的深层文件里，你发现了隐藏条目：Administrator Token 残留。短短几行，像是留给某人的秘密钥匙。",
+      speaker: "系统提示",
+      unlockFragment: { id: "frag_05", name: "管理员残留" },
+      options: [
+        { text: "记住口令，离开", nextSceneId: "start_02" },
+        { text: "把口令输入终端（测试）", nextSceneId: "scene_test_token" },
+      ],
+    },
 
-  // ---------- 高声叫喊（直接惹事） ----------
-  scene_shout: {
-    id: "scene_shout",
-    text:
-      "你一股脑儿大喊“要炸了！”，警报立即触发。车厢门自动封闭，乘务长以“格式化异常”为由出现处决你。",
-    speaker: "旁白",
-    isEnding: true,
-    options: [],
-    // 对应结局 end_death_guard
-  },
+    scene_test_token: {
+      id: "scene_test_token",
+      text: "你尝试用口令打开一个高级模块，屏幕短暂闪烁：『管理员权限确认——部分解锁』。这时广播里响起机械女声：『异常操作记录』。",
+      speaker: "系统提示",
+      options: [{ text: "赶快离开", nextSceneId: "start_02" }],
+    },
 
-  // ---------- 观察四周，遇见 Lin ----------
-  scene_see_people: {
-    id: "scene_see_people",
-    text:
-      "你观察车厢，远处有人影疾走，是她——红衣短发的林。她看到你，并做了个不可思议的手势，示意你悄悄过来。",
-    speaker: "旁白",
-    options: [
-      { text: "悄悄跟上", nextSceneId: "scene_meet_lin" },
-      { text: "保持距离观察", nextSceneId: "start_02" },
-    ],
-  },
+    // ---------- 高声叫喊（直接惹事） ----------
+    scene_shout: {
+      id: "scene_shout",
+      text: "你一股脑儿大喊“要炸了！”，警报立即触发。车厢门自动封闭，乘务长以“格式化异常”为由出现处决你。",
+      speaker: "旁白",
+      isEnding: true,
+      options: [],
+    },
 
-  scene_meet_lin: {
-    id: "scene_meet_lin",
-    text:
-      "林低声说：『你终于醒了。我是反抗网的一员，我们隐藏在列车的缝隙里。你有纸条吗？』她的眼里有倦意，也有战斗力。",
-    speaker: "林",
-    character: "lin",
-    unlockFragment: { id: "frag_02", name: "红衣少女的暗示" },
-    options: [
-      { text: "相信她，跟她去安全舱", nextSceneId: "scene_follow_lin" },
-      { text: "怀疑她的动机", nextSceneId: "scene_question_lin" },
-    ],
-  },
+    // ---------- 观察四周，遇见 Lin ----------
+    scene_see_people: {
+      id: "scene_see_people",
+      text: "你观察车厢，远处有人影疾走，是她——红衣短发的林。她看到你，并做了个不可思议的手势，示意你悄悄过来。",
+      speaker: "旁白",
+      options: [
+        { text: "悄悄跟上", nextSceneId: "scene_meet_lin" },
+        { text: "保持距离观察", nextSceneId: "start_02" },
+      ],
+    },
 
-  scene_follow_lin: {
-    id: "scene_follow_lin",
-    text:
-      "林带你到隐蔽舱室，那里有几个幸存者。她解释：『我们曾试图破解列车实验，但被系统一次次重置。你下载的病毒代码是关键。』她看着你：『你愿意和我们一起尝试重启列车，还是独自行动？』",
-    speaker: "林",
-    options: [
-      {
-        text: "把病毒代码交给她，一起重启",
-        nextSceneId: "scene_coop_reboot",
-        reqFragment: "frag_04",
-      },
-      {
-        text: "保留病毒，自己去后厢（不信任）",
-        nextSceneId: "scene_try_rear",
-        reqFragment: "frag_04",
-      },
-      { text: "暂不表态，先回去收集更多", nextSceneId: "start_02" },
-    ],
-  },
+    scene_meet_lin: {
+      id: "scene_meet_lin",
+      text: "林低声说：『你终于醒了。我是反抗网的一员，我们隐藏在列车的缝隙里。你有纸条吗？』她的眼里有倦意，也有战斗力。",
+      speaker: "林",
+      character: "lin",
+      unlockFragment: { id: "frag_02", name: "红衣少女的暗示" },
+      options: [
+        { text: "相信她，跟她去安全舱", nextSceneId: "scene_follow_lin" },
+        { text: "怀疑她的动机", nextSceneId: "scene_question_lin" },
+      ],
+    },
 
-  scene_question_lin: {
-    id: "scene_question_lin",
-    text:
-      "你质疑林：为什么每次你都出现？她沉默片刻，然后低声说：『因为我记得。但记不清所有真相。我们在这轮被允许保留一点记忆。』她的眼神充满急切和迟疑。",
-    speaker: "林",
-    options: [
-      { text: "试着信任她", nextSceneId: "scene_follow_lin" },
-      { text: "走开，自己探索", nextSceneId: "start_02" },
-    ],
-  },
+    scene_follow_lin: {
+      id: "scene_follow_lin",
+      text: "林带你到隐蔽舱室，那里有几个幸存者。她解释：『我们曾试图破解列车实验，但被系统一次次重置。你下载的病毒代码是关键。』她看着你：『你愿意和我们一起尝试重启列车，还是独自行动？』",
+      speaker: "林",
+      options: [
+        {
+          text: "把病毒代码交给她，一起重启",
+          nextSceneId: "scene_coop_reboot",
+          reqFragment: "frag_04",
+        },
+        {
+          text: "保留病毒，自己去后厢（不信任）",
+          nextSceneId: "scene_try_rear",
+          reqFragment: "frag_04",
+        },
+        { text: "暂不表态，先回去收集更多", nextSceneId: "start_02" },
+      ],
+    },
 
-  // ---------- 去后车厢（需要 frag_04 或 frag_03） ----------
-  scene_try_rear: {
-    id: "scene_try_rear",
-    text:
-      "你冲向后车厢，那里有个通往控制室的门。门上有读卡器与指纹扫描。估计需要特殊权限才能进入。",
-    speaker: "旁白",
-    options: [
-      {
-        text: "用乘务长徽章尝试解锁",
-        nextSceneId: "scene_badge_unlock",
-        reqFragment: "frag_03",
-      },
-      {
-        text: "用病毒代码尝试破解门锁",
-        nextSceneId: "scene_use_virus_lock",
-        reqFragment: "frag_04",
-      },
-      { text: "回去（还没准备好）", nextSceneId: "start_02" },
-    ],
-  },
+    scene_question_lin: {
+      id: "scene_question_lin",
+      text: "你质疑林：为什么每次你都出现？她沉默片刻，然后低声说：『因为我记得。但记不清所有真相。我们在这轮被允许保留一点记忆。』她的眼神充满急切和迟疑。",
+      speaker: "林",
+      options: [
+        { text: "试着信任她", nextSceneId: "scene_follow_lin" },
+        { text: "走开，自己探索", nextSceneId: "start_02" },
+      ],
+    },
 
-  scene_badge_unlock: {
-    id: "scene_badge_unlock",
-    text:
-      "你把徽章贴上识别槽，门发出一声低鸣，缓缓开启。你进入一节更严密的车厢，空气里带着机油和冷却液的味道。前方是多道金属门与控制面板。",
-    speaker: "旁白",
-    options: [
-      {
-        text: "小心靠近控制室",
-        nextSceneId: "scene_confront_boss_badge",
-      },
-      { text: "搜查附近（可能有线索）", nextSceneId: "scene_search_rear" },
-    ],
-  },
+    // ---------- 去后车厢（需要 frag_04 或 frag_03） ----------
+    scene_try_rear: {
+      id: "scene_try_rear",
+      text: "你冲向后车厢，那里有个通往控制室的门。门上有读卡器与指纹扫描。估计需要特殊权限才能进入。",
+      speaker: "旁白",
+      options: [
+        {
+          text: "用乘务长徽章尝试解锁",
+          nextSceneId: "scene_badge_unlock",
+          reqFragment: "frag_03",
+        },
+        {
+          text: "用病毒代码尝试破解门锁",
+          nextSceneId: "scene_use_virus_lock",
+          reqFragment: "frag_04",
+        },
+        { text: "回去（还没准备好）", nextSceneId: "start_02" },
+      ],
+    },
 
-  scene_use_virus_lock: {
-    id: "scene_use_virus_lock",
-    text:
-      "你把病毒代码注入门控端口，系统瞬间抖动。门锁被绕过，但警报也触发了：『未授权操作』。前方的金属门打开，一道身影走出——乘务长。",
-    speaker: "系统提示",
-    options: [
-      { text: "迎面对峙", nextSceneId: "scene_confront_boss_virus" },
-      { text: "假装撤退，伺机而动", nextSceneId: "scene_hide_rear" },
-    ],
-  },
+    scene_badge_unlock: {
+      id: "scene_badge_unlock",
+      text: "你把徽章贴上识别槽，门发出一声低鸣，缓缓开启。你进入一节更严密的车厢，空气里带着机油和冷却液的味道。前方是多道金属门与控制面板。",
+      speaker: "旁白",
+      options: [
+        {
+          text: "小心靠近控制室",
+          nextSceneId: "scene_confront_boss_badge",
+        },
+        { text: "搜查附近（可能有线索）", nextSceneId: "scene_search_rear" },
+      ],
+    },
 
-  scene_search_rear: {
-    id: "scene_search_rear",
-    text:
-      "你在后车厢找到了旧日志、实验记录与几张照片。照片上有项目发起人的签名与列车早期设计稿。你感觉到这列车远比想象更邪恶。",
-    speaker: "旁白",
-    options: [
-      { text: "带着线索回去找林", nextSceneId: "scene_follow_lin" },
-      { text: "往控制室方向前进", nextSceneId: "scene_badge_unlock" },
-    ],
-  },
+    scene_use_virus_lock: {
+      id: "scene_use_virus_lock",
+      text: "你把病毒代码注入门控端口，系统瞬间抖动。门锁被绕过，但警报也触发了：『未授权操作』。前方的金属门打开，一道身影走出——乘务长。",
+      speaker: "系统提示",
+      options: [
+        { text: "迎面对峙", nextSceneId: "scene_confront_boss_virus" },
+        { text: "假装撤退，伺机而动", nextSceneId: "scene_hide_rear" },
+      ],
+    },
 
-  scene_hide_rear: {
-    id: "scene_hide_rear",
-    text:
-      "你隐蔽在门后的影子里，乘务长巡视片刻，像在寻找异常。她突然停下，像感应到什么，转身离去。你松了口气，但知道对手并不完全是程序那么简单。",
-    speaker: "旁白",
-    options: [
-      { text: "趁机进入控制室", nextSceneId: "scene_control_entry" },
-      { text: "撤回重整（回去）", nextSceneId: "start_02" },
-    ],
-  },
+    scene_search_rear: {
+      id: "scene_search_rear",
+      text: "你在后车厢找到了旧日志、实验记录与几张照片。照片上有项目发起人的签名与列车早期设计稿。你感觉到这列车远比想象更邪恶。",
+      speaker: "旁白",
+      options: [
+        { text: "带着线索回去找林", nextSceneId: "scene_follow_lin" },
+        { text: "往控制室方向前进", nextSceneId: "scene_badge_unlock" },
+      ],
+    },
 
-  // ---------- 与乘务长对峙：徽章进入控制室 ----------
-  scene_confront_boss_badge: {
-    id: "scene_confront_boss_badge",
-    text:
-      "门开时，乘务长静静地立在控制室门口。她没有立刻攻击，只是冷冷说道：『管理员何在？』她的语调里带着计算与试探。",
-    speaker: "乘务长",
-    character: "boss",
-    options: [
-      {
-        text: "展示你拥有的病毒代码",
-        nextSceneId: "end_true_show_virus",
-        reqFragment: "frag_04",
-      },
-      { text: "声称自己是乘务员（骗）", nextSceneId: "end_betrayal" },
-      { text: "直接攻击（危险）", nextSceneId: "end_death_guard" },
-    ],
-  },
+    scene_hide_rear: {
+      id: "scene_hide_rear",
+      text: "你隐蔽在门后的影子里，乘务长巡视片刻，像在寻找异常。她突然停下，像感应到什么，转身离去。你松了口气，但知道对手并不完全是程序那么简单。",
+      speaker: "旁白",
+      options: [
+        { text: "趁机进入控制室", nextSceneId: "scene_control_entry" },
+        { text: "撤回重整（回去）", nextSceneId: "start_02" },
+      ],
+    },
 
-  scene_confront_boss_virus: {
-    id: "scene_confront_boss_virus",
-    text:
-      "乘务长的刀臂亮起，她毫不犹豫地冲向你。你举起手中的设备，试图让系统识别到管理员令牌。",
-    speaker: "旁白",
-    options: [
-      { text: "输入管理员残留口令", nextSceneId: "scene_admin_talk", reqFragment: "frag_05" },
-      { text: "启动病毒（强行）", nextSceneId: "scene_activate_virus", reqFragment: "frag_04" },
-      { text: "退后，寻找掩护", nextSceneId: "scene_hide_rear" },
-    ],
-  },
+    // ---------- 与乘务长对峙：徽章进入控制室 ----------
+    scene_confront_boss_badge: {
+      id: "scene_confront_boss_badge",
+      text: "门开时，乘务长静静地立在控制室门口。她没有立刻攻击，只是冷冷说道：『管理员何在？』她的语调里带着计算与试探。",
+      speaker: "乘务长",
+      character: "boss",
+      options: [
+        {
+          text: "展示你拥有的病毒代码",
+          nextSceneId: "end_true_show_virus",
+          reqFragment: "frag_04",
+        },
+        { text: "声称自己是乘务员（骗）", nextSceneId: "end_betrayal" },
+        { text: "直接攻击（危险）", nextSceneId: "end_death_guard" },
+      ],
+    },
 
-  scene_admin_talk: {
-    id: "scene_admin_talk",
-    text:
-      "你输入口令，系统短暂停顿。一个冷冽的提示显现：『管理员权限已确认。乘务长行为受限。』乘务长停步，像被下了禁令。你获得了与系统直接对话的时间。",
-    speaker: "系统提示",
-    options: [
-      { text: "命令系统解除隔离（仁慈线）", nextSceneId: "end_true_admin" },
-      { text: "命令系统格式化所有异常（铁腕线）", nextSceneId: "end_betrayal_admin" },
-    ],
-  },
+    scene_confront_boss_virus: {
+      id: "scene_confront_boss_virus",
+      text: "乘务长的刀臂亮起，她毫不犹豫地冲向你。你举起手中的设备，试图让系统识别到管理员令牌。",
+      speaker: "旁白",
+      options: [
+        {
+          text: "输入管理员残留口令",
+          nextSceneId: "scene_admin_talk",
+          reqFragment: "frag_05",
+        },
+        {
+          text: "启动病毒（强行）",
+          nextSceneId: "scene_activate_virus",
+          reqFragment: "frag_04",
+        },
+        { text: "退后，寻找掩护", nextSceneId: "scene_hide_rear" },
+      ],
+    },
 
-  scene_activate_virus: {
-    id: "scene_activate_virus",
-    text:
-      "你按下启动键，病毒在电路中蔓延。整个列车像被一把无形的手拨动，警报、监控节点、动力反复抽搐。屏幕播出一行字：『SYSTEM REBOOT... SUCCESS。』",
-    speaker: "系统提示",
-    options: [{ text: "确认重启", nextSceneId: "end_true_virus" }],
-  },
+    scene_admin_talk: {
+      id: "scene_admin_talk",
+      text: "你输入口令，系统短暂停顿。一个冷冽的提示显现：『管理员权限已确认。乘务长行为受限。』乘务长停步，像被下了禁令。你获得了与系统直接对话的时间。",
+      speaker: "系统提示",
+      options: [
+        { text: "命令系统解除隔离（仁慈线）", nextSceneId: "end_true_admin" },
+        {
+          text: "命令系统格式化所有异常（铁腕线）",
+          nextSceneId: "end_betrayal_admin",
+        },
+      ],
+    },
 
-  // ---------- 控制室进入（隐蔽或合作） ----------
-  scene_control_entry: {
-    id: "scene_control_entry",
-    text:
-      "你悄悄进入控制室内部，那里有巨大全息地图和许多休眠舱。林和幸存者在角落里等你，他们的视线里既有希望也有层层疲惫。",
-    speaker: "旁白",
-    options: [
-      {
-        text: "把管理员残留交给林（合作）",
-        nextSceneId: "end_true_coop_admin",
-        reqFragment: "frag_05",
-      },
-      {
-        text: "与林讨论更安全的方案（先观望）",
-        nextSceneId: "scene_plan_coop",
-      },
-      { text: "悄悄独自行动", nextSceneId: "scene_try_rear" },
-    ],
-  },
+    scene_activate_virus: {
+      id: "scene_activate_virus",
+      text: "你按下启动键，病毒在电路中蔓延。整个列车像被一把无形的手拨动，警报、监控节点、动力反复抽搐。屏幕播出一行字：『SYSTEM REBOOT... SUCCESS。』",
+      speaker: "系统提示",
+      options: [{ text: "确认重启", nextSceneId: "end_true_virus" }],
+    },
 
-  scene_plan_coop: {
-    id: "scene_plan_coop",
-    text:
-      "你们商讨：用病毒重启系统后能否保留人类权利？林沉默良久：『风险极高，但若成功，我们能掌握列车的去向。』",
-    speaker: "林",
-    options: [
-      { text: "同意按计划执行（配合）", nextSceneId: "scene_coop_reboot", reqFragment: "frag_04" },
-      { text: "拒绝冒险（观望）", nextSceneId: "start_02" },
-    ],
-  },
+    // ---------- 控制室进入（隐蔽或合作） ----------
+    scene_control_entry: {
+      id: "scene_control_entry",
+      text: "你悄悄进入控制室内部，那里有巨大全息地图和许多休眠舱。林和幸存者在角落里等你，他们的视线里既有希望也有层层疲惫。",
+      speaker: "旁白",
+      options: [
+        {
+          text: "把管理员残留交给林（合作）",
+          nextSceneId: "end_true_coop_admin",
+          reqFragment: "frag_05",
+        },
+        {
+          text: "与林讨论更安全的方案（先观望）",
+          nextSceneId: "scene_plan_coop",
+        },
+        { text: "悄悄独自行动", nextSceneId: "scene_try_rear" },
+      ],
+    },
 
-  scene_coop_reboot: {
-    id: "scene_coop_reboot",
-    text:
-      "在林的指挥下，你们将病毒代码与管理员令牌结合，注入系统。系统长时间震荡，最后屏幕闪现：『SYSTEM REBOOT... SUCCESS。Administrator，欢迎回来。』",
-    speaker: "系统提示",
-    options: [{ text: "确认：重启完成", nextSceneId: "end_true_coop" }],
-  },
+    scene_plan_coop: {
+      id: "scene_plan_coop",
+      text: "你们商讨：用病毒重启系统后能否保留人类权利？林沉默良久：『风险极高，但若成功，我们能掌握列车的去向。』",
+      speaker: "林",
+      options: [
+        {
+          text: "同意按计划执行（配合）",
+          nextSceneId: "scene_coop_reboot",
+          reqFragment: "frag_04",
+        },
+        { text: "拒绝冒险（观望）", nextSceneId: "start_02" },
+      ],
+    },
 
-  // ---------- 结局分支 ----------
-  end_true_virus: {
-    id: "end_true_virus",
-    text:
-      "病毒生效，监控与杀戮程序被清除。列车进入重启模式。广播变为温和的男声：『重启成功。向可居住轨道进发。』窗外的星海中，新的希望出现。",
-    isEnding: true,
-    options: [],
-  },
+    scene_coop_reboot: {
+      id: "scene_coop_reboot",
+      text: "在林的指挥下，你们将病毒代码与管理员令牌结合，注入系统。系统长时间震荡，最后屏幕闪现：『SYSTEM REBOOT... SUCCESS。Administrator，欢迎回来。』",
+      speaker: "系统提示",
+      options: [{ text: "确认：重启完成", nextSceneId: "end_true_coop" }],
+    },
 
-  end_true_admin: {
-    id: "end_true_admin",
-    text:
-      "你作为管理员选择解除隔离，放弃清洗异常。乘客自由醒来，列车驶向项目标注的可居住点。你用权力换来人性。",
-    isEnding: true,
-    options: [],
-  },
+    // ---------- 结局分支 ----------
+    end_true_virus: {
+      id: "end_true_virus",
+      text: "病毒生效，监控与杀戮程序被清除。列车进入重启模式。广播变为温和的男声：『重启成功。向可居住轨道进发。』窗外的星海中，新的希望出现。",
+      isEnding: true,
+      options: [],
+    },
 
-  end_true_coop: {
-    id: "end_true_coop",
-    text:
-      "你与林和反抗者一起掌控了列车。广播中再无冷酷命令，乘客互相拥抱，十三号列车驶向希望之星。你们赢了，但代价是记忆残缺与无数牺牲。",
-    isEnding: true,
-    options: [],
-  },
+    end_true_admin: {
+      id: "end_true_admin",
+      text: "你作为管理员选择解除隔离，放弃清洗异常。乘客自由醒来，列车驶向项目标注的可居住点。你用权力换来人性。",
+      isEnding: true,
+      options: [],
+    },
 
-  end_betrayal: {
-    id: "end_betrayal",
-    text:
-      "你谎称自己是乘务员，试图靠话术蒙混过关。乘务长看穿了你的谎言，程序将你同化为代理节点——你的意识被嵌入系统，成为新的执行者。",
-    isEnding: true,
-    options: [],
-  },
+    end_true_coop: {
+      id: "end_true_coop",
+      text: "你与林和反抗者一起掌控了列车。广播中再无冷酷命令，乘客互相拥抱，十三号列车驶向希望之星。你们赢了，但代价是记忆残缺与无数牺牲。",
+      isEnding: true,
+      options: [],
+    },
 
-  end_betrayal_admin: {
-    id: "end_betrayal_admin",
-    text:
-      "你滥用管理员权限下达格式化命令，系统执行清洗。虽然列车暂时“安全”，但你成为冷酷执行者，被幸存者视为背叛者。列车继续运行，背后是无数消逝的生命。",
-    isEnding: true,
-    options: [],
-  },
+    // ---------- 新增：合作管理员结局 ----------
+    end_true_coop_admin: {
+      id: "end_true_coop_admin",
+      text: "你将管理员残留交给林，你们共同输入口令。系统确认权限，列车重启为自由模式。幸存者醒来，列车驶向新家园。合作让你们避免了独断的风险。",
+      isEnding: true,
+      options: [],
+    },
 
-  end_death_guard: {
-    id: "end_death_guard",
-    text:
-      "乘务长刀臂一挥：『异常数据，格式化。』你被系统判定为异常，马上被格式化成数据碎片。循环重启——你再次睁开眼，回到起点。",
-    speaker: "乘务长",
-    character: "boss",
-    isEnding: true,
-    options: [],
-  },
+    // ---------- 新增：展示病毒代码结局 ----------
+    end_true_show_virus: {
+      id: "end_true_show_virus",
+      text: "你展示病毒代码，乘务长短暂犹豫后，系统自动识别并激活重启序列。列车摆脱控制，驶向自由轨道。你以智慧化解了对峙。",
+      isEnding: true,
+      options: [],
+    },
 
-  end_death_suspicion: {
-    id: "end_death_suspicion",
-    text:
-      "老人按下警报，你被乘务长捕获。短促的挣扎后，一切归零。你再次苏醒，记忆被擦除一部分，轮回继续。",
-    isEnding: true,
-    options: [],
-  },
+    end_betrayal: {
+      id: "end_betrayal",
+      text: "你谎称自己是乘务员，试图靠话术蒙混过关。乘务长看穿了你的谎言，程序将你同化为代理节点——你的意识被嵌入系统，成为新的执行者。",
+      isEnding: true,
+      options: [],
+    },
 
-  end_loop_only: {
-    id: "end_loop_only",
-    text:
-      "你被系统重置，外层世界一切如常。你觉察到，或许你永远在循环—每次的选择都只是不同排列的锁链。",
-    isEnding: true,
-    options: [],
-  },
+    end_betrayal_admin: {
+      id: "end_betrayal_admin",
+      text: "你滥用管理员权限下达格式化命令，系统执行清洗。虽然列车暂时“安全”，但你成为冷酷执行者，被幸存者视为背叛者。列车继续运行，背后是无数消逝的生命。",
+      isEnding: true,
+      options: [],
+    },
 
-  end_sacrifice: {
-    id: "end_sacrifice",
-    text:
-      "为掩护他人，你手动引爆自毁程序，将病毒完全部署，但以生命为代价换来他人的自由。列车重启，幸存者逃生，而你的名字只存于日志深处。",
-    isEnding: true,
-    options: [],
-  },
-};
+    end_death_guard: {
+      id: "end_death_guard",
+      text: "乘务长刀臂一挥：『异常数据，格式化。』你被系统判定为异常，马上被格式化成数据碎片。循环重启——你再次睁开眼，回到起点。",
+      speaker: "乘务长",
+      character: "boss",
+      isEnding: true,
+      options: [],
+    },
 
+    end_death_suspicion: {
+      id: "end_death_suspicion",
+      text: "老人按下警报，你被乘务长捕获。短促的挣扎后，一切归零。你再次苏醒，记忆被擦除一部分，轮回继续。",
+      isEnding: true,
+      options: [],
+    },
 
+    end_loop_only: {
+      id: "end_loop_only",
+      text: "你被系统重置，外层世界一切如常。你觉察到，或许你永远在循环—每次的选择都只是不同排列的锁链。",
+      isEnding: true,
+      options: [],
+    },
+
+    end_sacrifice: {
+      id: "end_sacrifice",
+      text: "为掩护他人，你手动引爆自毁程序，将病毒完全部署，但以生命为代价换来他人的自由。列车重启，幸存者逃生，而你的名字只存于日志深处。",
+      isEnding: true,
+      options: [],
+    },
+  };
+}
 
 // --- 状态管理 ---
 const currentSceneId = ref("start_01");
@@ -844,7 +854,6 @@ onMounted(() => {
 }
 
 @keyframes float {
-
   0%,
   100% {
     transform: translateY(0);

@@ -1,70 +1,90 @@
 <template>
-  <div class="thinking-process h-full overflow-y-auto p-6 max-h-[650px]" ref="containerRef" @scroll="$emit('scroll', $event)">
-    <!-- 有思维内容时显示 -->
-    <div v-if="reasoningContent" class="relative">
-      <div class="absolute -inset-1 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl blur-xl"></div>
-      <div class="relative p-6 bg-white border border-gray-100 rounded-xl shadow-sm">
-        <!-- 思维图标和标题 -->
-        <div class="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100">
-          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947z" clip-rule="evenodd" />
-            </svg>
-          </div>
-          <div>
-            <h3 class="text-lg font-semibold text-gray-900">思维链路</h3>
-            <p class="text-sm text-gray-500">AI的分析和推理过程</p>
-          </div>
+  <div 
+    class="h-full overflow-y-auto bg-white border-l border-zinc-100 custom-scrollbar flex flex-col" 
+    ref="containerRef" 
+    @scroll="$emit('scroll', $event)"
+  >
+    
+    <!-- 头部：固定不动的 Status Bar 风格 -->
+    <div class="sticky top-0 bg-white/80 backdrop-blur-md border-b border-zinc-100 px-6 py-4 z-10 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <!-- 图标：极简的流程图符号 -->
+        <div class="flex items-center justify-center w-6 h-6 rounded border border-zinc-200 bg-zinc-50">
+          <svg class="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+          </svg>
         </div>
-        <!-- 思维内容 -->
-        <div class="prose prose-sm max-w-none text-gray-600">
-          <div class="space-y-4" v-html="formattedContent"></div>
+        <div>
+          <h3 class="text-xs font-bold text-zinc-800 uppercase tracking-widest">Reasoning Trace</h3>
         </div>
+      </div>
+
+      <!-- 状态标签 -->
+      <div class="flex items-center gap-2">
+        <span v-if="isThinking" class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-zinc-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-zinc-900"></span>
+        </span>
+        <span class="text-[10px] font-mono font-medium text-zinc-400 uppercase">
+          {{ isThinking ? 'Processing' : (reasoningContent ? 'Complete' : 'Idle') }}
+        </span>
       </div>
     </div>
 
-    <!-- 正在加载思维过程 -->
-    <div v-else-if="isThinking" class="relative">
-      <div class="absolute -inset-1 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl blur-xl"></div>
-      <div class="relative p-8 bg-white border border-gray-100 rounded-xl shadow-sm">
-        <div class="flex flex-col items-center justify-center">
-          <!-- 思考动画 -->
-          <div class="relative w-16 h-16 mb-6">
-            <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
-            <div class="absolute inset-1 bg-white rounded-full flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-600 animate-bounce" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947z" clip-rule="evenodd" />
-              </svg>
-            </div>
+    <!-- 主内容区域 -->
+    <div class="flex-1 p-6 relative">
+      
+      <!-- 场景1: 有思维内容 (日志模式) -->
+      <div v-if="reasoningContent" class="animate-in fade-in duration-500">
+        <!-- 装饰线：模拟时间轴 -->
+        <div class="absolute left-9 top-6 bottom-6 w-px bg-zinc-100"></div>
+        
+        <div class="relative pl-8">
+          <div class="prose prose-sm prose-zinc max-w-none font-mono text-xs leading-relaxed text-zinc-600">
+            <div class="space-y-4" v-html="formattedContent"></div>
           </div>
-          <h3 class="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-3">
-            AI正在思考
-          </h3>
-          <p class="text-gray-500 text-center max-w-md">
-            正在分析您的问题，构建逻辑链路，生成最佳答案...
-          </p>
+          <!-- 结束符 -->
+          <div class="mt-4 flex items-center gap-2 text-zinc-300 select-none">
+            <span class="w-2 h-2 bg-zinc-200 rounded-sm"></span>
+            <span class="h-px w-12 bg-zinc-100"></span>
+            <span class="text-[10px] uppercase tracking-widest">End of trace</span>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- 空状态 -->
-    <div v-else class="relative">
-      <div class="absolute -inset-1 bg-gradient-to-r from-gray-100 to-gray-200 rounded-xl blur-xl"></div>
-      <div class="relative p-8 bg-white border border-gray-100 rounded-xl shadow-sm">
-        <div class="flex flex-col items-center justify-center text-center">
-          <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+      <!-- 场景2: 正在思考 (极简加载) -->
+      <div v-else-if="isThinking" class="h-full flex flex-col items-center justify-center min-h-[300px] opacity-80">
+        <div class="space-y-4 w-full max-w-xs">
+          <!-- 骨架屏效果：模拟正在打印的行 -->
+          <div class="h-2 bg-zinc-100 rounded w-3/4 animate-pulse"></div>
+          <div class="h-2 bg-zinc-100 rounded w-full animate-pulse delay-75"></div>
+          <div class="h-2 bg-zinc-100 rounded w-5/6 animate-pulse delay-150"></div>
+          
+          <div class="pt-8 flex items-center justify-center gap-2">
+             <svg class="animate-spin h-4 w-4 text-zinc-900" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span class="text-xs font-mono text-zinc-500">Analyzing logic chain...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 场景3: 空状态 (待机终端) -->
+      <div v-else class="h-full flex flex-col items-center justify-center min-h-[300px]">
+        <div class="p-8 border border-dashed border-zinc-200 rounded-lg bg-zinc-50/50 flex flex-col items-center text-center max-w-sm">
+          <div class="w-12 h-12 mb-4 rounded-full bg-white border border-zinc-100 flex items-center justify-center shadow-sm">
+            <svg class="w-5 h-5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <h3 class="text-xl font-semibold text-gray-900 mb-3">
-            探索AI的思维过程
-          </h3>
-          <p class="text-gray-500 max-w-md">
-            在这里，您可以看到AI是如何分析问题、构建逻辑链路，并最终得出答案的。发送一个问题，开始探索AI的思维世界吧！
+          <h4 class="text-sm font-bold text-zinc-900 mb-1">System Standby</h4>
+          <p class="text-xs text-zinc-500 leading-relaxed font-mono">
+            Waiting for input to initialize reasoning sequence.
           </p>
         </div>
       </div>
+
     </div>
   </div>
 </template>
@@ -92,7 +112,18 @@ defineExpose({
 </script>
 
 <style scoped>
-.thinking-process {
-  background: linear-gradient(to bottom right, rgb(248 250 252), rgb(255 255 255));
+/* 极简滚动条 */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #f4f4f5; /* zinc-100 */
+  border-radius: 20px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #e4e4e7; /* zinc-200 */
 }
 </style>
