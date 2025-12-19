@@ -1,9 +1,7 @@
 <template>
-  <div class="min-h-screen bg-slate-50 py-8 px-1 sm:px-6 lg:px-8">
-    <PageHeader />
-
+  <div class="w-full h-full flex flex-col bg-slate-50 overflow-hidden">
     <!-- 主内容区域：配置面板和聊天面板 -->
-    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-4 md:mb-8 px-4">
+    <div class="flex-1 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 px-4 overflow-hidden min-h-0">
       <ConfigPanel
         v-model:apiKey="apiKey"
         v-model:apiUrl="apiUrl"
@@ -60,15 +58,6 @@
       @apply="handleApplyTransform"
       @update:selectedMode="selectedTransformMode = $event"
     />
-
-    <!-- 代码示例区域 -->
-    <CodeExample
-      :apiStyle="apiStyle"
-      :userInput="userInput"
-      :streaming="streaming"
-      :temperature="temperature"
-      :maxTokens="maxTokens"
-    />
   </div>
 </template>
 
@@ -80,7 +69,6 @@ import ConfigPanel from './deepseek/ConfigPanel.vue';
 import ChatPanel from './deepseek/ChatPanel.vue';
 import SearchProcessModal from './deepseek/modals/SearchProcessModal.vue';
 import TransformModal from './deepseek/modals/TransformModal.vue';
-import CodeExample from './deepseek/CodeExample.vue';
 import { useDeepseekApi } from '@/composables/useDeepseekApi';
 import { usePromptStore } from '@/stores/prompt';
 import { useHotTopics } from '@/composables/useHotTopics';

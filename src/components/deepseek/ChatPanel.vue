@@ -1,5 +1,5 @@
 <template>
-  <div class="col-span-1 lg:col-span-2 flex flex-col bg-white rounded-2xl shadow-2xl shadow-zinc-200/50 min-h-[500px] md:min-h-[650px] order-1 lg:order-2 overflow-hidden ring-1 ring-zinc-100">
+  <div class="col-span-1 lg:col-span-2 flex flex-col bg-white rounded-2xl shadow-2xl shadow-zinc-200/50 order-1 lg:order-2 overflow-hidden ring-1 ring-zinc-100 h-full">
 
     <!-- 1. 头部区域：集成视图切换和状态指示 -->
     <div class="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-b border-zinc-100 bg-white/80 backdrop-blur-sm sticky top-0 z-30">

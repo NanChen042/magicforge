@@ -162,56 +162,56 @@ import {
 import { ElMessage } from "element-plus";
 import trainImage from "../assets/image.png";
 import trainImage2 from "../assets/2.png";
-{
-  // --- 类型定义 ---
-  interface Fragment {
-    id: string;
-    name: string;
-  }
-  /** 场景选项接口 */
-  interface Option {
-    text: string; // 选项显示的文本
-    nextSceneId: string; // 选择此选项后跳转的场景 ID
-    reqFragment?: string; // 解锁此选项所需的碎片 ID
-    locked?: boolean; // 选项是否被锁定
-  }
 
-  /** 场景接口 */
-  interface Scene {
-    id: string; // 场景唯一标识
-    text: string; // 场景的对话或描述文本
-    speaker?: string; // 发言者
-    character?: string; // 立绘 ID (protagonist, lin, oldman...)
-    bgImage?: string; // 背景图 URL
-    options: Option[]; // 该场景的所有选项
-    unlockFragment?: Fragment; // 完成此场景后解锁的碎片
-    isEnding?: boolean; // 是否为结局场景
-  }
+// --- 类型定义 ---
+interface Fragment {
+  id: string;
+  name: string;
+}
+/** 场景选项接口 */
+interface Option {
+  text: string; // 选项显示的文本
+  nextSceneId: string; // 选择此选项后跳转的场景 ID
+  reqFragment?: string; // 解锁此选项所需的碎片 ID
+  locked?: boolean; // 选项是否被锁定
+}
 
-  // --- 静态资源映射 (模拟立绘) ---
-  const getCharacterImage = (charId: string) => {
-    const map: Record<string, string> = {
-      lin: "https://api.dicebear.com/7.x/micah/svg?seed=Lin&backgroundColor=b6e3f4", // 少女
-      protagonist:
-        "https://api.dicebear.com/7.x/micah/svg?seed=Felix&backgroundColor=ffdfbf", // 主角
-      oldman:
-        "https://api.dicebear.com/7.x/micah/svg?seed=Grandpa&backgroundColor=c0aede", // 老头
-      boss: "https://api.dicebear.com/7.x/bottts/svg?seed=Boss&backgroundColor=ff0000", // 机械BOSS
-    };
-    return map[charId] || "";
+/** 场景接口 */
+interface Scene {
+  id: string; // 场景唯一标识
+  text: string; // 场景的对话或描述文本
+  speaker?: string; // 发言者
+  character?: string; // 立绘 ID (protagonist, lin, oldman...)
+  bgImage?: string; // 背景图 URL
+  options: Option[]; // 该场景的所有选项
+  unlockFragment?: Fragment; // 完成此场景后解锁的碎片
+  isEnding?: boolean; // 是否为结局场景
+}
+
+// --- 静态资源映射 (模拟立绘) ---
+const getCharacterImage = (charId: string) => {
+  const map: Record<string, string> = {
+    lin: "https://api.dicebear.com/7.x/micah/svg?seed=Lin&backgroundColor=b6e3f4", // 少女
+    protagonist:
+      "https://api.dicebear.com/7.x/micah/svg?seed=Felix&backgroundColor=ffdfbf", // 主角
+    oldman:
+      "https://api.dicebear.com/7.x/micah/svg?seed=Grandpa&backgroundColor=c0aede", // 老头
+    boss: "https://api.dicebear.com/7.x/bottts/svg?seed=Boss&backgroundColor=ff0000", // 机械BOSS
   };
+  return map[charId] || "";
+};
 
-  // 可收集的线索碎片
-  const allFragments: Fragment[] = [
-    { id: "frag_01", name: "神秘代码" }, // 纸条 ERROR:404_LIN
-    { id: "frag_02", name: "红衣少女的暗示" }, // Lin 的信任/提示
-    { id: "frag_03", name: "乘务长的徽章" }, // 老人给的物理徽章
-    { id: "frag_04", name: "病毒源代码" }, // 从终端下载
-    { id: "frag_05", name: "管理员残留" }, // 管理者身份/口令（高级碎片）
-  ];
+// 可收集的线索碎片
+const allFragments: Fragment[] = [
+  { id: "frag_01", name: "神秘代码" }, // 纸条 ERROR:404_LIN
+  { id: "frag_02", name: "红衣少女的暗示" }, // Lin 的信任/提示
+  { id: "frag_03", name: "乘务长的徽章" }, // 老人给的物理徽章
+  { id: "frag_04", name: "病毒源代码" }, // 从终端下载
+  { id: "frag_05", name: "管理员残留" }, // 管理者身份/口令（高级碎片）
+];
 
-  // 脚本场景数据
-  const scriptData: Record<string, Scene> = {
+// 脚本场景数据
+const scriptData: Record<string, Scene> = {
     // ---------- 起点 ----------
     start_01: {
       id: "start_01",
@@ -657,7 +657,6 @@ import trainImage2 from "../assets/2.png";
       options: [],
     },
   };
-}
 
 // --- 状态管理 ---
 const currentSceneId = ref("start_01");

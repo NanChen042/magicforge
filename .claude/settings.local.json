@@ -10,7 +10,9 @@
       "Bash(netstat:*)",
       "Bash(findstr:*)",
       "Bash(npm run type-check:*)",
-      "Bash(npx vue-tsc:*)"
+      "Bash(npx vue-tsc:*)",
+      "Bash(rm:*)",
+      "Bash(dir:*)"
     ]
   }
 }
