@@ -21,6 +21,9 @@
   --transition-normal: all 0.3s ease;
 }
 
+button{
+  cursor: pointer;
+}
 body {
   font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
   background-color: var(--gray-100);

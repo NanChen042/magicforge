@@ -1,6 +1,120 @@
 <template>
-  <!-- 全屏容器 -->
-  <div class="relative w-full h-screen overflow-hidden bg-slate-900 font-sans select-none" @click="handleGlobalClick">
+  <!-- 游戏封面（未开始时显示） -->
+  <div v-if="!gameStarted" class="relative w-full h-screen overflow-hidden bg-slate-900 font-sans">
+    <!-- 背景 -->
+    <div class="absolute inset-0">
+      <img 
+        src="../assets/fengmian.png" 
+        class="w-full h-full object-cover opacity-40"
+        alt="Background"
+      />
+      <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
+    </div>
+
+    <!-- 封面内容 -->
+    <div class="relative z-10 h-full flex flex-col items-center justify-center px-6">
+      <!-- 标题 -->
+      <div class="text-center mb-12 animate-fade-in-down">
+        <div class="text-amber-400 text-sm font-mono tracking-[0.5em] mb-4">INTERACTIVE FICTION</div>
+        <h1 class="text-5xl md:text-7xl font-bold text-white tracking-wider mb-4">
+          第<span class="text-amber-400">13</span>号列车
+        </h1>
+        <p class="text-slate-400 text-lg max-w-md mx-auto">
+          近地轨道实验舱 · 时间循环 · 赛博朋克悬疑
+        </p>
+      </div>
+
+      <!-- 配置面板 -->
+      <div class="w-full max-w-md space-y-6 bg-slate-900/80 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
+        <!-- 模式选择 -->
+        <div>
+          <div class="text-sm font-medium text-slate-400 mb-3">游戏模式</div>
+          <div class="grid grid-cols-2 gap-3">
+            <button 
+              @click="enableAI = true"
+              class="p-4 rounded-xl border-2 transition-all text-left"
+              :class="enableAI 
+                ? 'border-emerald-500 bg-emerald-500/10' 
+                : 'border-slate-700 hover:border-slate-600 bg-slate-800/50'"
+            >
+              <div class="w-8 h-8 mb-2 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+              </div>
+              <div class="font-bold text-white">AI 动态</div>
+              <div class="text-xs text-slate-400 mt-1">AI 生成场景描述</div>
+            </button>
+            <button 
+              @click="enableAI = false"
+              class="p-4 rounded-xl border-2 transition-all text-left"
+              :class="!enableAI 
+                ? 'border-blue-500 bg-blue-500/10' 
+                : 'border-slate-700 hover:border-slate-600 bg-slate-800/50'"
+            >
+              <div class="w-8 h-8 mb-2 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+              </div>
+              <div class="font-bold text-white">静态模式</div>
+              <div class="text-xs text-slate-400 mt-1">预设剧本，无需 API</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- AI 模型选择 -->
+        <div v-if="enableAI">
+          <div class="text-sm font-medium text-slate-400 mb-3">AI 模型</div>
+          <el-select 
+            v-model="selectedModel" 
+            placeholder="选择模型" 
+            class="w-full"
+            size="large"
+          >
+            <el-option 
+              v-for="model in fastModels" 
+              :key="model.id" 
+              :label="model.name" 
+              :value="model.id"
+            >
+              <div class="flex items-center justify-between w-full">
+                <span>{{ model.name }}</span>
+                <span class="text-xs text-gray-400">{{ model.description }}</span>
+              </div>
+            </el-option>
+          </el-select>
+          
+          <!-- API Key 提示 -->
+          <div v-if="!apiStore.apiKey" class="mt-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+            <div class="text-sm text-amber-400">
+              未配置 API Key，请先在主页设置
+            </div>
+          </div>
+        </div>
+
+        <!-- 开始按钮 -->
+        <button 
+          @click="startGame"
+          :disabled="enableAI && !apiStore.apiKey"
+          class="w-full py-4 rounded-xl font-bold text-lg tracking-wider transition-all duration-300"
+          :class="enableAI && !apiStore.apiKey 
+            ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
+            : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-400 hover:to-orange-400 shadow-lg shadow-amber-500/30'"
+        >
+          开始游戏
+        </button>
+      </div>
+
+      <!-- 底部提示 -->
+      <div class="mt-8 text-slate-500 text-sm">
+        点击屏幕推进剧情 · 选择决定命运
+      </div>
+    </div>
+  </div>
+
+  <!-- 游戏主界面（开始后显示） -->
+  <div v-else class="relative w-full h-screen overflow-hidden bg-slate-900 font-sans select-none" @click="handleGlobalClick">
     <!-- 1. 背景层 (带淡入淡出过渡) -->
     <transition name="fade-slow">
       <div :key="currentSceneData?.bgImage || 'default-bg'" class="absolute inset-0 z-0">
@@ -37,15 +151,32 @@
         </div>
       </div>
 
-      <!-- 右上角：碎片收集 -->
-      <div class="flex gap-3 pointer-events-auto">
-        <el-tooltip v-for="frag in allFragments" :key="frag.id" :content="hasFragment(frag.id) ? frag.name : '未解锁'" placement="bottom" effect="dark">
-          <div class="relative flex items-center justify-center w-10 h-10 rounded-lg border backdrop-blur-md transition-all duration-500" :class="hasFragment(frag.id)
-            ? 'border-amber-400/50 bg-amber-500/10 shadow-[0_0_15px_rgba(251,191,36,0.2)]'
-            : 'border-white/10 bg-black/20 grayscale'">
-            <component :is="hasFragment(frag.id) ? 'Key' : 'Lock'" class="w-4 h-4 text-amber-100" />
-          </div>
+      <!-- 右上角：碎片收集 + AI 设置 -->
+      <div class="flex items-center gap-4 pointer-events-auto">
+        <!-- AI 设置按钮（返回封面） -->
+        <el-tooltip :content="enableAI ? `AI 模式 (${selectedModelName}) - 点击返回设置` : '静态模式 - 点击返回设置'" placement="bottom">
+          <button 
+            @click="gameStarted = false"
+            class="px-3 py-1.5 rounded-lg text-xs font-bold tracking-wider transition-all duration-300 border backdrop-blur-md"
+            :class="enableAI 
+              ? 'bg-emerald-500/20 border-emerald-400/50 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.3)]' 
+              : 'bg-slate-800/50 border-slate-600/50 text-slate-400'"
+          >
+            {{ enableAI ? '🤖 AI' : '📝 静态' }}
+          </button>
         </el-tooltip>
+        
+        <!-- 碎片收集 -->
+        <div class="flex gap-3">
+          <el-tooltip v-for="frag in allFragments" :key="frag.id" :content="hasFragment(frag.id) ? frag.name : '未解锁'" placement="bottom" effect="dark">
+            <div class="relative flex items-center justify-center w-10 h-10 rounded-lg border backdrop-blur-md transition-all duration-500" :class="hasFragment(frag.id)
+              ? 'border-amber-400/50 bg-amber-500/10 shadow-[0_0_15px_rgba(251,191,36,0.2)]'
+              : 'border-white/10 bg-black/20 grayscale'">
+              <el-icon v-if="hasFragment(frag.id)" class="w-4 h-4 text-amber-100"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg></el-icon>
+              <el-icon v-else class="w-4 h-4 text-amber-100"><Lock /></el-icon>
+            </div>
+          </el-tooltip>
+        </div>
       </div>
     </div>
 
@@ -81,8 +212,15 @@
 
           <!-- 剧情文本 -->
           <div class="text-lg md:text-xl text-slate-200 leading-relaxed font-medium tracking-wide font-sans text-shadow-sm min-h-[80px]">
-            <span v-html="displayedText"></span>
-            <span v-if="isTyping" class="inline-block w-2 h-5 ml-1 bg-amber-400 animate-pulse align-middle shadow-[0_0_8px_rgba(251,191,36,0.8)]"></span>
+            <!-- AI 生成中提示 -->
+            <div v-if="isAIGenerating" class="flex items-center gap-3 text-amber-400/80">
+              <el-icon class="animate-spin"><Loading /></el-icon>
+              <span class="animate-pulse">AI 正在构思场景...</span>
+            </div>
+            <template v-else>
+              <span v-html="displayedText"></span>
+              <span v-if="isTyping" class="inline-block w-2 h-5 ml-1 bg-amber-400 animate-pulse align-middle shadow-[0_0_8px_rgba(251,191,36,0.8)]"></span>
+            </template>
           </div>
 
           <!-- 下一步提示 (仅在线性剧情且打字结束时显示) -->
@@ -132,10 +270,18 @@
         <!-- 结局 - 重启按钮 -->
         <transition name="zoom-in">
           <div v-if="currentSceneData?.isEnding && !isTyping" class="absolute bottom-[130%] w-full flex flex-col items-center gap-4 z-50">
-            <div class="text-6xl animate-pulse">
-              {{ isBadEnding ? '💀' : '🔓' }}
+            <div class="w-16 h-16 rounded-full flex items-center justify-center animate-pulse" :class="isBadEnding ? 'bg-red-500/20 border-2 border-red-500' : 'bg-emerald-500/20 border-2 border-emerald-500'">
+              <svg v-if="isBadEnding" class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+              <svg v-else class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
             </div>
-            <button @click.stop="restartGame" class="px-12 py-4 bg-red-600 hover:bg-red-500 text-white font-bold tracking-[0.2em] text-lg uppercase rounded shadow-[0_0_30px_rgba(220,38,38,0.6)] transition-all transform hover:scale-105 hover:rotate-1 flex items-center gap-3 border border-red-400">
+            <div class="text-sm text-slate-400 uppercase tracking-widest">
+              {{ isBadEnding ? 'GAME OVER' : 'ENDING UNLOCKED' }}
+            </div>
+            <button @click.stop="restartGame" class="px-12 py-4 bg-red-600 hover:bg-red-500 text-white font-bold tracking-[0.2em] text-lg uppercase rounded shadow-[0_0_30px_rgba(220,38,38,0.6)] transition-all transform hover:scale-105 flex items-center gap-3 border border-red-400">
               <el-icon class="animate-spin-slow">
                 <Refresh />
               </el-icon>
@@ -153,15 +299,19 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import {
-  Key,
   Lock,
   CaretBottom,
   Right,
   Refresh,
+  Loading,
 } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
-import trainImage from "../assets/image.png";
-import trainImage2 from "../assets/2.png";
+import { useApiStore } from "@/stores/api";
+import { generateSceneText, type GameContext, type ScenePromptConfig } from "@/services/scenarioAIService";
+import { MODEL_CONFIGS } from "@/constants/modelConfig";
+
+// 快速生成模型列表（对话型，响应快）
+const fastModels = MODEL_CONFIGS.filter(m => m.type === 'chat' || m.type === 'reasoning');
 
 // --- 类型定义 ---
 interface Fragment {
@@ -186,6 +336,9 @@ interface Scene {
   options: Option[]; // 该场景的所有选项
   unlockFragment?: Fragment; // 完成此场景后解锁的碎片
   isEnding?: boolean; // 是否为结局场景
+  // AI 生成相关
+  aiPrompt?: ScenePromptConfig; // AI 生成提示配置
+  useAI?: boolean; // 是否使用 AI 生成（默认 true）
 }
 
 // --- 静态资源映射 (模拟立绘) ---
@@ -218,8 +371,13 @@ const scriptData: Record<string, Scene> = {
       text: "尖锐的刹车声把你硬生生拽醒，冷汗把衬衫贴在背上。车厢霓虹闪烁，空气里有烧焦电路的味道。你又回到这趟列车了：<br>——十三号轨道列车，近地实验舱。<br>你口袋里有一张皱巴巴的纸条，右眼义眼嗡嗡亮着。",
       speaker: "旁白",
       bgImage:
-        "https://images.unsplash.com/photo-1504198266287-1659872e6590?q=80&w=2070&auto=format&fit=crop", // 假设的列车背景
+        "https://images.unsplash.com/photo-1504198266287-1659872e6590?q=80&w=2070&auto=format&fit=crop",
       options: [{ text: "我这是第几次醒了……", nextSceneId: "start_02" }],
+      aiPrompt: {
+        situation: "主角在列车上醒来，发现自己又回到了循环的起点，口袋里有纸条，右眼义眼在闪烁",
+        mood: "迷茫",
+        character: "protagonist"
+      }
     },
 
     // ---------- 通用选择界面 ----------
@@ -385,6 +543,12 @@ const scriptData: Record<string, Scene> = {
         { text: "相信她，跟她去安全舱", nextSceneId: "scene_follow_lin" },
         { text: "怀疑她的动机", nextSceneId: "scene_question_lin" },
       ],
+      aiPrompt: {
+        situation: "主角遇到了红衣少女林，她自称是反抗网成员，询问主角是否有纸条",
+        mood: "神秘",
+        speaker: "林",
+        character: "lin"
+      }
     },
 
     scene_follow_lin: {
@@ -404,6 +568,12 @@ const scriptData: Record<string, Scene> = {
         },
         { text: "暂不表态，先回去收集更多", nextSceneId: "start_02" },
       ],
+      aiPrompt: {
+        situation: "林带主角到隐蔽舱室，解释反抗组织的计划，询问主角是否愿意合作",
+        mood: "希望",
+        speaker: "林",
+        character: "lin"
+      }
     },
 
     scene_question_lin: {
@@ -581,6 +751,10 @@ const scriptData: Record<string, Scene> = {
       text: "病毒生效，监控与杀戮程序被清除。列车进入重启模式。广播变为温和的男声：『重启成功。向可居住轨道进发。』窗外的星海中，新的希望出现。",
       isEnding: true,
       options: [],
+      aiPrompt: {
+        situation: "病毒成功重启了列车系统，监控被清除，列车驶向希望",
+        mood: "希望"
+      }
     },
 
     end_true_admin: {
@@ -595,6 +769,11 @@ const scriptData: Record<string, Scene> = {
       text: "你与林和反抗者一起掌控了列车。广播中再无冷酷命令，乘客互相拥抱，十三号列车驶向希望之星。你们赢了，但代价是记忆残缺与无数牺牲。",
       isEnding: true,
       options: [],
+      aiPrompt: {
+        situation: "主角与林和反抗者合作成功，列车驶向希望，但付出了代价",
+        mood: "希望",
+        character: "lin"
+      }
     },
 
     // ---------- 新增：合作管理员结局 ----------
@@ -659,12 +838,31 @@ const scriptData: Record<string, Scene> = {
   };
 
 // --- 状态管理 ---
+const apiStore = useApiStore();
 const currentSceneId = ref("start_01");
 const displayedText = ref("");
 const isTyping = ref(false);
 const isResetting = ref(false);
 const userFragments = ref<Set<string>>(new Set());
 const loopCount = ref(1);
+const isAIGenerating = ref(false); // AI 生成中状态
+const enableAI = ref(true); // 是否启用 AI 生成
+const lastChoice = ref(""); // 上一个选择
+const sceneCache = ref<Map<string, string>>(new Map()); // 缓存已生成的场景文本
+const selectedModel = ref('Qwen/Qwen2.5-7B-Instruct'); // 选择的模型
+const gameStarted = ref(false); // 游戏是否已开始
+
+// 获取选中模型的名称
+const selectedModelName = computed(() => {
+  const model = fastModels.find(m => m.id === selectedModel.value);
+  return model?.name || '未知模型';
+});
+
+// 开始游戏
+const startGame = () => {
+  gameStarted.value = true;
+  loadScene("start_01");
+};
 
 const currentSceneData = computed(() => scriptData[currentSceneId.value]);
 
@@ -678,6 +876,8 @@ const isLinearScene = computed(() => {
 
   // 检查这唯一的选项是否被锁定
   const soleOption = opts[0];
+  if (!soleOption) return false;
+  
   if (
     soleOption.reqFragment &&
     !userFragments.value.has(soleOption.reqFragment)
@@ -687,9 +887,9 @@ const isLinearScene = computed(() => {
 
   return true;
 });
-// ★★★ 新增：判断当前是否可以点击下一步 ★★★
+// 判断当前是否可以点击下一步
 const canClickNext = computed(() => {
-  return !isTyping.value && isLinearScene.value;
+  return !isTyping.value && !isAIGenerating.value && isLinearScene.value;
 });
 
 // 计算是否为坏结局 (用于显示不同图标)
@@ -713,11 +913,16 @@ const getFragmentName = (id?: string) =>
 const hasFragment = (id: string) => userFragments.value.has(id);
 // 1. 全局点击（处理背景点击）
 const handleGlobalClick = () => {
+  // AI 生成中不响应点击
+  if (isAIGenerating.value) return;
   handleBoxClick();
 };
 
 // 2. 对话框点击（核心逻辑）
 const handleBoxClick = () => {
+  // AI 生成中不响应点击
+  if (isAIGenerating.value) return;
+  
   // 情况A：正在打字 -> 瞬间显示全文
   if (isTyping.value) {
     finishTyping();
@@ -725,8 +930,8 @@ const handleBoxClick = () => {
   }
 
   // 情况B：打字结束 且 是线性剧情 -> 进入下一场景
-  if (isLinearScene.value) {
-    const nextId = currentSceneData.value!.options[0].nextSceneId;
+  if (isLinearScene.value && currentSceneData.value?.options?.[0]) {
+    const nextId = currentSceneData.value.options[0].nextSceneId;
     loadScene(nextId);
   }
 
@@ -772,21 +977,6 @@ const finishTyping = (resolve?: () => void) => {
   if (resolve) resolve();
 };
 
-// 屏幕点击处理
-const handleScreenClick = () => {
-  // 1. 如果正在打字，点击瞬间显示全文
-  if (isTyping) {
-    finishTyping();
-    return;
-  }
-
-  // 2. 如果是线性剧情（只有一个选项），点击屏幕进入下一段
-  if (isLinearScene.value) {
-    const nextId = currentSceneData.value!.options[0].nextSceneId;
-    loadScene(nextId);
-  }
-};
-
 const loadScene = async (sceneId: string) => {
   const scene = scriptData[sceneId];
   if (!scene) return;
@@ -807,17 +997,72 @@ const loadScene = async (sceneId: string) => {
     });
   }
 
-  await typeWriter(scene.text);
+  // 构建缓存 key（包含循环次数，因为不同循环可能生成不同文本）
+  const cacheKey = `${sceneId}_loop${loopCount.value}`;
+
+  // 检查缓存
+  if (sceneCache.value.has(cacheKey)) {
+    await typeWriter(sceneCache.value.get(cacheKey)!);
+    return;
+  }
+
+  // 构建游戏上下文
+  const gameContext: GameContext = {
+    loopCount: loopCount.value,
+    fragments: Array.from(userFragments.value).map(id => getFragmentName(id)),
+    visitedScenes: [], // 可以后续扩展
+    lastChoice: lastChoice.value
+  };
+
+  // 判断是否使用 AI 生成
+  const shouldUseAI = enableAI.value && 
+                      scene.useAI !== false && 
+                      apiStore.apiKey && 
+                      scene.aiPrompt;
+
+  let textToDisplay = scene.text;
+
+  if (shouldUseAI && scene.aiPrompt) {
+    try {
+      isAIGenerating.value = true;
+      
+      const aiText = await generateSceneText(
+        scene.aiPrompt,
+        gameContext,
+        apiStore.apiKey,
+        apiStore.apiUrl,
+        selectedModel.value // 使用用户选择的模型
+      );
+      
+      if (aiText && aiText !== scene.aiPrompt.situation) {
+        textToDisplay = aiText;
+      }
+    } catch (err) {
+      console.error('AI 场景生成失败，使用静态文本:', err);
+    } finally {
+      isAIGenerating.value = false;
+    }
+  }
+
+  // 缓存生成的文本
+  sceneCache.value.set(cacheKey, textToDisplay);
+
+  await typeWriter(textToDisplay);
 };
 
 const handleSelect = (option: Option) => {
+  // AI 生成中或正在打字时不响应
+  if (isAIGenerating.value || isTyping.value) return;
   if (option.locked) return;
+  lastChoice.value = option.text; // 记录选择
   loadScene(option.nextSceneId);
 };
 
 const restartGame = () => {
   isResetting.value = true; // 触发白屏闪光
   loopCount.value++;
+  sceneCache.value.clear(); // 清空场景缓存，新循环生成新文本
+  lastChoice.value = ""; // 重置选择记录
 
   setTimeout(() => {
     displayedText.value = "";
@@ -827,11 +1072,16 @@ const restartGame = () => {
 };
 
 onMounted(() => {
-  loadScene("start_01");
+  // 不自动加载场景，等用户在配置弹窗点击开始
 });
 </script>
 
 <style scoped>
+/* 封面动画 */
+.animate-fade-in-down {
+  animation: fadeInDown 1s ease-out;
+}
+
 /* 背景缓慢移动效果 */
 .animate-slow-pan {
   animation: pan 20s infinite alternate ease-in-out;
