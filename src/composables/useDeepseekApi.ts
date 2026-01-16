@@ -16,7 +16,7 @@ export function useDeepseekApi() {
   const isThinking = ref(false);
 
   // 聊天历史
-  const conversationHistory = reactive<Array<{role: string; content: string}>>([]);
+  const conversationHistory = reactive<Array<{role: string; content: string; images?: string[]}>>([]);
 
   // 思维链内容
   const reasoningContent = ref('');
@@ -48,13 +48,21 @@ export function useDeepseekApi() {
     temperature?: number;
     maxTokens?: number;
     model?: string;
+    topP?: number;
+    topK?: number;
+    frequencyPenalty?: number;
+    presencePenalty?: number;
   }) => {
     return new DeepseekClient({
       apiKey: apiKey.value,
       baseURL: apiUrl.value,
       temperature: options?.temperature || API_CONFIG.temperature,
       maxTokens: options?.maxTokens || API_CONFIG.maxTokens,
-      model: options?.model || API_CONFIG.model
+      model: options?.model || API_CONFIG.model,
+      topP: options?.topP,
+      topK: options?.topK,
+      frequencyPenalty: options?.frequencyPenalty,
+      presencePenalty: options?.presencePenalty
     });
   };
 
@@ -66,6 +74,12 @@ export function useDeepseekApi() {
       maxTokens?: number;
       model?: string;
       systemPrompt?: string;
+      topP?: number;
+      topK?: number;
+      frequencyPenalty?: number;
+      presencePenalty?: number;
+      images?: Array<{ base64: string; mimeType?: string }>;
+      imageUrls?: string[]; // 图片预览 URL，用于显示在对话中
     }
   ) => {
     if (!message.trim()) return null;
@@ -75,14 +89,39 @@ export function useDeepseekApi() {
       isProcessing.value = true;
       isThinking.value = true;
 
+      // 构建用户消息内容（支持图片）
+      let userContent: string | Array<{ type: string; text?: string; image_url?: { url: string } }> = message;
+      
+      if (options?.images && options.images.length > 0) {
+        userContent = [
+          // 先添加图片
+          ...options.images.map(img => ({
+            type: 'image_url' as const,
+            image_url: {
+              url: `data:${img.mimeType || 'image/jpeg'};base64,${img.base64}`
+            }
+          })),
+          // 再添加文本
+          { type: 'text' as const, text: message }
+        ];
+      }
+
       // 添加用户消息到历史
       conversationHistory.push({
         role: 'user',
-        content: message
+        content: typeof userContent === 'string' ? userContent : message, // 历史记录只保存文本
+        images: options?.imageUrls // 保存图片预览 URL
       });
 
       // 准备消息列表
-      const messages = [...conversationHistory];
+      const messages: Array<{ role: string; content: string | Array<{ type: string; text?: string; image_url?: { url: string } }> }> = 
+        conversationHistory.slice(0, -1).map(m => ({ role: m.role, content: m.content }));
+      
+      // 添加当前用户消息（可能包含图片）
+      messages.push({
+        role: 'user',
+        content: userContent
+      });
 
       // 如果有系统提示，添加到最前面
       if (options?.systemPrompt) {
@@ -188,6 +227,12 @@ export function useDeepseekApi() {
       maxTokens?: number;
       model?: string;
       systemPrompt?: string;
+      topP?: number;
+      topK?: number;
+      frequencyPenalty?: number;
+      presencePenalty?: number;
+      images?: Array<{ base64: string; mimeType?: string }>;
+      imageUrls?: string[]; // 图片预览 URL，用于显示在对话中
     }
   ) => {
     if (!message.trim()) return null;
@@ -204,10 +249,28 @@ export function useDeepseekApi() {
       // 创建新的abort controller
       abortController.value = new AbortController();
 
-      // 添加用户消息到历史
+      // 构建用户消息内容（支持图片）
+      let userContent: string | Array<{ type: string; text?: string; image_url?: { url: string } }> = message;
+      
+      if (options?.images && options.images.length > 0) {
+        userContent = [
+          // 先添加图片
+          ...options.images.map(img => ({
+            type: 'image_url' as const,
+            image_url: {
+              url: `data:${img.mimeType || 'image/jpeg'};base64,${img.base64}`
+            }
+          })),
+          // 再添加文本
+          { type: 'text' as const, text: message }
+        ];
+      }
+
+      // 添加用户消息到历史（只保存文本）
       conversationHistory.push({
         role: 'user',
-        content: message
+        content: message,
+        images: options?.imageUrls // 保存图片预览 URL
       });
 
       // 添加AI响应占位
@@ -217,8 +280,16 @@ export function useDeepseekApi() {
         content: ''
       });
 
-      // 准备消息列表
-      const messages = [...conversationHistory.slice(0, -1)]; // 不包含最后一个空AI响应
+      // 准备消息列表（不包含最后一个空AI响应）
+      const historyMessages = conversationHistory.slice(0, -2); // 不包含刚添加的用户消息和空AI响应
+      const messages: Array<{ role: string; content: string | Array<{ type: string; text?: string; image_url?: { url: string } }> }> = 
+        historyMessages.map(m => ({ role: m.role, content: m.content }));
+      
+      // 添加当前用户消息（可能包含图片）
+      messages.push({
+        role: 'user',
+        content: userContent
+      });
 
       // 如果有系统提示，添加到最前面
       if (options?.systemPrompt) {

@@ -4,7 +4,7 @@
     - 使用 min-h-screen：保证至少占满一屏，内容多时自动长高。
     - flex flex-col：垂直弹性布局。
   -->
-  <div class="min-h-screen w-full relative font-sans selection:bg-indigo-500/30 flex flex-col">
+  <div class="h-screen w-full relative font-sans selection:bg-indigo-500/30 flex flex-col overflow-hidden">
 
     <!-- =========================================================================
          1. 全局沉浸式背景 (保持不变)
@@ -104,7 +104,7 @@
        - pt-16 md:pt-20: 必须加这个！因为 Header 是 fixed 的，不占位置，
          如果不加 padding，main 的内容会被 header 挡住。
     -->
-    <main class="flex-1 w-full pt-16 md:pt-20 px-4 md:px-8 box-border relative z-10">
+    <main class="flex-1 w-full pt-16 md:pt-20 px-4 md:px-8 box-border relative overflow-auto">
       <div class="max-w-7xl mx-auto h-full">
         <router-view />
       </div>
@@ -117,7 +117,7 @@
        只是一个普通的块级元素，不需要 fixed，不需要 absolute。
        因为 main 是 flex-1，所以 footer 会自然排在 main 后面。
     -->
-    <footer class="relative z-10 text-center text-slate-400 text-sm py-8 border-t border-slate-200/60 bg-white/40 backdrop-blur-sm">
+    <footer class="relative z-1 text-center text-slate-400 text-sm py-8 border-t border-slate-200/60 bg-white/40 backdrop-blur-sm">
       <p>© 2025 AI Vista Platform. Design for Future.</p>
     </footer>
 
@@ -135,13 +135,11 @@ import {
   Document,
   Setting
 } from '@element-plus/icons-vue';
-import axios from 'axios';
 
 const mobileMenuOpen = ref(false);
 
-// 定义 QQ 号
-const qq = '1159063863';
-const imageUrl = ref(`https://q1.qlogo.cn/g?b=qq&nk=${qq}&s=640`);
+// 直接使用QQ头像URL，避免额外API调用
+const imageUrl = ref('https://q1.qlogo.cn/g?b=qq&nk=1159063863&s=640');
 
 const navItems = [
   { path: '/', name: '首页', icon: House },
@@ -152,12 +150,6 @@ const navItems = [
   { path: '/prompt-library', name: '提示库', icon: Document },
   { path: '/mcp-agent', name: 'MCP配置', icon: Setting }
 ];
-
-// 获取头像逻辑
-axios.get('https://v.api.aa1.cn/api/qqimg/index.php?qq=1159063863').then(res => {
-  const match = res.data.match(/<img\s+src=([^>\s]+)/);
-  imageUrl.value = match ? match[1] : null;
-});
 </script>
 
 <style scoped>

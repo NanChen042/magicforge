@@ -28,7 +28,7 @@ const playerName = ref('')
 const showIntro = ref(true)
 const apiUrl = ref('https://api.siliconflow.cn/v1/chat/completions')
 const apiKey = ref('sk-etybbrewlaafxjjqtlgfeqaaskzrmryfndjtjjecyixbsznw')
-const modelName = ref('deepseek-ai/DeepSeek-R1-Distill-Qwen-7B')
+const modelName = ref('Qwen/Qwen2.5-7B-Instruct')
 const loading = ref(false)
 
 // UI 状态
@@ -412,7 +412,7 @@ const switchTab = (tab: string) => {
 
 // 切换模型
 const changeModel = () => {
-  const models = ['deepseek-ai/DeepSeek-R1-Distill-Qwen-7B', 'deepseek-r1', 'deepseek-chat', 'QwQ-32B']
+  const models = ['Qwen/Qwen2.5-7B-Instruct', 'Qwen/Qwen3-8B', 'THUDM/GLM-4-9B-Chat', 'Qwen/Qwen2-7B-Instruct']
   const currentIndex = models.indexOf(modelName.value)
   const nextIndex = (currentIndex + 1) % models.length
 

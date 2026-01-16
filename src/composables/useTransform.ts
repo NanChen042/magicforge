@@ -77,6 +77,13 @@ export function useTransform() {
   };
 
   /**
+   * 更新转换结果
+   */
+  const updateTransformResult = (result: TransformResult) => {
+    transformResult.value = result;
+  };
+
+  /**
    * 打开转换模态框
    */
   const openTransformModal = () => {
@@ -98,6 +105,7 @@ export function useTransform() {
     selectedTransformMode,
     performTransform,
     applyTransform,
+    updateTransformResult,
     openTransformModal,
     closeTransformModal
   };

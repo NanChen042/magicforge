@@ -19,7 +19,8 @@ export function useScroll() {
     // 更精确地检测是否在底部
     const isAtBottom = scrollOffset < 50;
 
-    // 只有当用户手动滚动且不在底部时，才禁用自动滚动
+    // 当用户手动滚动离开底部时，禁用自动滚动
+    // 只有当用户滚动回底部时，才重新启用自动滚动
     shouldAutoScroll.value = isAtBottom;
 
     // 标记用户正在滚动
@@ -35,13 +36,13 @@ export function useScroll() {
   /**
    * 防抖处理的滚动到底部函数
    */
-  const debouncedScrollToBottom = debounce((container: HTMLElement | null, forceScroll = false, isProcessing = false, isThinking = false) => {
+  const debouncedScrollToBottom = debounce((container: HTMLElement | null, forceScroll = false) => {
     if (!container) return;
 
-    const shouldScroll = forceScroll ||
-                        (shouldAutoScroll.value && !isUserScrolling.value) ||
-                        isThinking ||
-                        isProcessing;
+    // 只有在以下情况才滚动：
+    // 1. 强制滚动（如首次加载、清空对话等）
+    // 2. 用户没有手动滚动离开底部（shouldAutoScroll 为 true）
+    const shouldScroll = forceScroll || (shouldAutoScroll.value && !isUserScrolling.value);
 
     if (shouldScroll) {
       container.style.scrollBehavior = 'smooth';
@@ -70,17 +71,28 @@ export function useScroll() {
 
   /**
    * 滚动到底部
+   * @param container 滚动容器
+   * @param forceScroll 是否强制滚动（忽略用户滚动状态）
    */
-  const scrollToBottom = (container: HTMLElement | null, forceScroll = false, isProcessing = false, isThinking = false) => {
+  const scrollToBottom = (container: HTMLElement | null, forceScroll = false) => {
     nextTick(() => {
-      debouncedScrollToBottom(container, forceScroll, isProcessing, isThinking);
+      debouncedScrollToBottom(container, forceScroll);
     });
+  };
+
+  /**
+   * 重置自动滚动状态（用于新对话开始时）
+   */
+  const resetAutoScroll = () => {
+    shouldAutoScroll.value = true;
+    isUserScrolling.value = false;
   };
 
   return {
     shouldAutoScroll,
     isUserScrolling,
     handleScroll,
-    scrollToBottom
+    scrollToBottom,
+    resetAutoScroll
   };
 }

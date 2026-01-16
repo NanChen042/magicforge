@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia'
+import { DEFAULT_MODEL_ID, DEFAULT_API_URL } from '@/constants/modelConfig'
 
 export const useApiStore = defineStore('api', {
   state: () => ({
-    apiUrl: localStorage.getItem('apiUrl') || '',
+    apiUrl: localStorage.getItem('apiUrl') || DEFAULT_API_URL,
     apiKey: localStorage.getItem('apiKey') || '',
-    modelName: localStorage.getItem('modelName') || 'deepseek-ai/DeepSeek-R1-Distill-Qwen-7B',
+    modelName: localStorage.getItem('modelName') || DEFAULT_MODEL_ID,
   }),
 
   actions: {

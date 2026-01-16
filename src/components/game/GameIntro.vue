@@ -10,7 +10,7 @@ const emit = defineEmits<{
 // 状态
 const playerName = ref('')
 const apiKey = ref('')
-const modelName = ref('deepseek-ai/DeepSeek-R1-Distill-Qwen-7B')
+const modelName = ref('Qwen/Qwen2.5-7B-Instruct')
 const customModelName = ref('')
 const showConfig = ref(false)
 

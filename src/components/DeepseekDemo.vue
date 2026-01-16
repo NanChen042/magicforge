@@ -10,6 +10,10 @@
         v-model:streaming="streaming"
         v-model:temperature="temperature"
         v-model:maxTokens="maxTokens"
+        v-model:topP="topP"
+        v-model:topK="topK"
+        v-model:frequencyPenalty="frequencyPenalty"
+        v-model:presencePenalty="presencePenalty"
       />
 
       <ChatPanel
@@ -22,29 +26,30 @@
         :error="error"
         :streamProgress="streamProgress"
         :userInput="userInput"
-        :isSearching="isSearching"
         :isTransforming="isTransforming"
-        :enableWebSearch="enableWebSearch"
         :hotTopics="hotTopics"
         :isLoadingTopics="isLoadingTopics"
+        :showReasoningTab="showReasoningTab"
+        :modelType="currentModelType"
+        :followUpSuggestions="followUpSuggestions"
+        :isLoadingFollowUp="isLoadingFollowUp"
+        :showFollowUp="showFollowUp"
+        :supportsVision="supportsVision"
+        :uploadedImages="uploadedImages"
         @update:userInput="userInput = $event"
-        @update:enableWebSearch="enableWebSearch = $event"
         @send="handleSendMessage"
         @clear="handleClearConversation"
         @optimize="handleOptimize"
         @stop="stopGeneration"
         @select-question="handleSelectQuestion"
-        @refresh-topics="refreshHotTopics"
+        @refresh-topics="handleRefreshTopics"
         @scroll="handleScroll"
+        @select-follow-up="handleSelectFollowUp"
+        @refresh-follow-up="handleRefreshFollowUp"
+        @upload-images="handleUploadImages"
+        @remove-image="handleRemoveImage"
       />
     </div>
-
-    <!-- 搜索过程展示 -->
-    <SearchProcessModal
-      v-if="showSearchProcess"
-      :steps="searchSteps"
-      @close="showSearchProcess = false"
-    />
 
     <!-- 关键词转换模态框 -->
     <TransformModal
@@ -57,31 +62,34 @@
       @transform="performTransform"
       @apply="handleApplyTransform"
       @update:selectedMode="selectedTransformMode = $event"
+      @update:transformResult="updateTransformResult"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick, onMounted } from 'vue';
+import { ref, watch, nextTick, onMounted, computed } from 'vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
-import PageHeader from './deepseek/PageHeader.vue';
 import ConfigPanel from './deepseek/ConfigPanel.vue';
 import ChatPanel from './deepseek/ChatPanel.vue';
-import SearchProcessModal from './deepseek/modals/SearchProcessModal.vue';
 import TransformModal from './deepseek/modals/TransformModal.vue';
 import { useDeepseekApi } from '@/composables/useDeepseekApi';
 import { usePromptStore } from '@/stores/prompt';
 import { useHotTopics } from '@/composables/useHotTopics';
 import { useScroll } from '@/composables/useScroll';
-import { useWebSearch } from '@/composables/useWebSearch';
 import { useTransform } from '@/composables/useTransform';
+import { useFollowUpSuggestions } from '@/composables/useFollowUpSuggestions';
+import { isReasoningModel, DEFAULT_MODEL_ID, getModelConfig, supportsVision as checkSupportsVision } from '@/constants/modelConfig';
+
+// 图片上传接口
+interface UploadedImage {
+  file: File;
+  preview: string;
+  base64?: string;
+}
 
 // 定义属性
 const props = defineProps({
-  apiBaseUrl: {
-    type: String,
-    default: "",
-  },
   initialPrompt: {
     type: String,
     default: ''
@@ -93,10 +101,28 @@ const userInput = ref("");
 const streaming = ref(true);
 const temperature = ref(0.7);
 const maxTokens = ref(2000);
+const topP = ref(0.9);
+const topK = ref(0);
+const frequencyPenalty = ref(0);
+const presencePenalty = ref(0);
 const apiStyle = ref<'openai' | 'adapter'>("openai");
-const modelName = ref(localStorage.getItem('modelName') || "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B");
+const modelName = ref(localStorage.getItem('modelName') || DEFAULT_MODEL_ID);
 const isSending = ref(false);
-const enableWebSearch = ref(false);
+
+// 判断当前模型是否支持思考过程
+const showReasoningTab = computed(() => isReasoningModel(modelName.value));
+
+// 获取当前模型类型
+const currentModelType = computed(() => {
+  const config = getModelConfig(modelName.value);
+  return config?.type || 'chat';
+});
+
+// 判断当前模型是否支持视觉输入
+const supportsVision = computed(() => checkSupportsVision(modelName.value));
+
+// 上传的图片列表
+const uploadedImages = ref<UploadedImage[]>([]);
 
 // 获取提示词store
 const promptStore = usePromptStore();
@@ -114,19 +140,13 @@ const {
   isLastMessageStopped,
   sendChatMessage,
   streamChatMessage,
-  stopGeneration
+  stopGeneration,
+  clearHistory
 } = useDeepseekApi();
 
 // 使用 Composables
 const { hotTopics, isLoading: isLoadingTopics, fetchHotTopics, refreshHotTopics } = useHotTopics();
-const { shouldAutoScroll, handleScroll: handleScrollEvent, scrollToBottom } = useScroll();
-const {
-  isSearching,
-  showSearchProcess,
-  searchResult,
-  searchSteps,
-  performSearch
-} = useWebSearch();
+const { shouldAutoScroll, handleScroll: handleScrollEvent, scrollToBottom, resetAutoScroll } = useScroll();
 const {
   showTransformModal,
   isTransforming,
@@ -134,9 +154,27 @@ const {
   selectedTransformMode,
   performTransform: performTransformInternal,
   applyTransform,
+  updateTransformResult,
   openTransformModal,
   closeTransformModal
 } = useTransform();
+
+// 后续问题推荐
+const {
+  suggestions: followUpSuggestions,
+  isLoading: isLoadingFollowUp,
+  generateSuggestions,
+  refreshSuggestions,
+  clearSuggestions
+} = useFollowUpSuggestions();
+
+// 是否显示后续问题推荐
+const showFollowUp = computed(() => {
+  return conversationHistory.length > 0 
+    && !isProcessing.value 
+    && !isThinking.value 
+    && followUpSuggestions.value.length > 0;
+});
 
 // 引用
 const chatPanelRef = ref<InstanceType<typeof ChatPanel> | null>(null);
@@ -152,11 +190,6 @@ if (!apiKey.value) {
 
 // 在组件挂载时初始化数据
 onMounted(() => {
-  // 设置API URL
-  if (props.apiBaseUrl) {
-    apiUrl.value = props.apiBaseUrl;
-  }
-
   // 确保初始状态下滚动到底部
   nextTick(() => {
     scrollToBottomHelper(true);
@@ -174,33 +207,15 @@ onMounted(() => {
   }
 });
 
-// 监听apiBaseUrl变化
-watch(
-  () => props.apiBaseUrl,
-  (newUrl) => {
-    if (newUrl) {
-      apiUrl.value = newUrl;
-    }
-  },
-  { immediate: true }
-);
-
 // 监听对话历史和思维内容变化
 watch([conversationHistory, reasoningContent], async () => {
   await nextTick();
 
-  if (conversationHistory.length <= 1 || !shouldAutoScroll.value) {
-    scrollToBottomHelper(true);
-  } else if (shouldAutoScroll.value || isProcessing.value || isThinking.value) {
-    scrollToBottomHelper(true);
+  // 只有在用户没有手动滚动离开底部时才自动滚动
+  if (shouldAutoScroll.value) {
+    scrollToBottomHelper(false);
   }
 }, { deep: true });
-
-// 监听标签切换
-watch(() => chatPanelRef.value?.activeTab, async () => {
-  await nextTick();
-  scrollToBottomHelper(true);
-});
 
 /**
  * 滚动到底部辅助函数
@@ -208,12 +223,8 @@ watch(() => chatPanelRef.value?.activeTab, async () => {
 const scrollToBottomHelper = (forceScroll = false) => {
   if (!chatPanelRef.value) return;
 
-  const activeTab = chatPanelRef.value.activeTab;
-  const container = activeTab === 'output'
-    ? chatPanelRef.value.chatContainerRef?.containerRef ?? null
-    : chatPanelRef.value.thinkingContainerRef?.containerRef ?? null;
-
-  scrollToBottom(container, forceScroll, isProcessing.value, isThinking.value);
+  const container = chatPanelRef.value.chatContainerRef ?? null;
+  scrollToBottom(container, forceScroll);
 };
 
 /**
@@ -221,6 +232,13 @@ const scrollToBottomHelper = (forceScroll = false) => {
  */
 const handleScroll = (event: Event) => {
   handleScrollEvent(event);
+};
+
+/**
+ * 刷新热门话题（使用 AI 生成）
+ */
+const handleRefreshTopics = () => {
+  refreshHotTopics(apiKey.value, apiUrl.value, modelName.value);
 };
 
 /**
@@ -259,15 +277,16 @@ const handleClearConversation = () => {
     }
   )
     .then(() => {
-      conversationHistory.length = 0;
-      reasoningContent.value = '';
-      isThinking.value = false;
-      isSearching.value = false;
-      showSearchProcess.value = false;
+      // 使用 composable 提供的 clearHistory 方法
+      clearHistory();
+      
+      // 重置其他状态
       showTransformModal.value = false;
-      isProcessing.value = false;
       isSending.value = false;
       userInput.value = '';
+      
+      // 清空后续问题推荐
+      clearSuggestions();
 
       ElMessage({
         type: 'success',
@@ -320,11 +339,111 @@ const handleOptimize = () => {
 };
 
 /**
+ * 选择后续问题
+ */
+const handleSelectFollowUp = (question: string) => {
+  userInput.value = question;
+  // 清空当前推荐
+  clearSuggestions();
+  nextTick(() => {
+    const inputElement = document.getElementById('message-input');
+    if (inputElement) {
+      inputElement.focus();
+    }
+  });
+};
+
+/**
+ * 刷新后续问题推荐
+ */
+const handleRefreshFollowUp = () => {
+  refreshSuggestions(apiKey.value, apiUrl.value, modelName.value);
+};
+
+/**
+ * 处理图片上传
+ */
+const handleUploadImages = async (files: File[]) => {
+  for (const file of files) {
+    // 检查文件类型
+    if (!file.type.startsWith('image/')) {
+      ElMessage.warning(`${file.name} 不是有效的图片文件`);
+      continue;
+    }
+
+    // 检查文件大小 (限制 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      ElMessage.warning(`${file.name} 超过 10MB 大小限制`);
+      continue;
+    }
+
+    // 创建预览 URL
+    const preview = URL.createObjectURL(file);
+
+    // 转换为 base64
+    const base64 = await fileToBase64(file);
+
+    uploadedImages.value.push({
+      file,
+      preview,
+      base64
+    });
+  }
+
+  // 限制最多 4 张图片
+  if (uploadedImages.value.length > 4) {
+    uploadedImages.value = uploadedImages.value.slice(-4);
+    ElMessage.info('最多支持 4 张图片');
+  }
+};
+
+/**
+ * 移除上传的图片
+ */
+const handleRemoveImage = (index: number) => {
+  const removed = uploadedImages.value.splice(index, 1);
+  // 释放预览 URL
+  if (removed[0]?.preview) {
+    URL.revokeObjectURL(removed[0].preview);
+  }
+};
+
+/**
+ * 将文件转换为 base64
+ */
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      // 移除 data:image/xxx;base64, 前缀
+      const commaIndex = result.indexOf(',');
+      const base64 = commaIndex >= 0 ? result.substring(commaIndex + 1) : result;
+      resolve(base64);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
+
+/**
+ * 清空上传的图片
+ */
+const clearUploadedImages = () => {
+  uploadedImages.value.forEach(img => {
+    if (img.preview) {
+      URL.revokeObjectURL(img.preview);
+    }
+  });
+  uploadedImages.value = [];
+};
+
+/**
  * 发送消息
  */
 const handleSendMessage = async () => {
-  if (isSending.value || isSearching.value) {
-    console.log("已经在发送或搜索过程中，忽略此次点击");
+  if (isSending.value) {
+    console.log("已经在发送过程中，忽略此次点击");
     return;
   }
 
@@ -340,46 +459,7 @@ const handleSendMessage = async () => {
       console.log("使用临时API Key");
     }
 
-    let input = userInput.value;
-
-    // 如果启用了联网搜索，先进行搜索增强
-    if (enableWebSearch.value && apiKey.value && apiUrl.value) {
-      try {
-        input = await performSearch(input, apiKey.value, apiUrl.value, modelName.value);
-
-        // 在对话历史中添加搜索信息
-        if (searchResult.value) {
-          const searchInfo = `🔍 **联网搜索增强完成**
-
-**原始查询：** ${userInput.value}
-
-**搜索结果：** 找到 ${searchResult.value.searchResults.length} 个相关结果
-${searchResult.value.searchResults.map((item, index) =>
-  `${index + 1}. [${item.title}](${item.url}) - ${item.source}`
-).join('\n')}
-
-**搜索摘要：** ${searchResult.value.searchSummary}
-
-**增强查询：** ${searchResult.value.enhancedQuery}
-
-**相关建议：** ${searchResult.value.suggestions.join('、')}`;
-
-          conversationHistory.push({
-            role: 'system',
-            content: searchInfo
-          });
-        }
-      } catch (searchError: any) {
-        console.error('联网搜索失败，停止发送:', searchError.message);
-
-        conversationHistory.push({
-          role: 'system',
-          content: `❌ 联网搜索失败：${searchError.message}\n\n请检查网络连接或稍后重试。`
-        });
-
-        return;
-      }
-    }
+    const input = userInput.value;
 
     // 清除旧的思维内容
     reasoningContent.value = "";
@@ -387,20 +467,36 @@ ${searchResult.value.searchResults.map((item, index) =>
     // 清空输入框
     userInput.value = "";
 
+    // 重置自动滚动状态，确保新消息时滚动到底部
+    resetAutoScroll();
+
     // 自动滚动到最新内容
     await nextTick();
-    scrollToBottomHelper();
+    scrollToBottomHelper(true);
 
     // 根据是否流式处理选择不同的发送方法
     if (streaming.value) {
       isThinking.value = true;
+      const originalInput = input; // 保存原始输入用于生成后续问题
+      
+      // 准备图片数据
+      const images = uploadedImages.value
+        .filter(img => img.base64)
+        .map(img => ({
+          base64: img.base64!,
+          mimeType: img.file.type || 'image/jpeg'
+        }));
+      
+      // 图片预览 URL 列表
+      const imageUrls = uploadedImages.value.map(img => img.preview);
+      
       await streamChatMessage(input, {
-        onContent: (_: string) => {
+        onContent: () => {
           nextTick(() => {
             scrollToBottomHelper();
           });
         },
-        onReasoning: (content: string) => {
+        onReasoning: () => {
           // 思维内容更新
         },
         onError: (error: any) => {
@@ -408,18 +504,70 @@ ${searchResult.value.searchResults.map((item, index) =>
         },
         onComplete: () => {
           isThinking.value = false;
+          // 生成后续问题推荐
+          const lastMessage = conversationHistory[conversationHistory.length - 1];
+          if (lastMessage && lastMessage.role === 'assistant') {
+            generateSuggestions(
+              originalInput,
+              lastMessage.content,
+              apiKey.value,
+              apiUrl.value,
+              modelName.value
+            );
+          }
         }
       }, {
         temperature: temperature.value,
         maxTokens: maxTokens.value,
-        model: modelName.value
+        model: modelName.value,
+        topP: topP.value,
+        topK: topK.value,
+        frequencyPenalty: frequencyPenalty.value,
+        presencePenalty: presencePenalty.value,
+        images: images.length > 0 ? images : undefined,
+        imageUrls: imageUrls.length > 0 ? imageUrls : undefined
       });
+      
+      // 清空上传的图片（不释放 URL，因为对话历史还需要显示）
+      uploadedImages.value = [];
     } else {
+      // 准备图片数据
+      const images = uploadedImages.value
+        .filter(img => img.base64)
+        .map(img => ({
+          base64: img.base64!,
+          mimeType: img.file.type || 'image/jpeg'
+        }));
+      
+      // 图片预览 URL 列表
+      const imageUrls = uploadedImages.value.map(img => img.preview);
+      
       await sendChatMessage(input, {
         temperature: temperature.value,
         maxTokens: maxTokens.value,
-        model: modelName.value
+        model: modelName.value,
+        topP: topP.value,
+        topK: topK.value,
+        frequencyPenalty: frequencyPenalty.value,
+        presencePenalty: presencePenalty.value,
+        images: images.length > 0 ? images : undefined,
+        imageUrls: imageUrls.length > 0 ? imageUrls : undefined
       });
+      
+      // 清空上传的图片（不释放 URL，因为对话历史还需要显示）
+      uploadedImages.value = [];
+      
+      // 非流式模式也生成后续问题
+      const lastMessage = conversationHistory[conversationHistory.length - 1];
+      if (lastMessage && lastMessage.role === 'assistant') {
+        generateSuggestions(
+          input,
+          lastMessage.content,
+          apiKey.value,
+          apiUrl.value,
+          modelName.value
+        );
+      }
     }
 
     await nextTick();
@@ -433,96 +581,46 @@ ${searchResult.value.searchResults.map((item, index) =>
 </script>
 
 <style scoped>
-/* Markdown 优化样式 */
+/* 全局 Markdown 样式覆盖 */
 :deep(.markdown-body) {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-size: 15px;
-  line-height: 1.7;
+  line-height: 1.75;
   word-wrap: break-word;
-  color: #24292e;
+  color: #374151;
   max-width: 100%;
 }
 
-:deep(.markdown-body h1),
-:deep(.markdown-body h2),
-:deep(.markdown-body h3),
-:deep(.markdown-body h4),
-:deep(.markdown-body h5),
-:deep(.markdown-body h6) {
-  margin-top: 28px;
-  margin-bottom: 18px;
-  font-weight: 600;
-  line-height: 1.3;
-  letter-spacing: -0.01em;
-  color: #1a202c;
-}
-
-:deep(.markdown-body h1) {
-  font-size: 1.9em;
-  padding-bottom: 0.3em;
-  border-bottom: 1px solid #edf2f7;
-}
-
-:deep(.markdown-body h2) {
-  font-size: 1.5em;
-  padding-bottom: 0.3em;
-  border-bottom: 1px solid #edf2f7;
-}
-
-:deep(.markdown-body p) {
-  margin-top: 0;
-  margin-bottom: 18px;
-}
-
-:deep(.markdown-body ul),
-:deep(.markdown-body ol) {
-  padding-left: 2em;
-  margin-top: 0;
-  margin-bottom: 18px;
-}
-
-:deep(.markdown-body blockquote) {
-  padding: 0.75em 1em;
-  margin-left: 0;
-  margin-right: 0;
-  margin-bottom: 18px;
-  color: #4a5568;
-  background-color: #f8fafc;
-  border-left: 4px solid #e2e8f0;
-  border-radius: 0 4px 4px 0;
-}
-
-:deep(.markdown-body pre) {
-  margin-top: 0;
-  margin-bottom: 18px;
-  padding: 16px;
-  overflow: auto;
-  font-size: 85%;
-  line-height: 1.5;
-  background-color: #f8fafc;
-  border-radius: 6px;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-:deep(.markdown-body code) {
-  padding: 0.2em 0.4em;
-  margin: 0;
-  font-size: 85%;
-  background-color: rgba(226, 232, 240, 0.5);
-  border-radius: 4px;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-}
-
+/* 代码高亮主题 - VS Code Dark+ */
 :deep(.hljs) {
-  background: #0d1117 !important;
-  color: #c9d1d9 !important;
-  padding: 1rem !important;
-  border-radius: 0 !important;
-  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace !important;
-  font-size: 0.9rem !important;
-  line-height: 1.5 !important;
-  tab-size: 2;
+  background: transparent !important;
+  color: #d4d4d4 !important;
+  padding: 0 !important;
 }
+
+:deep(.hljs-keyword) { color: #569cd6; }
+:deep(.hljs-string) { color: #ce9178; }
+:deep(.hljs-number) { color: #b5cea8; }
+:deep(.hljs-function) { color: #dcdcaa; }
+:deep(.hljs-comment) { color: #6a9955; font-style: italic; }
+:deep(.hljs-class) { color: #4ec9b0; }
+:deep(.hljs-variable) { color: #9cdcfe; }
+:deep(.hljs-operator) { color: #d4d4d4; }
+:deep(.hljs-punctuation) { color: #d4d4d4; }
+:deep(.hljs-property) { color: #9cdcfe; }
+:deep(.hljs-attr) { color: #9cdcfe; }
+:deep(.hljs-selector-class) { color: #d7ba7d; }
+:deep(.hljs-selector-id) { color: #d7ba7d; }
+:deep(.hljs-tag) { color: #569cd6; }
+:deep(.hljs-name) { color: #569cd6; }
+:deep(.hljs-attribute) { color: #9cdcfe; }
+:deep(.hljs-built_in) { color: #4ec9b0; }
+:deep(.hljs-type) { color: #4ec9b0; }
+:deep(.hljs-params) { color: #9cdcfe; }
+:deep(.hljs-literal) { color: #569cd6; }
+:deep(.hljs-symbol) { color: #b5cea8; }
+:deep(.hljs-meta) { color: #9cdcfe; }
+:deep(.hljs-title) { color: #dcdcaa; }
 
 /* 思维过程样式优化 */
 .thinking-process {
@@ -537,15 +635,6 @@ ${searchResult.value.searchResults.map((item, index) =>
 
 .animate-thinking {
   animation: thinking 2s ease-in-out infinite;
-}
-
-/* 代码块增强样式 */
-:deep(.code-block) {
-  margin: 1.25rem 0;
-  position: relative;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 /* 思考状态提示框动画 */
@@ -578,3 +667,5 @@ ${searchResult.value.searchResults.map((item, index) =>
   animation: glow 1.5s ease-in-out infinite;
 }
 </style>
+
+
