@@ -1,1 +1,0 @@
-import{d as p}from"./pinia-BjCkHraf.js";import{r as m}from"./vue-CjgK3QL3.js";const u=p("prompt",()=>{const t=m("");function r(e){t.value=e}function o(){t.value=""}return{promptText:t,setPromptText:r,clearPromptText:o}});export{u};
