@@ -3,58 +3,62 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8  relative">
       <!-- Hero Refactored: 浅色科技风 + 边缘悬浮特效 -->
       <section class="relative pt-20 pb-32 lg:pt-32 lg:pb-40 text-center overflow-hidden">
-        
+
         <!-- ==================== [新增] 1. 边缘酷炫特效层 ==================== -->
         <div class="absolute inset-0 z-0 pointer-events-none select-none">
-          
+
           <!-- A. 左上角：悬浮的“玻璃逻辑卡片” (3D Floating Card) -->
           <!-- 仅在大屏显示，增加空间进深感 -->
           <div class="absolute top-10 left-[5%] lg:left-[10%] w-48 p-3 rounded-2xl bg-white/40 backdrop-blur-xl border border-white/60 shadow-[0_8px_32px_rgba(31,38,135,0.1)] -rotate-6 animate-float-slow hidden lg:block">
-             <!-- 模拟代码块 -->
-             <div class="flex items-center gap-2 mb-2">
-               <div class="w-2 h-2 rounded-full bg-red-400"></div>
-               <div class="w-2 h-2 rounded-full bg-yellow-400"></div>
-               <div class="w-2 h-2 rounded-full bg-green-400"></div>
-             </div>
-             <div class="space-y-1.5">
-               <div class="h-1.5 w-3/4 bg-slate-400/20 rounded-full"></div>
-               <div class="h-1.5 w-1/2 bg-indigo-500/20 rounded-full"></div>
-               <div class="h-1.5 w-5/6 bg-slate-400/20 rounded-full"></div>
-             </div>
-             <!-- 装饰光泽 -->
-             <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/40 to-transparent rounded-2xl pointer-events-none"></div>
+            <!-- 模拟代码块 -->
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-2 h-2 rounded-full bg-red-400"></div>
+              <div class="w-2 h-2 rounded-full bg-yellow-400"></div>
+              <div class="w-2 h-2 rounded-full bg-green-400"></div>
+            </div>
+            <div class="space-y-1.5">
+              <div class="h-1.5 w-3/4 bg-slate-400/20 rounded-full"></div>
+              <div class="h-1.5 w-1/2 bg-indigo-500/20 rounded-full"></div>
+              <div class="h-1.5 w-5/6 bg-slate-400/20 rounded-full"></div>
+            </div>
+            <!-- 装饰光泽 -->
+            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/40 to-transparent rounded-2xl pointer-events-none"></div>
           </div>
 
           <!-- B. 右上角：动态“神经轨道” (Spinning Orbits) -->
           <div class="absolute -top-20 -right-20 w-[500px] h-[500px] opacity-30">
-             <!-- 轨道 1 -->
-             <div class="absolute inset-0 border border-indigo-200/40 rounded-full animate-spin-slower border-dashed"></div>
-             <!-- 轨道 2 (反向) -->
-             <div class="absolute inset-[15%] border border-violet-200/40 rounded-full animate-reverse-spin border-dotted"></div>
-             <!-- 核心光晕 -->
-             <div class="absolute inset-[30%] bg-gradient-to-br from-indigo-500/5 to-purple-500/5 rounded-full blur-2xl"></div>
+            <!-- 轨道 1 -->
+            <div class="absolute inset-0 border border-indigo-200/40 rounded-full animate-spin-slower border-dashed"></div>
+            <!-- 轨道 2 (反向) -->
+            <div class="absolute inset-[15%] border border-violet-200/40 rounded-full animate-reverse-spin border-dotted"></div>
+            <!-- 核心光晕 -->
+            <div class="absolute inset-[30%] bg-gradient-to-br from-indigo-500/5 to-purple-500/5 rounded-full blur-2xl"></div>
           </div>
 
           <!-- C. 散落的“科技锚点” (Tech Decorators) -->
           <!-- 十字准星 + -->
-          <svg class="absolute top-24 right-[15%] w-6 h-6 text-slate-200" viewBox="0 0 24 24" fill="currentColor"><path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg>
-          <svg class="absolute bottom-24 left-[10%] w-4 h-4 text-slate-200" viewBox="0 0 24 24" fill="currentColor"><path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg>
+          <svg class="absolute top-24 right-[15%] w-6 h-6 text-slate-200" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2h6z" />
+          </svg>
+          <svg class="absolute bottom-24 left-[10%] w-4 h-4 text-slate-200" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2h6z" />
+          </svg>
           <!-- 刻度线 -->
           <div class="absolute bottom-10 right-10 flex gap-2">
-             <div class="w-1 h-4 bg-slate-200"></div>
-             <div class="w-1 h-2 bg-slate-200 mt-2"></div>
-             <div class="w-1 h-4 bg-slate-200"></div>
+            <div class="w-1 h-4 bg-slate-200"></div>
+            <div class="w-1 h-2 bg-slate-200 mt-2"></div>
+            <div class="w-1 h-4 bg-slate-200"></div>
           </div>
         </div>
 
         <!-- ==================== 2. 原有背景装饰 (保留光晕) ==================== -->
         <div class="absolute inset-0 -z-10 pointer-events-none">
-           <div class="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-indigo-500/5 rounded-full blur-[100px] mix-blend-multiply animate-blob"></div>
-           <div class="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+          <div class="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-indigo-500/5 rounded-full blur-[100px] mix-blend-multiply animate-blob"></div>
+          <div class="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
         </div>
 
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          
+
           <!-- 顶部胶囊 -->
           <div class="inline-flex items-center justify-center mb-8 animate-fade-in-up">
             <a href="#" class="group relative inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-sm border border-slate-200 shadow-[0_2px_10px_rgba(0,0,0,0.05)] hover:border-indigo-300 transition-all duration-300">
@@ -103,24 +107,24 @@
 
             <router-link to="/prompt-library" class="group px-8 py-3.5 bg-white text-slate-700 rounded-xl font-medium border border-slate-200 shadow-sm hover:border-indigo-200 hover:text-indigo-600 transition-all duration-300">
               <span class="flex items-center gap-2">
-                 <svg class="w-5 h-5 text-slate-400 group-hover:text-indigo-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 6.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 6.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 6.253" />
-                 </svg>
-                 浏览提示库
+                <svg class="w-5 h-5 text-slate-400 group-hover:text-indigo-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 6.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 6.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 6.253" />
+                </svg>
+                浏览提示库
               </span>
             </router-link>
           </div>
 
           <!-- 底部数据背书 -->
           <div class="mt-16 pt-8 border-t border-slate-200/60 flex flex-col md:flex-row items-center justify-center gap-8 animate-fade-in-up animation-delay-600">
-             <div class="flex items-center gap-2 text-slate-500 text-sm font-medium">
-               <div class="flex -space-x-2">
-                 <div class="w-6 h-6 rounded-full bg-slate-200 border-2 border-white"></div>
-                 <div class="w-6 h-6 rounded-full bg-slate-300 border-2 border-white"></div>
-                 <div class="w-6 h-6 rounded-full bg-slate-400 border-2 border-white"></div>
-               </div>
-               <span>2,000+ 开发者正在使用</span>
-             </div>
+            <div class="flex items-center gap-2 text-slate-500 text-sm font-medium">
+              <div class="flex -space-x-2">
+                <div class="w-6 h-6 rounded-full bg-slate-200 border-2 border-white"></div>
+                <div class="w-6 h-6 rounded-full bg-slate-300 border-2 border-white"></div>
+                <div class="w-6 h-6 rounded-full bg-slate-400 border-2 border-white"></div>
+              </div>
+              <span>2,000+ 开发者正在使用</span>
+            </div>
           </div>
 
         </div>
@@ -161,37 +165,39 @@
               </p>
             </div>
 
-                      <!-- 三大核心卡片：Bento Pro (Glassmorphism + 3D Transforms) -->
+            <!-- 三大核心卡片：Bento Pro (Glassmorphism + 3D Transforms) -->
             <div class="grid md:grid-cols-3 gap-8">
 
               <!-- ==============================================================
                    Feature 1: 深度思考 (Deep Reasoning) - 神经晶格风格
                    ============================================================== -->
               <div class="group relative bg-white/50 backdrop-blur-xl rounded-[2.5rem] p-8 border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-2xl hover:shadow-indigo-500/20 transition-all duration-700 overflow-hidden z-10">
-                
+
                 <!-- [A] 动态背景光效 -->
                 <div class="absolute inset-0 bg-gradient-to-br from-indigo-50/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                 <div class="absolute -right-10 -top-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-[60px] group-hover:bg-indigo-500/20 transition-colors duration-700"></div>
 
                 <!-- [B] 视觉主体：悬浮神经节点 (Neural Node) -->
                 <div class="relative h-48 mb-6 perspective-1000 flex items-center justify-center">
-                   <!-- 装饰网格背景 -->
-                   <div class="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.05)_1px,transparent_1px)] bg-[size:20px_20px] [mask-image:radial-gradient(circle,black,transparent_80%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-                   
-                   <!-- 核心节点动画 -->
-                   <div class="relative w-24 h-24 transform transition-transform duration-700 group-hover:scale-110 group-hover:rotate-12">
-                      <!-- 中心球体 -->
-                      <div class="absolute inset-0 bg-gradient-to-tr from-indigo-600 to-violet-500 rounded-2xl shadow-lg rotate-45 z-10 flex items-center justify-center border border-white/20">
-                        <svg class="w-10 h-10 text-white opacity-90" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                      </div>
-                      <!-- 环绕卫星 (Orbiting Nodes) -->
-                      <div class="absolute -inset-4 border border-indigo-200/50 rounded-full animate-[spin_10s_linear_infinite]">
-                        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-indigo-400 rounded-full shadow-[0_0_10px_rgba(99,102,241,0.8)]"></div>
-                      </div>
-                      <div class="absolute -inset-8 border border-dashed border-indigo-200/30 rounded-full animate-[spin_15s_linear_infinite_reverse]">
-                         <div class="absolute bottom-1/2 right-0 translate-y-1/2 w-3 h-3 bg-violet-400 rounded-full"></div>
-                      </div>
-                   </div>
+                  <!-- 装饰网格背景 -->
+                  <div class="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.05)_1px,transparent_1px)] bg-[size:20px_20px] [mask-image:radial-gradient(circle,black,transparent_80%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+
+                  <!-- 核心节点动画 -->
+                  <div class="relative w-24 h-24 transform transition-transform duration-700 group-hover:scale-110 group-hover:rotate-12">
+                    <!-- 中心球体 -->
+                    <div class="absolute inset-0 bg-gradient-to-tr from-indigo-600 to-violet-500 rounded-2xl shadow-lg rotate-45 z-10 flex items-center justify-center border border-white/20">
+                      <svg class="w-10 h-10 text-white opacity-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                    </div>
+                    <!-- 环绕卫星 (Orbiting Nodes) -->
+                    <div class="absolute -inset-4 border border-indigo-200/50 rounded-full animate-[spin_10s_linear_infinite]">
+                      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-indigo-400 rounded-full shadow-[0_0_10px_rgba(99,102,241,0.8)]"></div>
+                    </div>
+                    <div class="absolute -inset-8 border border-dashed border-indigo-200/30 rounded-full animate-[spin_15s_linear_infinite_reverse]">
+                      <div class="absolute bottom-1/2 right-0 translate-y-1/2 w-3 h-3 bg-violet-400 rounded-full"></div>
+                    </div>
+                  </div>
                 </div>
 
                 <!-- [C] 文本内容 -->
@@ -209,62 +215,64 @@
                 </div>
 
                 <!-- 装饰：角落角标 -->
-                <svg class="absolute bottom-6 right-6 w-6 h-6 text-indigo-100 group-hover:text-indigo-500 transition-colors duration-500" viewBox="0 0 24 24" fill="currentColor"><path d="M22 22h-6v-2h4v-4h2v6z"/></svg>
+                <svg class="absolute bottom-6 right-6 w-6 h-6 text-indigo-100 group-hover:text-indigo-500 transition-colors duration-500" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M22 22h-6v-2h4v-4h2v6z" />
+                </svg>
               </div>
 
-                           <!-- Feature 2: 视觉创造 (Visual Creativity) - 终极重构：全息光圈 (The Holographic Iris) -->
+              <!-- Feature 2: 视觉创造 (Visual Creativity) - 终极重构：全息光圈 (The Holographic Iris) -->
               <!-- 设计语言与两侧卡片完全统一：玻璃态 + 悬浮几何 + 呼吸光效 -->
               <div class="group relative bg-white/50 backdrop-blur-xl rounded-[2.5rem] p-8 border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-700 overflow-hidden z-10">
-                
+
                 <!-- [A] 环境氛围光 (保持统一的微光感) -->
                 <div class="absolute inset-0 bg-gradient-to-br from-purple-50/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                 <div class="absolute -left-10 -top-10 w-40 h-40 bg-purple-500/10 rounded-full blur-[60px] group-hover:bg-purple-500/20 transition-colors duration-700"></div>
 
                 <!-- [B] 视觉主体：全息光圈 (悬浮的机械/光学结构) -->
                 <div class="relative h-48 mb-6 flex items-center justify-center perspective-1000">
-                   
-                   <!-- 1. 外层刻度环 (Tech Ring) -->
-                   <!-- 缓慢旋转，代表参数调整 -->
-                   <div class="absolute w-32 h-32 rounded-full border border-dashed border-purple-300/50 animate-[spin_20s_linear_infinite] group-hover:border-purple-400 transition-colors"></div>
-                   
-                   <!-- 2. 玻璃透镜层 (Glass Lens) -->
-                   <!-- 悬浮感核心，Hover时轻微放大 -->
-                   <div class="relative w-24 h-24 rounded-full bg-gradient-to-tr from-white/40 to-white/10 backdrop-blur-md border border-white/60 shadow-xl flex items-center justify-center transition-all duration-700 group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(168,85,247,0.3)] z-10">
-                      
-                      <!-- 内部：七彩光谱 (Spectrum) -->
-                      <!-- 代表多模态生成的无限色彩 -->
-                      <div class="absolute inset-2 rounded-full opacity-80 overflow-hidden">
-                        <div class="w-full h-full bg-[conic-gradient(from_0deg,transparent_0deg,#d8b4fe_90deg,transparent_180deg)] animate-[spin_4s_linear_infinite]"></div>
-                      </div>
-                      
-                      <!-- 核心：瞳孔 (Pupil) -->
-                      <div class="relative w-12 h-12 bg-white rounded-full shadow-inner flex items-center justify-center overflow-hidden">
-                         <!-- 瞳孔内的微光 -->
-                         <div class="absolute inset-0 bg-gradient-to-br from-purple-100 to-indigo-100"></div>
-                         <div class="w-4 h-4 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-600 shadow-lg animate-pulse"></div>
-                      </div>
-                      
-                      <!-- 表面高光反光 -->
-                      <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-white/60 via-transparent to-transparent opacity-50 pointer-events-none"></div>
-                   </div>
 
-                   <!-- 3. 悬浮粒子 (Floating Elements) -->
-                   <!-- 呼应左侧的卫星节点，保持平衡 -->
-                   <div class="absolute w-full h-full animate-[spin_8s_linear_infinite_reverse]">
-                      <div class="absolute top-2 left-1/2 w-2 h-2 bg-purple-400 rounded-full blur-[1px]"></div>
-                      <div class="absolute bottom-8 right-8 w-1.5 h-1.5 bg-fuchsia-400 rounded-full"></div>
-                   </div>
+                  <!-- 1. 外层刻度环 (Tech Ring) -->
+                  <!-- 缓慢旋转，代表参数调整 -->
+                  <div class="absolute w-32 h-32 rounded-full border border-dashed border-purple-300/50 animate-[spin_20s_linear_infinite] group-hover:border-purple-400 transition-colors"></div>
 
-                   <!-- 4. 装饰：取景框线 (Focus Marks) -->
-                   <!-- 增加一点点科技感，不抢戏 -->
-                   <div class="absolute w-40 h-40 opacity-30 transition-all duration-500 group-hover:scale-90 group-hover:opacity-100 group-hover:text-purple-400">
-                      <svg class="w-full h-full" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1">
-                         <path d="M20,20 L30,20 M20,20 L20,30" />
-                         <path d="M80,20 L70,20 M80,20 L80,30" />
-                         <path d="M20,80 L30,80 M20,80 L20,70" />
-                         <path d="M80,80 L70,80 M80,80 L80,70" />
-                      </svg>
-                   </div>
+                  <!-- 2. 玻璃透镜层 (Glass Lens) -->
+                  <!-- 悬浮感核心，Hover时轻微放大 -->
+                  <div class="relative w-24 h-24 rounded-full bg-gradient-to-tr from-white/40 to-white/10 backdrop-blur-md border border-white/60 shadow-xl flex items-center justify-center transition-all duration-700 group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(168,85,247,0.3)] z-10">
+
+                    <!-- 内部：七彩光谱 (Spectrum) -->
+                    <!-- 代表多模态生成的无限色彩 -->
+                    <div class="absolute inset-2 rounded-full opacity-80 overflow-hidden">
+                      <div class="w-full h-full bg-[conic-gradient(from_0deg,transparent_0deg,#d8b4fe_90deg,transparent_180deg)] animate-[spin_4s_linear_infinite]"></div>
+                    </div>
+
+                    <!-- 核心：瞳孔 (Pupil) -->
+                    <div class="relative w-12 h-12 bg-white rounded-full shadow-inner flex items-center justify-center overflow-hidden">
+                      <!-- 瞳孔内的微光 -->
+                      <div class="absolute inset-0 bg-gradient-to-br from-purple-100 to-indigo-100"></div>
+                      <div class="w-4 h-4 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-600 shadow-lg animate-pulse"></div>
+                    </div>
+
+                    <!-- 表面高光反光 -->
+                    <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-white/60 via-transparent to-transparent opacity-50 pointer-events-none"></div>
+                  </div>
+
+                  <!-- 3. 悬浮粒子 (Floating Elements) -->
+                  <!-- 呼应左侧的卫星节点，保持平衡 -->
+                  <div class="absolute w-full h-full animate-[spin_8s_linear_infinite_reverse]">
+                    <div class="absolute top-2 left-1/2 w-2 h-2 bg-purple-400 rounded-full blur-[1px]"></div>
+                    <div class="absolute bottom-8 right-8 w-1.5 h-1.5 bg-fuchsia-400 rounded-full"></div>
+                  </div>
+
+                  <!-- 4. 装饰：取景框线 (Focus Marks) -->
+                  <!-- 增加一点点科技感，不抢戏 -->
+                  <div class="absolute w-40 h-40 opacity-30 transition-all duration-500 group-hover:scale-90 group-hover:opacity-100 group-hover:text-purple-400">
+                    <svg class="w-full h-full" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1">
+                      <path d="M20,20 L30,20 M20,20 L20,30" />
+                      <path d="M80,20 L70,20 M80,20 L80,30" />
+                      <path d="M20,80 L30,80 M20,80 L20,70" />
+                      <path d="M80,80 L70,80 M80,80 L80,70" />
+                    </svg>
+                  </div>
 
                 </div>
 
@@ -272,7 +280,7 @@
                 <div class="relative z-10">
                   <h3 class="text-2xl font-bold text-slate-900 mb-3 tracking-tight group-hover:text-purple-600 transition-colors">视觉与想象</h3>
                   <p class="text-sm text-slate-500 leading-relaxed mb-6 border-l-2 border-purple-100 pl-4 group-hover:border-purple-500 transition-colors">
-                     打破语言的边界。利用多模态大模型，将抽象的文本指令转化为 4K 级的艺术图像与设计素材。
+                    打破语言的边界。利用多模态大模型，将抽象的文本指令转化为 4K 级的艺术图像与设计素材。
                   </p>
 
                   <div class="flex flex-wrap gap-2">
@@ -280,8 +288,10 @@
                     <span class="px-2.5 py-1 rounded-md bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-wider border border-slate-100">Art</span>
                   </div>
                 </div>
-                
-                 <svg class="absolute bottom-6 right-6 w-6 h-6 text-purple-100 group-hover:text-purple-500 transition-colors duration-500" viewBox="0 0 24 24" fill="currentColor"><path d="M22 22h-6v-2h4v-4h2v6z"/></svg>
+
+                <svg class="absolute bottom-6 right-6 w-6 h-6 text-purple-100 group-hover:text-purple-500 transition-colors duration-500" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M22 22h-6v-2h4v-4h2v6z" />
+                </svg>
               </div>
 
 
@@ -290,40 +300,40 @@
                    Feature 3: 互动娱乐 (Interactive) - 时空隧道风格
                    ============================================================== -->
               <div class="group relative bg-white/50 backdrop-blur-xl rounded-[2.5rem] p-8 border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-700 overflow-hidden z-10">
-                
+
                 <div class="absolute inset-0 bg-gradient-to-br from-emerald-50/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                 <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-emerald-500/10 rounded-full blur-[60px] group-hover:bg-emerald-500/20 transition-colors duration-700"></div>
 
                 <!-- [B] 视觉主体：无限流接口 (Infinite Interface) -->
                 <div class="relative h-48 mb-6 flex items-center justify-center perspective-1000">
-                   <!-- 隧道背景圈 -->
-                   <div class="absolute inset-0 flex items-center justify-center opacity-30 group-hover:opacity-60 transition-opacity">
-                      <div class="w-40 h-40 border border-emerald-500/20 rounded-full animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
-                      <div class="absolute w-28 h-28 border border-emerald-500/40 rounded-full animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite_0.5s]"></div>
-                   </div>
-                   
-                   <!-- 悬浮控制器 -->
-                   <div class="relative w-32 h-20 bg-gradient-to-b from-slate-900 to-emerald-950 rounded-2xl border border-emerald-500/30 shadow-2xl transform rotate-x-12 group-hover:rotate-x-0 group-hover:scale-105 transition-all duration-500 flex items-center justify-center overflow-hidden">
-                      <!-- 屏幕发光 -->
-                      <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
-                      <div class="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-emerald-500/20 to-transparent"></div>
-                      
-                      <!-- 动态文字 -->
-                      <div class="flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span class="text-xs font-mono font-bold text-emerald-300 tracking-widest">START</span>
-                      </div>
-                   </div>
+                  <!-- 隧道背景圈 -->
+                  <div class="absolute inset-0 flex items-center justify-center opacity-30 group-hover:opacity-60 transition-opacity">
+                    <div class="w-40 h-40 border border-emerald-500/20 rounded-full animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
+                    <div class="absolute w-28 h-28 border border-emerald-500/40 rounded-full animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite_0.5s]"></div>
+                  </div>
 
-                   <!-- 漂浮粒子 -->
-                   <div class="absolute w-1 h-1 bg-emerald-400 rounded-full top-10 left-10 animate-float-fast"></div>
-                   <div class="absolute w-1.5 h-1.5 bg-emerald-500 rounded-full bottom-10 right-10 animate-float-medium"></div>
+                  <!-- 悬浮控制器 -->
+                  <div class="relative w-32 h-20 bg-gradient-to-b from-slate-900 to-emerald-950 rounded-2xl border border-emerald-500/30 shadow-2xl transform rotate-x-12 group-hover:rotate-x-0 group-hover:scale-105 transition-all duration-500 flex items-center justify-center overflow-hidden">
+                    <!-- 屏幕发光 -->
+                    <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+                    <div class="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-emerald-500/20 to-transparent"></div>
+
+                    <!-- 动态文字 -->
+                    <div class="flex items-center gap-2">
+                      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                      <span class="text-xs font-mono font-bold text-emerald-300 tracking-widest">START</span>
+                    </div>
+                  </div>
+
+                  <!-- 漂浮粒子 -->
+                  <div class="absolute w-1 h-1 bg-emerald-400 rounded-full top-10 left-10 animate-float-fast"></div>
+                  <div class="absolute w-1.5 h-1.5 bg-emerald-500 rounded-full bottom-10 right-10 animate-float-medium"></div>
                 </div>
 
                 <div class="relative z-10">
                   <h3 class="text-2xl font-bold text-slate-900 mb-3 tracking-tight group-hover:text-emerald-600 transition-colors">无限流互动</h3>
                   <p class="text-sm text-slate-500 leading-relaxed mb-6 border-l-2 border-emerald-100 pl-4 group-hover:border-emerald-500 transition-colors">
-                     生成式剧情引擎。打造 Roguelike 游戏与沉浸式互动小说，每一次选择都通向未知的平行宇宙。
+                    生成式剧情引擎。打造 Roguelike 游戏与沉浸式互动小说，每一次选择都通向未知的平行宇宙。
                   </p>
 
                   <div class="flex flex-wrap gap-2">
@@ -332,15 +342,17 @@
                   </div>
                 </div>
 
-                 <svg class="absolute bottom-6 right-6 w-6 h-6 text-emerald-100 group-hover:text-emerald-500 transition-colors duration-500" viewBox="0 0 24 24" fill="currentColor"><path d="M22 22h-6v-2h4v-4h2v6z"/></svg>
+                <svg class="absolute bottom-6 right-6 w-6 h-6 text-emerald-100 group-hover:text-emerald-500 transition-colors duration-500" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M22 22h-6v-2h4v-4h2v6z" />
+                </svg>
               </div>
 
             </div>
 
 
-                      <!-- 底部统计：实时遥测仪表盘 (Telemetry Dashboard) -->
+            <!-- 底部统计：实时遥测仪表盘 (Telemetry Dashboard) -->
             <div class="relative mt-12 pt-10 border-t border-slate-200/60">
-              
+
               <!-- 装饰：顶部流光线条 -->
               <div class="absolute top-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent"></div>
 
@@ -350,7 +362,7 @@
                 <div class="group relative flex flex-col items-center justify-between">
                   <!-- 垂直分割线 (仅在非第一个元素显示，适配响应式可略繁琐，这里用简单右边框替代思路) -->
                   <div class="absolute right-0 top-2 bottom-2 w-px bg-gradient-to-b from-transparent via-slate-200 to-transparent hidden md:block lg:hidden"></div>
-                  
+
                   <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
                     <div class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></div>
                     Latency
@@ -362,9 +374,9 @@
                   </div>
                   <!-- 微型图表：折线 -->
                   <div class="h-6 w-24 mt-3 opacity-30 group-hover:opacity-100 transition-opacity duration-500">
-                     <svg viewBox="0 0 100 20" class="w-full h-full stroke-indigo-500 fill-none" stroke-width="2">
-                       <path d="M0 10 Q 25 10 35 5 T 60 15 T 85 8 T 100 10" vector-effect="non-scaling-stroke" />
-                     </svg>
+                    <svg viewBox="0 0 100 20" class="w-full h-full stroke-indigo-500 fill-none" stroke-width="2">
+                      <path d="M0 10 Q 25 10 35 5 T 60 15 T 85 8 T 100 10" vector-effect="non-scaling-stroke" />
+                    </svg>
                   </div>
                 </div>
 
@@ -383,12 +395,12 @@
                   </div>
                   <!-- 微型图表：柱状 -->
                   <div class="h-6 w-24 mt-3 flex items-end justify-center gap-1 opacity-30 group-hover:opacity-100 transition-opacity duration-500">
-                     <div class="w-1 h-2 bg-purple-400 rounded-t"></div>
-                     <div class="w-1 h-3 bg-purple-400 rounded-t"></div>
-                     <div class="w-1 h-5 bg-purple-500 rounded-t"></div>
-                     <div class="w-1 h-4 bg-purple-500 rounded-t"></div>
-                     <div class="w-1 h-3 bg-purple-400 rounded-t"></div>
-                     <div class="w-1 h-2 bg-purple-300 rounded-t"></div>
+                    <div class="w-1 h-2 bg-purple-400 rounded-t"></div>
+                    <div class="w-1 h-3 bg-purple-400 rounded-t"></div>
+                    <div class="w-1 h-5 bg-purple-500 rounded-t"></div>
+                    <div class="w-1 h-4 bg-purple-500 rounded-t"></div>
+                    <div class="w-1 h-3 bg-purple-400 rounded-t"></div>
+                    <div class="w-1 h-2 bg-purple-300 rounded-t"></div>
                   </div>
                 </div>
 
@@ -407,15 +419,15 @@
                   </div>
                   <!-- 微型图表：正弦波 -->
                   <div class="h-6 w-24 mt-3 opacity-30 group-hover:opacity-100 transition-opacity duration-500 overflow-hidden">
-                     <svg viewBox="0 0 100 20" class="w-full h-full stroke-emerald-500 fill-none" stroke-width="2">
-                       <path d="M0 10 Q 25 20 50 10 T 100 10" class="animate-[dash_2s_linear_infinite]" stroke-dasharray="100" stroke-dashoffset="100" />
-                     </svg>
+                    <svg viewBox="0 0 100 20" class="w-full h-full stroke-emerald-500 fill-none" stroke-width="2">
+                      <path d="M0 10 Q 25 20 50 10 T 100 10" class="animate-[dash_2s_linear_infinite]" stroke-dasharray="100" stroke-dashoffset="100" />
+                    </svg>
                   </div>
                 </div>
 
                 <!-- Metric 4: Uptime (Reliability) -->
                 <div class="group relative flex flex-col items-center justify-between">
-                  
+
                   <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
                     <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
                     SLA Guarantee
@@ -427,9 +439,9 @@
                   </div>
                   <!-- 微型图表：心跳线 -->
                   <div class="h-6 w-24 mt-3 opacity-30 group-hover:opacity-100 transition-opacity duration-500">
-                     <svg viewBox="0 0 100 20" class="w-full h-full stroke-blue-500 fill-none" stroke-width="2">
-                       <path d="M0 10 H 30 L 40 2 L 50 18 L 60 10 H 100" />
-                     </svg>
+                    <svg viewBox="0 0 100 20" class="w-full h-full stroke-blue-500 fill-none" stroke-width="2">
+                      <path d="M0 10 H 30 L 40 2 L 50 18 L 60 10 H 100" />
+                    </svg>
                   </div>
                 </div>
 
@@ -445,12 +457,12 @@
            3. 全新板块：模块化核心面板 (Modular Core Panel)
            ========================================================================= -->
       <section class="relative pb-24">
-        
+
         <!-- 背景装饰：淡雅的点阵 -->
         <div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none"></div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          
+
           <!-- 标题区 -->
           <div class="flex flex-col md:flex-row items-end justify-between mb-12 gap-6">
             <div>
@@ -464,7 +476,7 @@
           <!-- [核心面板容器] -->
           <!-- 使用 bg-white 和 shadow-xl 作为一个整体，内部用 divide 切割 -->
           <div class="relative bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden group">
-            
+
             <!-- 顶部动态扫描线 (Scanner) -->
             <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-indigo-500 to-transparent -translate-x-full group-hover:animate-[scan-fast_2s_linear_infinite] z-20"></div>
 
@@ -476,7 +488,9 @@
                 <!-- 顶部标签 -->
                 <div class="flex justify-between items-start mb-6">
                   <div class="w-10 h-10 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
                   </div>
                   <span class="text-[10px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">MOD_01</span>
                 </div>
@@ -496,7 +510,9 @@
               <div class="relative p-8 hover:bg-slate-50/50 transition-colors duration-300 flex flex-col h-full">
                 <div class="flex justify-between items-start mb-6">
                   <div class="w-10 h-10 rounded-lg bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
                   </div>
                   <span class="text-[10px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">MOD_02</span>
                 </div>
@@ -514,7 +530,9 @@
               <div class="relative p-8 hover:bg-slate-50/50 transition-colors duration-300 flex flex-col h-full">
                 <div class="flex justify-between items-start mb-6">
                   <div class="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
                   </div>
                   <span class="text-[10px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">MOD_03</span>
                 </div>
@@ -532,7 +550,9 @@
               <div class="relative p-8 hover:bg-slate-50/50 transition-colors duration-300 flex flex-col h-full">
                 <div class="flex justify-between items-start mb-6">
                   <div class="w-10 h-10 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                    </svg>
                   </div>
                   <span class="text-[10px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">MOD_04</span>
                 </div>
@@ -548,7 +568,7 @@
 
             </div>
           </div>
-          
+
         </div>
       </section>
 
@@ -955,80 +975,79 @@
 
           <!-- ==================== [Row 3 Left] 变长列车卡片 ==================== -->
 
-                 <!-- 5. 第13号列车 (Sci-Fi) - 修复版 -->
+          <!-- 5. 第13号列车 (Sci-Fi) - 修复版 -->
           <router-link to="/scenario" class="group relative col-span-1 md:col-span-2 lg:col-span-2 h-full bg-[#02040a] rounded-[2.5rem] overflow-hidden border border-slate-800 hover:border-blue-500/50 transition-all duration-500">
-            
+
             <!-- [A] 视窗核心：星空与速度线 -->
             <div class="absolute inset-0 overflow-hidden">
-              
+
               <!-- 1. 深空底色 -->
               <div class="absolute inset-0 bg-gradient-to-r from-[#020617] via-[#0B1120] to-[#020617]"></div>
 
               <!-- 2. 远景星空 (CSS动画: star-move) -->
               <!-- 注意：这里改用了 star-bg 类 -->
-              <div class="star-bg absolute inset-0 opacity-40" 
-                   style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 50px 50px;">
+              <div class="star-bg absolute inset-0 opacity-40" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 50px 50px;">
               </div>
-               <!-- 2. [新增] 实体列车图层 (Train Layer) -->
+              <!-- 2. [新增] 实体列车图层 (Train Layer) -->
               <!-- 使用 mix-blend-mode 让星空透过列车的暗部显示出来，仿佛列车是半透明的幽灵车 -->
               <div class="absolute inset-0 z-0">
-                 <!-- <img src="https://images.unsplash.com/photo-1532974297617-c0f05fe48bff?q=80&w=2070&auto=format&fit=crop" 
+                <!-- <img src="https://images.unsplash.com/photo-1532974297617-c0f05fe48bff?q=80&w=2070&auto=format&fit=crop" 
                       class="w-full h-full object-cover opacity-40 mix-blend-overlay grayscale group-hover:grayscale-0 transition-all duration-700 scale-110" 
                       alt="Train Interior"> -->
-                 <!-- 顶部渐变遮罩，保证文字清晰 -->
-                 <div class="absolute inset-0 bg-gradient-to-t from-[#02040a] via-[#02040a]/80 to-transparent"></div>
+                <!-- 顶部渐变遮罩，保证文字清晰 -->
+                <div class="absolute inset-0 bg-gradient-to-t from-[#02040a] via-[#02040a]/80 to-transparent"></div>
               </div>
- <!-- 3. [新增] 底部铁轨飞逝动画 (Rail Track Animation) -->
+              <!-- 3. [新增] 底部铁轨飞逝动画 (Rail Track Animation) -->
               <!-- 这是体现“列车感”的关键：高速后退的枕木 -->
               <div class="absolute bottom-0 left-0 right-0 h-32 opacity-30 pointer-events-none perspective-track">
-                 <!-- 铁轨枕木 -->
-                 <div class="track-lines absolute inset-0 bg-[linear-gradient(to_bottom,transparent_50%,#3b82f6_50%)] bg-[size:100%_40px]"></div>
-                 <!-- 铁轨纵深线 -->
-                 <div class="absolute top-0 bottom-0 left-[20%] w-1 bg-gradient-to-b from-transparent to-blue-500"></div>
-                 <div class="absolute top-0 bottom-0 right-[20%] w-1 bg-gradient-to-b from-transparent to-blue-500"></div>
+                <!-- 铁轨枕木 -->
+                <div class="track-lines absolute inset-0 bg-[linear-gradient(to_bottom,transparent_50%,#3b82f6_50%)] bg-[size:100%_40px]"></div>
+                <!-- 铁轨纵深线 -->
+                <div class="absolute top-0 bottom-0 left-[20%] w-1 bg-gradient-to-b from-transparent to-blue-500"></div>
+                <div class="absolute top-0 bottom-0 right-[20%] w-1 bg-gradient-to-b from-transparent to-blue-500"></div>
               </div>
               <!-- 3. 近景拉丝星轨 (CSS动画: speed-line) -->
               <div class="absolute inset-0 flex flex-col justify-around opacity-20 group-hover:opacity-60 transition-opacity duration-700 pointer-events-none">
-                 <!-- 速度线 1 -->
-                 <div class="speed-line h-[1px] w-full bg-gradient-to-r from-transparent via-blue-400 to-transparent"></div>
-                 <!-- 速度线 2 (延迟) -->
-                 <div class="speed-line h-[1px] w-full bg-gradient-to-r from-transparent via-cyan-300 to-transparent" style="animation-duration: 1.5s; animation-delay: 0.5s;"></div>
-                 <!-- 速度线 3 (更亮) -->
-                 <div class="speed-line h-[2px] w-full bg-gradient-to-r from-transparent via-white to-transparent" style="animation-duration: 0.8s; animation-delay: 1.2s;"></div>
-                 <!-- 速度线 4 -->
-                 <div class="speed-line h-[1px] w-full bg-gradient-to-r from-transparent via-blue-500 to-transparent" style="animation-duration: 2s; animation-delay: 0.2s;"></div>
+                <!-- 速度线 1 -->
+                <div class="speed-line h-[1px] w-full bg-gradient-to-r from-transparent via-blue-400 to-transparent"></div>
+                <!-- 速度线 2 (延迟) -->
+                <div class="speed-line h-[1px] w-full bg-gradient-to-r from-transparent via-cyan-300 to-transparent" style="animation-duration: 1.5s; animation-delay: 0.5s;"></div>
+                <!-- 速度线 3 (更亮) -->
+                <div class="speed-line h-[2px] w-full bg-gradient-to-r from-transparent via-white to-transparent" style="animation-duration: 0.8s; animation-delay: 1.2s;"></div>
+                <!-- 速度线 4 -->
+                <div class="speed-line h-[1px] w-full bg-gradient-to-r from-transparent via-blue-500 to-transparent" style="animation-duration: 2s; animation-delay: 0.2s;"></div>
               </div>
 
               <!-- 4. 车窗反光 -->
               <div class="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-blue-900/20 mix-blend-overlay pointer-events-none"></div>
-              
+
             </div>
 
             <!-- [B] 列车 HUD 界面 (保持不变) -->
             <div class="absolute inset-0 p-8 flex flex-col justify-between z-10">
-              
+
               <div class="flex justify-between items-start">
                 <div class="flex gap-4">
                   <div class="w-12 h-12 rounded-lg bg-blue-950/50 backdrop-blur-md border border-blue-500/30 flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.2)]">
-                     <svg class="w-6 h-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13l-7 7-7-7m14-8l-7 7-7-7" />
-                     </svg>
+                    <svg class="w-6 h-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13l-7 7-7-7m14-8l-7 7-7-7" />
+                    </svg>
                   </div>
                   <div>
                     <div class="flex items-center gap-2">
-                       <span class="text-2xl font-black text-white italic tracking-tighter">NO.13</span>
-                       <span class="px-1.5 py-0.5 rounded-sm bg-blue-600 text-[9px] font-bold text-white tracking-widest">EXPRESS</span>
+                      <span class="text-2xl font-black text-white italic tracking-tighter">NO.13</span>
+                      <span class="px-1.5 py-0.5 rounded-sm bg-blue-600 text-[9px] font-bold text-white tracking-widest">EXPRESS</span>
                     </div>
                     <div class="text-[10px] text-blue-300/60 font-mono mt-1">DESTINATION: UNKNOWN</div>
                   </div>
                 </div>
 
                 <div class="flex flex-col items-end">
-                   <div class="flex items-center gap-1.5">
-                     <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                     <span class="text-[10px] font-mono text-emerald-400 font-bold tracking-widest">RUNNING</span>
-                   </div>
-                   <div class="text-[9px] font-mono text-slate-500 mt-1">VELOCITY: ∞ km/h</div>
+                  <div class="flex items-center gap-1.5">
+                    <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <span class="text-[10px] font-mono text-emerald-400 font-bold tracking-widest">RUNNING</span>
+                  </div>
+                  <div class="text-[9px] font-mono text-slate-500 mt-1">VELOCITY: ∞ km/h</div>
                 </div>
               </div>
 
@@ -1038,8 +1057,8 @@
                   <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-100 to-blue-400">第13号列车 · 交互小说</span>
                 </h3>
                 <p class="text-xs text-slate-400 font-light max-w-lg leading-relaxed group-hover:text-blue-100/70 transition-colors">
-                   “下一站是深渊还是星辰？” <br>
-                   全沉浸式剧情引擎，你的每一次选择都将改变列车的航向。
+                  “下一站是深渊还是星辰？” <br>
+                  全沉浸式剧情引擎，你的每一次选择都将改变列车的航向。
                 </p>
               </div>
 
@@ -1205,7 +1224,18 @@
       </section>
 
       <!-- 5. 代码展示：IDE 风格窗口 -->
-   <section class="max-w-5xl mx-auto mb-8 relative z-20">
+      <section class="max-w-5xl mx-auto mb-8 relative z-20">
+        <!-- 标题区 -->
+        <div class="text-center mb-10">
+          <p class="text-xs font-bold text-indigo-500 uppercase tracking-widest mb-3">Developer First</p>
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight mb-4">
+            几行代码，接入
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">全栈 AI 能力</span>
+          </h2>
+          <p class="text-slate-500 text-base max-w-xl mx-auto font-light">
+            从流式对话到多模态理解，API 设计遵循直觉，让你专注于产品而非基础设施。
+          </p>
+        </div>
         <div class="bg-slate-900 rounded-[1.5rem] shadow-2xl shadow-slate-900/50 overflow-hidden ring-1 ring-white/10">
 
           <!-- 模拟 IDE 标题栏 -->
@@ -1221,59 +1251,84 @@
 
           <!-- 代码内容区，使用 grid 布局 -->
           <div class="grid lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-white/10">
-            <!-- Left Code -->
+            <!-- Left Code: 流式对话 + 思维链 -->
             <div class="p-6 md:p-8">
               <div class="flex items-center gap-2 mb-6">
-                <span class="px-2 py-1 bg-indigo-500/20 text-indigo-300 text-xs font-mono rounded border border-indigo-500/30">Client Mode</span>
+                <span class="px-2 py-1 bg-indigo-500/20 text-indigo-300 text-xs font-mono rounded border border-indigo-500/30">流式对话 + 思维链</span>
               </div>
               <div class="relative group">
                 <div class="absolute -inset-4 bg-indigo-500/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <pre class="relative text-sm font-mono leading-relaxed text-slate-300 overflow-x-auto"><code><span class="text-purple-400">import</span> DeepseekClient <span class="text-purple-400">from</span> <span class="text-green-400">'./services'</span>;
+                <pre class="relative text-sm font-mono leading-relaxed text-slate-300 overflow-x-auto"><code><span class="text-purple-400">import</span> { DeepseekClient } <span class="text-purple-400">from</span> <span class="text-green-400">'@/services'</span>;
 
-<span class="text-slate-500">// Initialize Client</span>
+<span class="text-slate-500">// 初始化客户端</span>
 <span class="text-purple-400">const</span> client = <span class="text-purple-400">new</span> <span class="text-yellow-300">DeepseekClient</span>({
-  apiKey: <span class="text-green-400">'sk-...'</span>,
-  model: <span class="text-green-400">'deepseek-r1'</span>
+  apiKey: <span class="text-green-400">'sk-xxx'</span>,
+  baseURL: <span class="text-green-400">'https://api.siliconflow.cn/v1'</span>
 });
 
-<span class="text-purple-400">const</span> stream = <span class="text-purple-400">await</span> client.chat.completions.<span class="text-blue-400">create</span>({
-  messages: [{ role: <span class="text-green-400">'user'</span>, content: <span class="text-green-400">'Hi'</span> }],
-  stream: <span class="text-orange-400">true</span>
+<span class="text-slate-500">// 流式对话，支持思维链</span>
+<span class="text-purple-400">const</span> stream = <span class="text-purple-400">await</span> client.<span class="text-blue-400">streamChat</span>({
+  model: <span class="text-green-400">'deepseek-r1'</span>,
+  messages: [
+    { role: <span class="text-green-400">'user'</span>, content: <span class="text-green-400">'解释量子纠缠'</span> }
+  ],
+  temperature: <span class="text-orange-400">0.7</span>,
+  onThinking: <span class="text-purple-400">(</span>reasoning<span class="text-purple-400">)</span> <span class="text-purple-400">=></span> {
+    <span class="text-slate-500">// 实时获取推理过程</span>
+    console.<span class="text-blue-400">log</span>(<span class="text-green-400">'思考中:'</span>, reasoning);
+  },
+  onContent: <span class="text-purple-400">(</span>chunk<span class="text-purple-400">)</span> <span class="text-purple-400">=></span> {
+    <span class="text-slate-500">// 逐字输出回答</span>
+    process.stdout.<span class="text-blue-400">write</span>(chunk);
+  }
 });</code></pre>
               </div>
             </div>
 
-            <!-- Right Code -->
+            <!-- Right Code: 多模态 + 图像理解 -->
             <div class="p-6 md:p-8">
               <div class="flex items-center gap-2 mb-6">
-                <span class="px-2 py-1 bg-violet-500/20 text-violet-300 text-xs font-mono rounded border border-violet-500/30">Adapter Mode</span>
+                <span class="px-2 py-1 bg-violet-500/20 text-violet-300 text-xs font-mono rounded border border-violet-500/30">多模态图像理解</span>
               </div>
               <div class="relative group">
                 <div class="absolute -inset-4 bg-violet-500/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <pre class="relative text-sm font-mono leading-relaxed text-slate-300 overflow-x-auto"><code><span class="text-purple-400">import</span> ai <span class="text-purple-400">from</span> <span class="text-green-400">'./adapter'</span>;
+                <pre class="relative text-sm font-mono leading-relaxed text-slate-300 overflow-x-auto"><code><span class="text-purple-400">import</span> { imageService } <span class="text-purple-400">from</span> <span class="text-green-400">'@/services'</span>;
 
-<span class="text-slate-500">// Vercel AI SDK Style</span>
-<span class="text-purple-400">const</span> model = ai.<span class="text-blue-400">createModel</span>(<span class="text-green-400">"deepseek"</span>, {
-  apiKey: process.env.API_KEY
+<span class="text-slate-500">// 图像生成</span>
+<span class="text-purple-400">const</span> result = <span class="text-purple-400">await</span> imageService.<span class="text-blue-400">generate</span>({
+  prompt: <span class="text-green-400">'赛博朋克风格的未来城市'</span>,
+  model: <span class="text-green-400">'kolors'</span>,
+  size: <span class="text-green-400">'1024x1024'</span>,
+  quality: <span class="text-green-400">'hd'</span>
 });
 
-<span class="text-purple-400">const</span> { dataStream } = <span class="text-purple-400">await</span> model.<span class="text-blue-400">streamText</span>({
-  model: <span class="text-green-400">"deepseek-r1"</span>,
-  messages: history
-});</code></pre>
+<span class="text-slate-500">// 视觉理解（OCR/图像分析）</span>
+<span class="text-purple-400">const</span> analysis = <span class="text-purple-400">await</span> client.<span class="text-blue-400">analyzeImage</span>({
+  model: <span class="text-green-400">'glm-4v'</span>,
+  image: imageUrl,
+  prompt: <span class="text-green-400">'描述这张图片的内容'</span>
+});
+
+<span class="text-slate-500">// 文档 OCR 转 Markdown</span>
+<span class="text-purple-400">const</span> markdown = <span class="text-purple-400">await</span> client.<span class="text-blue-400">ocr</span>({
+  model: <span class="text-green-400">'deepseek-ocr'</span>,
+  image: documentImage
+});
+
+console.<span class="text-blue-400">log</span>(markdown);</code></pre>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-         <!-- Footer Refactored: 增加内容密度，减少空洞感，保持极简科技风 -->
+      <!-- Footer Refactored: 增加内容密度，减少空洞感，保持极简科技风 -->
       <footer class="relative z-10 border-t border-slate-200/60 bg-white/60 backdrop-blur-xl pt-12 pb-8 mt-0">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           <!-- 上半部分：多列导航布局 -->
           <div class="grid grid-cols-2 md:grid-cols-12 gap-8 mb-12">
-            
+
             <!-- Column 1: 品牌核心 (占据较宽位置) -->
             <div class="col-span-2 md:col-span-4">
               <div class="flex items-center gap-2 mb-4">
@@ -1288,10 +1343,14 @@
               <!-- 社交图标组 -->
               <div class="flex gap-4">
                 <a href="#" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-indigo-500 hover:text-white transition-all duration-300">
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
+                  </svg>
                 </a>
                 <a href="#" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-black hover:text-white transition-all duration-300">
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                  </svg>
                 </a>
               </div>
             </div>
@@ -1300,10 +1359,10 @@
             <div class="col-span-1 md:col-span-2">
               <h4 class="text-sm font-bold text-slate-900 mb-4 tracking-wide">产品矩阵</h4>
               <ul class="space-y-3">
-                <li><a href="#" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">智能对话 (Chat)</a></li>
-                <li><a href="#" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">图像生成 (Image)</a></li>
-                <li><a href="#" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">互动游戏 (Game)</a></li>
-                <li><a href="#" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">API 服务</a></li>
+                <li><router-link to="/api-demo" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">智能对话 (Chat)</router-link></li>
+                <li><router-link to="/ai-image" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">图像生成 (Image)</router-link></li>
+                <li><router-link to="/game" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">互动游戏 (Game)</router-link></li>
+                <li><router-link to="/mcp-agent" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">API 服务</router-link></li>
               </ul>
             </div>
 
@@ -1323,9 +1382,9 @@
               <h4 class="text-sm font-bold text-slate-900 mb-4 tracking-wide">关于</h4>
               <ul class="space-y-3">
                 <li><a href="#" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">关于我们</a></li>
-                <li><a href="#" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">官方博客</a></li>
-                <li><a href="#" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">加入我们</a></li>
-                <li><a href="#" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">联系方式</a></li>
+                <li><a href="https://blog.csdn.net/nanchen_J?type=blog" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">我的博客</a></li>
+                <li><a href="#" @click.prevent="showJoinModal = true" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">加入我们</a></li>
+                <li><a href="#" @click.prevent="showContactModal = true" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">联系方式</a></li>
               </ul>
             </div>
 
@@ -1337,7 +1396,9 @@
                 <div class="flex gap-2">
                   <input type="email" placeholder="Email" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 transition-colors">
                   <button class="px-3 py-2 bg-slate-900 text-white rounded-lg hover:bg-indigo-600 transition-colors">
-                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
                   </button>
                 </div>
               </div>
@@ -1359,27 +1420,81 @@
 
 
     </div>
+
+    <!-- 联系方式弹窗 -->
+    <Teleport to="body">
+      <div v-if="showContactModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" @click.self="showContactModal = false">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+        <div class="relative bg-white rounded-3xl shadow-2xl p-8 flex flex-col items-center gap-4 w-72 z-10">
+          <button @click="showContactModal = false" class="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 transition-colors text-slate-500">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center">
+            <svg class="w-6 h-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+            </svg>
+          </div>
+          <p class="text-sm font-semibold text-slate-700">联系方式</p>
+          <a href="mailto:1159063863@qq.com" class="text-sm text-indigo-600 hover:text-indigo-800 transition-colors break-all">1159063863@qq.com</a>
+          <p class="text-xs text-slate-400">欢迎通过邮件与我们联系</p>
+        </div>
+      </div>
+    </Teleport>
+    <Teleport to="body">
+      <div v-if="showJoinModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" @click.self="showJoinModal = false">
+        <!-- 背景遮罩 -->
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+        <!-- 弹窗卡片 -->
+        <div class="relative bg-white rounded-3xl shadow-2xl p-8 flex flex-col items-center gap-4 w-72 z-10">
+          <!-- 关闭按钮 -->
+          <button @click="showJoinModal = false" class="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 transition-colors text-slate-500">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <!-- 微信号 -->
+          <p class="text-sm font-semibold text-slate-700 tracking-wide">微信号：SouthernWind_J</p>
+          <!-- 二维码图片 -->
+          <img src="@/assets/usercode.jpg" alt="微信二维码" class="w-44 object-cover border border-slate-100 shadow-md" />
+          <!-- 说明文字 -->
+          <p class="text-xs text-slate-400">扫码添加微信，加入我们</p>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup lang="ts">
-// Logic remains the same
+import { ref } from 'vue'
+const showJoinModal = ref(false)
+const showContactModal = ref(false)
 </script>
 
 <style>
-  /* 
+/* 
    === 3. 铁轨飞逝动画 === 
    模拟地面纹理高速向后移动
 */
 .track-lines {
-  animation: trackMove 0.5s linear infinite; /* 0.5s 极快循环 */
+  animation: trackMove 0.5s linear infinite;
+  /* 0.5s 极快循环 */
   transform-origin: bottom;
-  transform: perspective(100px) rotateX(45deg); /* 3D 透视效果 */
+  transform: perspective(100px) rotateX(45deg);
+  /* 3D 透视效果 */
 }
 
 @keyframes trackMove {
-  from { background-position: 0 0; }
-  to { background-position: 0 40px; } /* 对应 bg-size 的高度 */
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 0 40px;
+  }
+
+  /* 对应 bg-size 的高度 */
 }
 
 /* 之前其他的动画(star-bg, speed-line)请保留 */
@@ -1387,6 +1502,7 @@
   perspective: 200px;
   transform-style: preserve-3d;
 }
+
 /* ============================================================================
    全局动画定义 (非 scoped，避免 Vue 哈希冲突)
    ============================================================================ */
@@ -1397,8 +1513,13 @@
 }
 
 @keyframes moveStars {
-  from { background-position: 0 0; }
-  to { background-position: -1000px 0; }
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: -1000px 0;
+  }
 }
 
 /* 2. 速度线飞逝动画 */
@@ -1412,9 +1533,11 @@
     transform: translateX(100%) scaleX(0.5);
     opacity: 0;
   }
+
   10% {
     opacity: 1;
   }
+
   100% {
     transform: translateX(-150%) scaleX(1.5);
     opacity: 0;
@@ -1423,8 +1546,15 @@
 
 /* 3. 悬浮动画 */
 @keyframes floatSlow {
-  0%, 100% { transform: translateY(0) rotate(-6deg); }
-  50% { transform: translateY(-15px) rotate(-3deg); }
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(-6deg);
+  }
+
+  50% {
+    transform: translateY(-15px) rotate(-3deg);
+  }
 }
 
 .animate-float-slow {
@@ -1433,8 +1563,13 @@
 
 /* 4. 极慢速旋转 (顺时针) */
 @keyframes spinSlower {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .animate-spin-slower {
@@ -1443,8 +1578,13 @@
 
 /* 5. 极慢速旋转 (逆时针) */
 @keyframes reverseSpin {
-  from { transform: rotate(360deg); }
-  to { transform: rotate(0deg); }
+  from {
+    transform: rotate(360deg);
+  }
+
+  to {
+    transform: rotate(0deg);
+  }
 }
 
 .animate-reverse-spin {
@@ -1466,11 +1606,25 @@
 }
 
 /* 7. 延迟类 */
-.animation-delay-200 { animation-delay: 0.15s; }
-.animation-delay-400 { animation-delay: 0.3s; }
-.animation-delay-600 { animation-delay: 0.45s; }
-.animation-delay-2000 { animation-delay: 2s; }
-.animation-delay-4000 { animation-delay: 4s; }
+.animation-delay-200 {
+  animation-delay: 0.15s;
+}
+
+.animation-delay-400 {
+  animation-delay: 0.3s;
+}
+
+.animation-delay-600 {
+  animation-delay: 0.45s;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
 
 /* 8. 文字流光动画 */
 .animate-gradient-x {
@@ -1479,8 +1633,13 @@
 }
 
 @keyframes gradientX {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 200% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+
+  100% {
+    background-position: 200% 50%;
+  }
 }
 
 /* 9. Blob 动画 */
@@ -1489,17 +1648,38 @@
 }
 
 @keyframes blob {
-  0% { transform: translate(0px, 0px) scale(1); }
-  33% { transform: translate(30px, -50px) scale(1.1); }
-  66% { transform: translate(-20px, 20px) scale(0.9); }
-  100% { transform: translate(0px, 0px) scale(1); }
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
 }
 
 /* 10. 扫描线动画 */
 @keyframes scan {
-  0% { transform: translateY(-100%); opacity: 0; }
-  50% { opacity: 1; }
-  100% { transform: translateY(100%); opacity: 0; }
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
 }
 
 .animate-scan {
@@ -1508,15 +1688,29 @@
 
 /* 11. 快速扫描动画 */
 @keyframes scan-fast {
-  0% { transform: translateX(-100%); }
-  50%, 100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+
+  50%,
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 /* 12. 缓慢缩放动画 */
 @keyframes slowZoom {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .animate-slow-zoom {
@@ -1525,13 +1719,20 @@
 
 /* 13. 微光划过动画 */
 @keyframes shine {
-  100% { transform: translateX(100%); }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 /* 14. 网格流动动画 */
 @keyframes gridFlow {
-  0% { background-position: 0 0; }
-  100% { background-position: 0 40px; }
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 0 40px;
+  }
 }
 
 .animate-grid-flow {
@@ -1540,8 +1741,13 @@
 
 /* 15. 数据流下落动画 */
 @keyframes drop {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(500%); }
+  0% {
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(500%);
+  }
 }
 
 .animate-drop {

@@ -1,23 +1,12 @@
 <template>
-  <!-- 
-    核心修改 1: 外层容器 
-    - 使用 min-h-screen：保证至少占满一屏，内容多时自动长高。
-    - flex flex-col：垂直弹性布局。
-  -->
   <div class="h-screen w-full relative font-sans selection:bg-indigo-500/30 flex flex-col overflow-hidden">
 
-    <!-- =========================================================================
-         1. 全局沉浸式背景 (保持不变)
-         ========================================================================= -->
     <div class="fixed inset-0 -z-50 overflow-hidden bg-slate-50">
-      <!-- 左侧光幕墙 -->
       <div class="absolute top-0 left-0 w-[40vw] h-full bg-gradient-to-r from-indigo-200/40 via-indigo-50/20 to-transparent blur-[80px] pointer-events-none"></div>
       <div class="absolute top-0 left-0 w-[100px] h-full bg-gradient-to-r from-indigo-400/20 to-transparent blur-[40px] pointer-events-none"></div>
-      <!-- 右侧光幕墙 -->
       <div class="absolute top-0 right-0 w-[40vw] h-full bg-gradient-to-l from-violet-200/40 via-fuchsia-50/20 to-transparent blur-[80px] pointer-events-none"></div>
       <div class="absolute top-0 right-0 w-[100px] h-full bg-gradient-to-l from-violet-400/20 to-transparent blur-[40px] pointer-events-none"></div>
 
-      <!-- 粒子系统 -->
       <div class="absolute inset-y-0 left-0 w-[25vw] overflow-hidden pointer-events-none">
         <div class="absolute bottom-[-50px] left-[15%] w-2 h-2 bg-indigo-500/20 rounded-full animate-float-slow blur-[1px]"></div>
         <div class="absolute bottom-[-50px] left-[35%] w-3 h-3 bg-blue-500/10 rounded-full animate-float-medium animation-delay-2000 blur-[2px]"></div>
@@ -28,99 +17,107 @@
         <div class="absolute bottom-[-50px] right-[40%] w-1.5 h-1.5 bg-fuchsia-500/30 rounded-full animate-float-slow animation-delay-3000"></div>
       </div>
 
-      <!-- 空间网格 & 噪点 -->
       <div class="absolute inset-0 bg-[linear-gradient(to_right,#80808015_1px,transparent_1px),linear-gradient(to_bottom,#80808015_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)] pointer-events-none"></div>
       <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none"></div>
     </div>
 
-    <!-- =========================================================================
-         2. 导航栏 (Header)
-         ========================================================================= -->
-    <!-- 保持 fixed 不动，浮在最上层 -->
     <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 h-16 md:h-20">
-      <div class="absolute inset-0 bg-white/70 backdrop-blur-xl border-b border-white/50 shadow-sm shadow-indigo-50/10"></div>
+      <div class="absolute inset-0 bg-white/70 backdrop-blur-2xl border-b border-zinc-200/50 shadow-[0_1px_2px_rgba(0,0,0,0.02)]"></div>
+      
       <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
         <div class="flex justify-between items-center h-full">
           
-          <!-- Logo -->
           <div class="flex items-center gap-3 cursor-pointer group" @click="$router.push('/')">
-            <div class="relative w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 shadow-lg shadow-indigo-500/20 flex items-center justify-center overflow-hidden transition-transform group-hover:scale-105 duration-300">
+            <div class="relative w-9 h-9 rounded-xl bg-zinc-900 shadow-md shadow-zinc-900/10 flex items-center justify-center overflow-hidden transition-transform group-hover:scale-105 duration-300">
               <img v-if="imageUrl" :src="imageUrl" alt="Avatar" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" />
-              <div v-else class="text-white font-bold text-lg">S</div>
+              <div v-else class="text-white font-semibold text-lg font-mono">S</div>
             </div>
             <div class="flex flex-col">
-              <span class="text-base font-bold text-slate-800 tracking-tight leading-none group-hover:text-indigo-600 transition-colors">SouthernWind</span>
-              <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mt-1">Platform</span>
+              <span class="text-base font-bold text-zinc-900 tracking-tight leading-none">SouthernWind</span>
+              <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mt-1">Platform</span>
             </div>
           </div>
 
-          <!-- Desktop Nav -->
-          <nav class="hidden lg:flex items-center">
-            <div class="flex items-center p-1.5 bg-slate-50/50 backdrop-blur-md rounded-full border border-white/60 shadow-sm ring-1 ring-slate-200/50">
-              <router-link v-for="item in navItems" :key="item.path" :to="item.path" class="relative px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ease-out group isolate" :class="$route.path === item.path ? 'text-indigo-950' : 'text-slate-500 hover:text-slate-700'">
-                <div v-if="$route.path === item.path" class="absolute inset-0 bg-white rounded-full shadow-sm border border-slate-100/50 -z-10 transition-all duration-300"></div>
-                <span class="flex items-center gap-2">
-                  <component :is="item.icon" class="w-4 h-4 transition-colors duration-300" :class="$route.path === item.path ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-500'" />
-                  {{ item.name }}
-                </span>
-              </router-link>
-            </div>
+          <nav class="hidden lg:flex items-center gap-1">
+            <router-link 
+              v-for="item in navItems" 
+              :key="item.path" 
+              :to="item.path" 
+              class="relative px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 ease-out group flex items-center gap-2" 
+              :class="$route.path === item.path ? 'text-zinc-900 bg-zinc-100/80' : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50'"
+            >
+              <component 
+                :is="item.icon" 
+                class="w-4 h-4 transition-colors duration-300" 
+                :class="$route.path === item.path ? 'text-zinc-900' : 'text-zinc-400 group-hover:text-zinc-600'" 
+              />
+              {{ item.name }}
+            </router-link>
           </nav>
 
-          <!-- Mobile Toggle -->
           <div class="lg:hidden flex items-center">
-            <button @click="mobileMenuOpen = !mobileMenuOpen" class="relative w-10 h-10 flex items-center justify-center rounded-full bg-white/80 border border-slate-200 shadow-sm">
-              <div class="flex flex-col gap-[5px] transition-all duration-300" :class="{ 'rotate-45': mobileMenuOpen }">
-                <span class="w-5 h-0.5 bg-slate-600 rounded-full transition-all duration-300" :class="{ 'translate-y-[7px] rotate-0': mobileMenuOpen }"></span>
-                <span class="w-5 h-0.5 bg-slate-600 rounded-full transition-all duration-300" :class="{ 'opacity-0': mobileMenuOpen }"></span>
-                <span class="w-5 h-0.5 bg-slate-600 rounded-full transition-all duration-300" :class="{ '-translate-y-[7px] rotate-0': mobileMenuOpen }"></span>
+            <button @click="mobileMenuOpen = !mobileMenuOpen" class="relative w-10 h-10 flex items-center justify-center rounded-xl hover:bg-zinc-100 transition-colors cursor-pointer">
+              <div class="flex flex-col justify-center items-center gap-[5px] w-5 h-5 relative">
+                <span class="w-5 h-[1.5px] bg-zinc-700 rounded-full transition-all duration-300 absolute" :class="mobileMenuOpen ? 'rotate-45' : '-translate-y-[6px]'"></span>
+                <span class="w-5 h-[1.5px] bg-zinc-700 rounded-full transition-all duration-300 absolute" :class="mobileMenuOpen ? 'opacity-0' : 'opacity-100'"></span>
+                <span class="w-5 h-[1.5px] bg-zinc-700 rounded-full transition-all duration-300 absolute" :class="mobileMenuOpen ? '-rotate-45' : 'translate-y-[6px]'"></span>
               </div>
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Mobile Menu -->
       <div class="lg:hidden absolute top-full left-0 w-full overflow-hidden transition-all duration-500" :class="mobileMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'">
-        <div class="px-4 pb-6 bg-white/95 backdrop-blur-xl border-b border-slate-200/60 shadow-xl">
-          <div class="flex flex-col gap-2 mt-2">
-            <router-link v-for="item in navItems" :key="item.path" :to="item.path" @click="mobileMenuOpen = false" class="flex items-center gap-4 px-4 py-4 rounded-2xl transition-all duration-300" :class="$route.path === item.path ? 'bg-indigo-50/50 text-indigo-900' : 'text-slate-600 hover:bg-slate-50'">
-              <component :is="item.icon" class="w-5 h-5" :class="$route.path === item.path ? 'text-indigo-600' : 'text-slate-400'" />
-              <span class="text-sm font-bold">{{ item.name }}</span>
+        <div class="px-4 pb-6 bg-white/95 backdrop-blur-2xl border-b border-zinc-200/50 shadow-2xl shadow-zinc-900/5">
+          <div class="flex flex-col gap-1 mt-2">
+            <router-link 
+              v-for="item in navItems" 
+              :key="item.path" 
+              :to="item.path" 
+              @click="mobileMenuOpen = false" 
+              class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300" 
+              :class="$route.path === item.path ? 'bg-zinc-100/80 text-zinc-900' : 'text-zinc-500 hover:bg-zinc-50'"
+            >
+              <component :is="item.icon" class="w-5 h-5" :class="$route.path === item.path ? 'text-zinc-900' : 'text-zinc-400'" />
+              <span class="text-sm font-semibold tracking-wide">{{ item.name }}</span>
             </router-link>
           </div>
         </div>
       </div>
     </header>
 
-    <!-- =========================================================================
-         3. 主内容区 (Main Content)
-         ========================================================================= -->
-    <!-- 
-       核心修改 2: 
-       - flex-1: 自动占据剩余空间。
-          如果内容少：main 会拉伸，把 footer 推到底部。
-          如果内容多：main 会自然撑开，整个页面出现滚动条。
-       - pt-16 md:pt-20: 必须加这个！因为 Header 是 fixed 的，不占位置，
-         如果不加 padding，main 的内容会被 header 挡住。
-    -->
-    <main class="flex-1 w-full pt-16 md:pt-20 px-4 md:px-8 box-border relative overflow-auto">
-      <div class="max-w-7xl mx-auto h-full">
-        <router-view />
+    <main class="flex-1 w-full pt-16 md:pt-20 box-border relative overflow-auto flex flex-col min-h-0">
+      <div class="max-w-7xl mx-auto w-full px-4 md:px-8 flex-1 flex flex-col min-h-0">
+        <router-view v-slot="{ Component }">
+          <component :is="Component" class="flex-1 min-h-0" />
+        </router-view>
       </div>
     </main>
 
-    <!-- =========================================================================
-         4. 页脚 (Footer)
-         ========================================================================= -->
-    <!-- 
-       只是一个普通的块级元素，不需要 fixed，不需要 absolute。
-       因为 main 是 flex-1，所以 footer 会自然排在 main 后面。
-    -->
-    <footer class="relative z-1 text-center text-slate-400 text-sm py-8 border-t border-slate-200/60 bg-white/40 backdrop-blur-sm">
-      <p>© 2025 AI Vista Platform. Design for Future.</p>
-    </footer>
+<footer class="relative z-1 border-t border-zinc-200/50 bg-white/40 backdrop-blur-md">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white/60 border border-zinc-100 shadow-sm">
+      <div class="relative flex h-2 w-2">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+      </div>
+      <span class="text-[11px] font-semibold text-zinc-600 tracking-wide">All systems operational</span>
+    </div>
 
+    <p class="text-xs font-medium text-zinc-400 tracking-wide text-center">
+      © 2026 AI Vista Platform. <span class="hidden md:inline text-zinc-300 mx-1.5">|</span> <span class="block md:inline mt-1 md:mt-0">Design for Future.</span>
+    </p>
+
+    <div class="flex items-center gap-4 text-zinc-400">
+      <a href="#" class="hover:text-zinc-900 transition-colors duration-300 cursor-pointer">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" /></svg>
+      </a>
+      <a href="#" class="hover:text-zinc-900 transition-colors duration-300 cursor-pointer">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" /></svg>
+      </a>
+    </div>
+  </div>
+</footer>
   </div>
 </template>
 
@@ -153,8 +150,7 @@ const navItems = [
 </script>
 
 <style scoped>
-/* 
-  粒子上升动画：模拟热气流/丁达尔效应
+/* 粒子上升动画：模拟热气流/丁达尔效应
 */
 @keyframes float-slow {
   0% { transform: translateY(10vh) translateX(0) scale(1); opacity: 0; }
@@ -181,7 +177,5 @@ const navItems = [
 .animation-delay-3000 { animation-delay: 4.5s; }
 .animation-delay-4000 { animation-delay: 6s; }
 
-.rotate-45>span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-.rotate-45>span:nth-child(2) { opacity: 0; }
-.rotate-45>span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+/* 删除了原有移动端汉堡菜单的 CSS，因为现在全部通过 Tailwind 的绝对定位和旋转实现，更稳定流畅 */
 </style>

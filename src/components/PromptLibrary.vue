@@ -1,114 +1,100 @@
 <template>
-  <div class="min-h-screen bg-[#F8FAFC] font-sans selection:bg-indigo-500/30">
+  <div class="min-h-screen bg-white font-sans antialiased">
     
-    <!-- 1. 沉浸式头部区域 -->
-    <div class="relative bg-slate-900 pt-32 pb-20 overflow-hidden">
-      <!-- 动态背景装饰 -->
+    <!-- Hero Section: 极简黑白 + 精致渐变 -->
+    <div class="relative bg-gradient-to-b from-slate-50 to-white pt-24 pb-20 overflow-hidden border-b border-slate-100">
+      <!-- 背景装饰 -->
       <div class="absolute inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-indigo-500/20 rounded-full blur-[120px] mix-blend-screen animate-pulse"></div>
-        <div class="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-rose-500/10 rounded-full blur-[100px] mix-blend-screen"></div>
-        <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150"></div>
-        <!-- 网格线 -->
-        <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+        <!-- 顶部光晕 -->
+        <div class="absolute -top-[40%] left-[20%] w-[500px] h-[500px] bg-indigo-100/40 rounded-full blur-[120px]"></div>
+        <div class="absolute top-[10%] right-[10%] w-[400px] h-[400px] bg-violet-100/30 rounded-full blur-[100px]"></div>
+        
+        <!-- 网格 -->
+        <div class="absolute inset-0 bg-[linear-gradient(to_right,#8882_1px,transparent_1px),linear-gradient(to_bottom,#8882_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)]"></div>
       </div>
 
-      <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-medium mb-6 backdrop-blur-sm">
-          <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
-          Prompt Library v2.0
+      <!-- 内容 -->
+      <div class="relative z-10 max-w-6xl mx-auto px-6 text-center">
+        <!-- 标签 -->
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-medium mb-6">
+          <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+          Prompt Library
         </div>
-        <h1 class="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">
-          激发 AI 的无限
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-rose-400">创造力</span>
+        
+        <!-- 标题 -->
+        <h1 class="text-5xl md:text-6xl font-bold text-slate-900 mb-4 tracking-tight">
+          精选提示词模板库
         </h1>
-        <p class="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
-          精选 {{ Object.keys(promptExamples).length }}+ 高质量提示词模板。从代码优化到创意写作，复制即用，让 AI 更懂你的意图。
+        
+        <!-- 副标题 -->
+        <p class="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
+          {{ Object.keys(promptExamples).length }} 个专业模板，覆盖代码、创作、内容三大场景
         </p>
       </div>
     </div>
 
-    <!-- 2. 主要内容区域 -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20 pb-24">
+    <!-- 主内容 -->
+    <div class="max-w-6xl mx-auto px-6 py-12">
       
-      <!-- 悬浮分类导航 -->
-      <div class="bg-white/80 backdrop-blur-xl rounded-2xl border border-slate-200/60 shadow-lg shadow-slate-200/50 p-2 mb-12 flex flex-wrap justify-center gap-1 max-w-fit mx-auto sticky top-24 z-30 transition-all duration-300">
+      <!-- 分类导航 -->
+      <div class="flex items-center gap-2 mb-10 overflow-x-auto pb-2">
         <button
           v-for="cat in ['全部', '代码', '创作', '内容']"
           :key="cat"
           @click="setActiveCategory(cat)"
-          class="relative px-6 py-2.5 rounded-xl text-sm font-medium transition-all duration-300"
-          :class="activeCategory === cat ? 'text-indigo-600' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'"
+          class="px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap"
+          :class="activeCategory === cat 
+            ? 'bg-slate-900 text-white shadow-sm' 
+            : 'text-slate-600 hover:bg-slate-100'"
         >
-          <!-- 选中态背景 -->
-          <div v-if="activeCategory === cat" class="absolute inset-0 bg-indigo-50 rounded-xl -z-10 border border-indigo-100 shadow-sm" layoutId="activeTab"></div>
-          {{ cat === '全部' ? '全部分类' : cat + '相关' }}
+          {{ cat }}
         </button>
       </div>
 
-      <!-- 提示词卡片网格 -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div 
-          v-for="(example, type) in filteredExamples" 
+      <!-- 卡片网格 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div
+          v-for="(example, type) in filteredExamples"
           :key="String(type)"
-          class="group relative bg-white rounded-2xl border border-slate-200 hover:border-indigo-300 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10 hover:-translate-y-1 overflow-hidden flex flex-col"
+          class="group relative bg-white rounded-2xl border border-slate-200 p-6 transition-all duration-200 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-100 cursor-pointer"
+          @click="usePrompt(String(type))"
         >
-          <!-- 卡片顶部色彩条 (根据分类变色) -->
-          <div class="h-1.5 w-full bg-gradient-to-r" 
-               :class="{
-                 'from-blue-400 to-indigo-500': example.category === '代码',
-                 'from-rose-400 to-orange-500': example.category === '创作',
-                 'from-emerald-400 to-teal-500': example.category === '内容'
-               }">
+          <!-- 分类标签 -->
+          <div class="flex items-center justify-between mb-4">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium"
+              :class="{
+                'bg-blue-50 text-blue-700': example.category === '代码',
+                'bg-rose-50 text-rose-700': example.category === '创作',
+                'bg-emerald-50 text-emerald-700': example.category === '内容'
+              }">
+              <svg v-if="example.category === '代码'" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+              <svg v-else-if="example.category === '创作'" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+              <svg v-else class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+              {{ example.category }}
+            </span>
+            
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
           </div>
 
-          <div class="p-6 flex-1 flex flex-col">
-            <div class="flex justify-between items-start mb-4">
-              <!-- 图标 -->
-              <div class="w-12 h-12 rounded-xl flex items-center justify-center transition-colors duration-300"
-                   :class="{
-                     'bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white': example.category === '代码',
-                     'bg-rose-50 text-rose-600 group-hover:bg-rose-600 group-hover:text-white': example.category === '创作',
-                     'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white': example.category === '内容'
-                   }">
-                 <!-- 根据分类动态显示图标 (简化版，实际可配置) -->
-                 <svg v-if="example.category === '代码'" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
-                 <svg v-else-if="example.category === '创作'" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                 <svg v-else class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-              </div>
-
-              <!-- 类别标签 -->
-              <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded border"
-                :class="{
-                  'bg-blue-50 text-blue-600 border-blue-100': example.category === '代码',
-                  'bg-rose-50 text-rose-600 border-rose-100': example.category === '创作',
-                  'bg-emerald-50 text-emerald-600 border-emerald-100': example.category === '内容'
-                }"
-              >{{ example.category }}</span>
-            </div>
-
-            <h3 class="text-lg font-bold text-slate-900 mb-2 group-hover:text-indigo-600 transition-colors">{{ example.title }}</h3>
-            <p class="text-sm text-slate-500 leading-relaxed mb-6 line-clamp-2 flex-1">{{ example.description }}</p>
-
-            <button 
-              @click="usePrompt(type)"
-              class="w-full py-2.5 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50 transition-all flex items-center justify-center gap-2 group/btn"
-            >
-              使用模版
-              <svg class="w-4 h-4 transition-transform group-hover/btn:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-              </svg>
-            </button>
-          </div>
+          <!-- 标题 -->
+          <h3 class="text-lg font-semibold text-slate-900 mb-2 group-hover:text-indigo-600 transition-colors">
+            {{ example.title }}
+          </h3>
           
-          <!-- 背景装饰纹理 (非常淡) -->
-          <div class="absolute -bottom-6 -right-6 w-24 h-24 bg-slate-50 rounded-full z-0 pointer-events-none group-hover:scale-150 transition-transform duration-500"></div>
+          <!-- 描述 -->
+          <p class="text-sm text-slate-600 line-clamp-2 leading-relaxed">
+            {{ example.description }}
+          </p>
         </div>
       </div>
 
     </div>
 
-    <!-- 弹窗组件 (保持功能不变，仅样式对齐) -->
+    <!-- Modal -->
     <PromptExampleModal
+      v-if="isModalOpen"
       :is-open="isModalOpen"
       :title="currentPromptExample.title"
       :description="currentPromptExample.description"

@@ -12,6 +12,7 @@
     "deploy": "gh-pages -d dist -r https://github.com/NanChen042/magicforge.git -b gh-pages"
   },
   "dependencies": {
+    "@cloudbase/js-sdk": "^2.25.4",
     "@element-plus/icons-vue": "^2.3.2",
     "@types/markdown-it": "^14.1.2",
     "axios": "^1.13.2",

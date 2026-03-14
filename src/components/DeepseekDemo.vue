@@ -1,7 +1,7 @@
 <template>
-  <div class="w-full h-full flex flex-col bg-slate-50 overflow-hidden">
+  <div class="w-full flex-1 flex flex-col bg-slate-50/0 overflow-hidden min-h-0 py-4">
     <!-- 主内容区域：配置面板和聊天面板 -->
-    <div class="flex-1 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 px-4 overflow-hidden min-h-0">
+    <div class="flex-1 w-full grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 px-4 min-h-0 overflow-hidden">
       <ConfigPanel
         v-model:apiKey="apiKey"
         v-model:apiUrl="apiUrl"
