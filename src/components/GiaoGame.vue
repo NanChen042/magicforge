@@ -474,7 +474,7 @@ onMounted(() => {
     <div v-else class="relative z-10 min-h-screen">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
         <!-- 主容器 -->
-        <div class="rounded-2xl sm:rounded-3xl overflow-hidden bg-white/80 backdrop-blur-xl border border-slate-200/50 shadow-xl shadow-slate-200/50">
+        <div class="rounded-md sm:rounded-md overflow-hidden bg-white/80 backdrop-blur-xl border border-slate-200/50 shadow-xl shadow-slate-200/50">
           <!-- 状态栏 -->
           <GameStatusBar
             :player-name="playerName"
@@ -548,7 +548,7 @@ onMounted(() => {
             @click="showModelInfo = false"
           >
             <div
-              class="relative bg-white rounded-2xl p-6 sm:p-8 max-w-xs sm:max-w-md w-full mx-4 shadow-2xl border border-slate-100"
+              class="relative bg-white rounded-md p-6 sm:p-8 max-w-xs sm:max-w-md w-full mx-4 shadow-2xl border border-slate-100"
               @click.stop
             >
               <h2 class="text-xl sm:text-2xl font-bold text-slate-800 mb-4">AI模型信息</h2>
@@ -581,7 +581,7 @@ onMounted(() => {
                 <div class="pt-4">
                   <button
                     @click="changeModel"
-                    class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-xl font-medium text-sm sm:text-base transition-all shadow-lg shadow-indigo-200"
+                    class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-sm font-medium text-sm sm:text-base transition-all shadow-lg shadow-indigo-200"
                   >
                     切换模型
                   </button>
@@ -604,7 +604,7 @@ onMounted(() => {
             v-if="isGenerating && !isStreamResponseActive"
             class="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50"
           >
-            <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-100 shadow-2xl shadow-slate-200/50">
+            <div class="bg-white rounded-md p-6 sm:p-8 border border-slate-100 shadow-2xl shadow-slate-200/50">
               <div class="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4">
                 <svg class="animate-spin w-full h-full text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>

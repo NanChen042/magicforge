@@ -6,7 +6,7 @@
       
       <!-- Logo 区域 -->
       <div class="h-16 flex items-center px-6 border-b border-slate-800/50 bg-[#0F172A]">
-        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center mr-3 shadow-lg shadow-indigo-500/20 ring-1 ring-white/10">
+        <div class="w-8 h-8 rounded-sm bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center mr-3 shadow-lg shadow-indigo-500/20 ring-1 ring-white/10">
           <el-icon class="text-white text-lg"><Connection /></el-icon>
         </div>
         <div>
@@ -25,7 +25,7 @@
           <div 
             v-for="item in menuGroup1" 
             :key="item.label"
-            class="group flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200"
+            class="group flex items-center justify-between px-3 py-2.5 rounded-sm cursor-pointer transition-all duration-200"
             :class="currentRoute === item.id ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/20' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100'"
             @click="currentRoute = item.id"
           >
@@ -48,7 +48,7 @@
           <div 
             v-for="item in menuGroup2" 
             :key="item.label"
-            class="group flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200"
+            class="group flex items-center justify-between px-3 py-2.5 rounded-sm cursor-pointer transition-all duration-200"
             :class="currentRoute === item.id ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100'"
             @click="currentRoute = item.id"
           >
@@ -65,7 +65,7 @@
         <div class="space-y-1">
           <div class="px-3 mb-2 text-[11px] font-bold text-slate-500 uppercase tracking-wider">System</div>
           <div 
-            class="group flex items-center px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200 text-slate-400 hover:bg-slate-800/50 hover:text-slate-100"
+            class="group flex items-center px-3 py-2.5 rounded-sm cursor-pointer transition-all duration-200 text-slate-400 hover:bg-slate-800/50 hover:text-slate-100"
             @click="showApiConfig = true"
           >
             <div class="flex items-center gap-3">
@@ -79,7 +79,7 @@
 
       <!-- 底部用户信息 -->
       <div class="p-4 border-t border-slate-800/50 bg-[#0B1120]">
-        <div class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-800/40 hover:bg-slate-800 transition-colors cursor-pointer border border-white/5 hover:border-white/10 group">
+        <div class="flex items-center gap-3 p-2.5 rounded-sm bg-slate-800/40 hover:bg-slate-800 transition-colors cursor-pointer border border-white/5 hover:border-white/10 group">
           <div class="relative">
              <el-avatar :size="36" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" class="ring-2 ring-slate-700 group-hover:ring-indigo-500 transition-all" />
              <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-slate-900 rounded-full"></span>
@@ -103,7 +103,7 @@
           <el-tag type="info" size="small" effect="plain" class="!rounded-full px-3">Workspace: Default</el-tag>
         </div>
         <div class="flex items-center gap-3">
-           <el-button type="primary" @click="showCreateAgent = true" class="!rounded-lg !px-5 !bg-indigo-600 !border-indigo-600 hover:!bg-indigo-700 hover:!shadow-lg hover:!shadow-indigo-500/20 transition-all">
+           <el-button type="primary" @click="showCreateAgent = true" class="!rounded-sm !px-5 !bg-indigo-600 !border-indigo-600 hover:!bg-indigo-700 hover:!shadow-lg hover:!shadow-indigo-500/20 transition-all">
              <el-icon class="mr-2"><Plus /></el-icon>新建智能体
            </el-button>
         </div>
@@ -137,7 +137,7 @@
           <div 
             v-for="agent in filteredAgents" 
             :key="agent.id" 
-            class="group bg-white rounded-xl border border-slate-200 p-6 hover:shadow-xl hover:border-indigo-200 transition-all duration-300 cursor-pointer relative overflow-hidden"
+            class="group bg-white rounded-sm border border-slate-200 p-6 hover:shadow-xl hover:border-indigo-200 transition-all duration-300 cursor-pointer relative overflow-hidden"
             @click="selectAgent(agent)"
           >
             <!-- 顶部装饰条 -->
@@ -145,7 +145,7 @@
             
             <div class="flex justify-between items-start mb-4">
                <div class="flex items-center gap-4">
-                 <div class="w-14 h-14 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-2xl shadow-sm group-hover:scale-105 transition-transform">
+                 <div class="w-14 h-14 rounded-sm bg-slate-50 border border-slate-100 flex items-center justify-center text-2xl shadow-sm group-hover:scale-105 transition-transform">
                    {{ agent.avatar || '🤖' }}
                  </div>
                  <div>
@@ -180,14 +180,14 @@
 
             <div class="flex items-center justify-between pt-4 border-t border-slate-100">
                <div class="text-xs text-slate-400 font-mono">{{ agent.config.model.split('/').pop() }}</div>
-               <el-button type="primary" plain size="small" class="!rounded-lg" @click.stop="chatWithAgent(agent)">
+               <el-button type="primary" plain size="small" class="!rounded-sm" @click.stop="chatWithAgent(agent)">
                  Start Chat <el-icon class="ml-1"><ArrowRight /></el-icon>
                </el-button>
             </div>
           </div>
 
           <!-- 创建卡片 (Placeholder) -->
-          <div @click="showCreateAgent = true" class="group border-2 border-dashed border-slate-200 rounded-xl p-6 flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/30 transition-all min-h-[260px]">
+          <div @click="showCreateAgent = true" class="group border-2 border-dashed border-slate-200 rounded-sm p-6 flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/30 transition-all min-h-[260px]">
              <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-indigo-100 group-hover:text-indigo-600 transition-colors">
                <el-icon class="text-2xl"><Plus /></el-icon>
              </div>
@@ -233,7 +233,7 @@
               <!-- 消息体 -->
               <div class="max-w-[80%]">
                  <div class="text-xs text-slate-400 mb-1" :class="msg.role === 'user' ? 'text-right' : ''">{{ msg.role.toUpperCase() }} • {{ formatTime(msg.timestamp) }}</div>
-                 <div class="p-4 rounded-2xl text-sm leading-relaxed shadow-sm whitespace-pre-wrap" 
+                 <div class="p-4 rounded-md text-sm leading-relaxed shadow-sm whitespace-pre-wrap" 
                       :class="msg.role === 'user' ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white text-slate-700 border border-slate-200 rounded-tl-none'">
                     {{ msg.content }}
                     <span v-if="msg.streaming" class="inline-block w-2 h-4 align-middle bg-indigo-400 animate-pulse ml-1"></span>
@@ -241,7 +241,7 @@
                  
                  <!-- 工具调用日志 (Trace) -->
                  <div v-if="msg.toolCalls && msg.toolCalls.length" class="mt-2 space-y-2">
-                    <div v-for="(tool, idx) in msg.toolCalls" :key="idx" class="bg-slate-100 border border-slate-200 rounded-lg p-3 text-xs font-mono">
+                    <div v-for="(tool, idx) in msg.toolCalls" :key="idx" class="bg-slate-100 border border-slate-200 rounded-sm p-3 text-xs font-mono">
                        <div class="flex items-center gap-2 text-indigo-600 font-bold mb-1">
                           <el-icon><Tools /></el-icon> {{ tool.name }}
                        </div>
@@ -277,12 +277,12 @@
     </el-drawer>
 
     <!-- 配置对话框 (保持原有逻辑，仅优化样式) -->
-    <el-dialog v-model="showCreateAgent" :title="isEditing ? '配置智能体' : '创建智能体'" width="650px" class="!rounded-xl">
+    <el-dialog v-model="showCreateAgent" :title="isEditing ? '配置智能体' : '创建智能体'" width="650px" class="!rounded-sm">
        <el-form :model="agentForm" label-position="top" class="p-2">
           <div class="flex gap-6 mb-6">
              <div class="w-24 flex-shrink-0 text-center">
                 <el-upload class="avatar-uploader" action="#" :show-file-list="false" :auto-upload="false" :on-change="handleAvatarChange">
-                   <div class="w-24 h-24 rounded-2xl border-2 border-dashed border-slate-300 hover:border-indigo-500 flex flex-col items-center justify-center cursor-pointer bg-slate-50 hover:bg-indigo-50 transition-colors overflow-hidden">
+                   <div class="w-24 h-24 rounded-md border-2 border-dashed border-slate-300 hover:border-indigo-500 flex flex-col items-center justify-center cursor-pointer bg-slate-50 hover:bg-indigo-50 transition-colors overflow-hidden">
                       <span v-if="agentForm.avatar" class="text-4xl">{{ agentForm.avatar }}</span>
                       <el-icon v-else class="text-2xl text-slate-400 mb-2"><Camera /></el-icon>
                       <span v-if="!agentForm.avatar" class="text-xs text-slate-400">Upload</span>
@@ -301,7 +301,7 @@
 
           <el-tabs class="demo-tabs">
              <el-tab-pane label="Tools & Capabilities">
-                <div class="bg-slate-50 rounded-lg p-4 border border-slate-200 mb-4">
+                <div class="bg-slate-50 rounded-sm p-4 border border-slate-200 mb-4">
                    <div class="text-sm font-bold text-slate-700 mb-3">已启用的 MCP 工具</div>
                    <div class="flex flex-wrap gap-2">
                       <el-tag v-for="tool in agentForm.tools" :key="tool" closable @close="removeTool(tool)" type="info" effect="light" class="!bg-white !border-slate-300">
@@ -377,7 +377,7 @@ const NavItem = defineComponent({
   setup(props, { emit }) {
     return () => h('div', {
       class: [
-        'flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer transition-colors mb-1 group',
+        'flex items-center justify-between px-3 py-2 rounded-sm cursor-pointer transition-colors mb-1 group',
         props.active ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
       ],
       onClick: () => emit('click')
@@ -395,12 +395,12 @@ const NavItem = defineComponent({
 const StatCard = defineComponent({
   props: ['title', 'value', 'icon', 'color', 'bg'],
   setup(props) {
-    return () => h('div', { class: 'bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex items-center justify-between' }, [
+    return () => h('div', { class: 'bg-white rounded-sm p-5 border border-slate-200 shadow-sm flex items-center justify-between' }, [
       h('div', [
         h('div', { class: 'text-slate-500 text-xs font-medium uppercase tracking-wider mb-1' }, props.title),
         h('div', { class: 'text-2xl font-bold text-slate-800' }, props.value)
       ]),
-      h('div', { class: `w-12 h-12 rounded-lg ${props.bg} flex items-center justify-center ${props.color}` }, [
+      h('div', { class: `w-12 h-12 rounded-sm ${props.bg} flex items-center justify-center ${props.color}` }, [
         h(Icons[props.icon as keyof typeof Icons], { class: 'text-2xl' })
       ])
     ])

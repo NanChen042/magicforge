@@ -42,7 +42,7 @@
       <div class="h-full grid grid-cols-1 lg:grid-cols-[400px_1fr] xl:grid-cols-[440px_1fr] gap-6 items-start">
         
         <!-- 左侧：表单区 (自带滚动) -->
-        <div class="h-full overflow-y-auto hidden-scrollbar rounded-2xl bg-white/60 backdrop-blur-xl border border-white/50 shadow-xl shadow-indigo-500/5 ring-1 ring-slate-900/5">
+        <div class="h-full overflow-y-auto hidden-scrollbar rounded-md bg-white/60 backdrop-blur-xl border border-white/50 shadow-xl shadow-indigo-500/5 ring-1 ring-slate-900/5">
           <ImageGeneratorForm
             :form-data="formData"
             :loading="loading"
@@ -52,7 +52,7 @@
         </div>
 
         <!-- 右侧：结果展示区 (自带滚动) -->
-        <div class="h-full min-h-0 flex flex-col rounded-2xl bg-white/40 backdrop-blur-md border border-white/40 shadow-xl shadow-indigo-500/5 ring-1 ring-slate-900/5 overflow-hidden">
+        <div class="h-full min-h-0 flex flex-col rounded-md bg-white/40 backdrop-blur-md border border-white/40 shadow-xl shadow-indigo-500/5 ring-1 ring-slate-900/5 overflow-hidden">
           <ImageGeneratorResults
             :generated-images="generatedImages"
             :loading="loading"
@@ -79,11 +79,11 @@
       :title="previewTitle" 
       :append-to-body="true"
       width="90%"
-      class="!rounded-2xl !bg-slate-900/95 !backdrop-blur-md !border !border-white/10 !shadow-2xl overflow-hidden glass-dialog"
+      class="!rounded-md !bg-slate-900/95 !backdrop-blur-md !border !border-white/10 !shadow-2xl overflow-hidden glass-dialog"
     >
       <!-- 预览内容 -->
-      <div class="flex items-center justify-center bg-black/50 rounded-xl p-4 min-h-[400px]">
-        <img :src="previewImage" class="max-h-[70vh] w-auto object-contain rounded-lg shadow-2xl" alt="预览图片" />
+      <div class="flex items-center justify-center bg-black/50 rounded-sm p-4 min-h-[400px]">
+        <img :src="previewImage" class="max-h-[70vh] w-auto object-contain rounded-sm shadow-2xl" alt="预览图片" />
       </div>
 
       <!-- 底部操作栏 -->

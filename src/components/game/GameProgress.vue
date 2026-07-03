@@ -51,7 +51,7 @@ const getTheme = (value: number, type: 'blue' | 'green' | 'purple' | 'amber') =>
   
   return {
     // 卡片：纯白，极柔和阴影，移除边框，改用悬浮感
-    card: `bg-white rounded-2xl p-6 relative overflow-hidden transition-all duration-500 hover:-translate-y-1 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] ${s.shadow} group`,
+    card: `bg-white rounded-md p-6 relative overflow-hidden transition-all duration-500 hover:-translate-y-1 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] ${s.shadow} group`,
     // 文字颜色
     textColor: s.text,
     accentColor: s.accent,

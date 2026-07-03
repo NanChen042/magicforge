@@ -13,9 +13,12 @@ declare module 'vue' {
   export interface GlobalComponents {
     AIImageGenerator: typeof import('./src/components/AIImageGenerator.vue')['default']
     ApiUrlInput: typeof import('./src/components/ApiUrlInput.vue')['default']
+    CapabilitiesMatrix: typeof import('./src/components/home/CapabilitiesMatrix.vue')['default']
     ChatPanel: typeof import('./src/components/deepseek/ChatPanel.vue')['default']
     CodeExample: typeof import('./src/components/deepseek/CodeExample.vue')['default']
+    CodeShowcase: typeof import('./src/components/home/CodeShowcase.vue')['default']
     ConfigPanel: typeof import('./src/components/deepseek/ConfigPanel.vue')['default']
+    CoreArchitecture: typeof import('./src/components/home/CoreArchitecture.vue')['default']
     DeepseekDemo: typeof import('./src/components/DeepseekDemo.vue')['default']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElButton: typeof import('element-plus/es')['ElButton']
@@ -50,6 +53,7 @@ declare module 'vue' {
     GameScene: typeof import('./src/components/game/GameScene.vue')['default']
     GameStatusBar: typeof import('./src/components/game/GameStatusBar.vue')['default']
     GiaoGame: typeof import('./src/components/GiaoGame.vue')['default']
+    HeroSection: typeof import('./src/components/home/HeroSection.vue')['default']
     HomePage: typeof import('./src/components/HomePage.vue')['default']
     IconCommunity: typeof import('./src/components/icons/IconCommunity.vue')['default']
     IconDocumentation: typeof import('./src/components/icons/IconDocumentation.vue')['default']
@@ -58,6 +62,7 @@ declare module 'vue' {
     IconTooling: typeof import('./src/components/icons/IconTooling.vue')['default']
     ImageGeneratorForm: typeof import('./src/components/image-generator/ImageGeneratorForm.vue')['default']
     ImageGeneratorResults: typeof import('./src/components/image-generator/ImageGeneratorResults.vue')['default']
+    MainFooter: typeof import('./src/components/home/MainFooter.vue')['default']
     MessageItem: typeof import('./src/components/deepseek/chat/MessageItem.vue')['default']
     MessageNotification: typeof import('./src/components/MessageNotification.vue')['default']
     ModalDialog: typeof import('./src/components/ModalDialog.vue')['default']
@@ -69,5 +74,6 @@ declare module 'vue' {
     SearchProcessModal: typeof import('./src/components/deepseek/modals/SearchProcessModal.vue')['default']
     ThinkingProcess: typeof import('./src/components/deepseek/chat/ThinkingProcess.vue')['default']
     TransformModal: typeof import('./src/components/deepseek/modals/TransformModal.vue')['default']
+    ValueShowcase: typeof import('./src/components/home/ValueShowcase.vue')['default']
   }
 }

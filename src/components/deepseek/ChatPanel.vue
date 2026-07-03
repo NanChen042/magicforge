@@ -1,5 +1,5 @@
 <template>
-  <div class="col-span-1 lg:col-span-2 flex flex-col bg-white rounded-2xl shadow-2xl shadow-zinc-200/50 order-1 lg:order-2 overflow-hidden ring-1 ring-zinc-100 h-full">
+  <div class="col-span-1 lg:col-span-2 flex flex-col bg-white rounded-md shadow-2xl shadow-zinc-200/50 order-1 lg:order-2 overflow-hidden ring-1 ring-zinc-100 h-full">
 
     <!-- 1. 头部：视图切换和状态 -->
     <div class="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-b border-zinc-100 bg-white/80 backdrop-blur-sm sticky top-0 z-30">
@@ -99,7 +99,7 @@
         leave-to-class="opacity-0 translate-y-4"
       >
         <div v-if="error" class="absolute bottom-4 left-4 right-4 z-20 mx-auto max-w-lg">
-          <div class="flex items-start gap-3 p-4 bg-white border border-red-100 rounded-xl shadow-xl shadow-red-500/5 ring-1 ring-red-500/10">
+          <div class="flex items-start gap-3 p-4 bg-white border border-red-100 rounded-sm shadow-xl shadow-red-500/5 ring-1 ring-red-500/10">
             <div class="shrink-0 w-8 h-8 rounded-full bg-red-50 flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
@@ -127,7 +127,7 @@
             <img 
               :src="img.preview" 
               :alt="`上传图片 ${index + 1}`"
-              class="w-20 h-20 object-cover rounded-lg border border-zinc-200 shadow-sm"
+              class="w-20 h-20 object-cover rounded-sm border border-zinc-200 shadow-sm"
             />
             <button
               @click="$emit('remove-image', index)"
@@ -147,7 +147,7 @@
             id="message-input"
             :value="userInput"
             @input="$emit('update:userInput', ($event.target as HTMLTextAreaElement).value)"
-            class="block w-full resize-none bg-white rounded-xl border-0 ring-1 ring-zinc-200 shadow-sm
+            class="block w-full resize-none bg-white rounded-sm border-0 ring-1 ring-zinc-200 shadow-sm
                    text-sm text-zinc-800 placeholder:text-zinc-400 leading-relaxed
                    focus:ring-2 focus:ring-zinc-900 focus:outline-none focus:shadow-md
                    hover:ring-zinc-300
@@ -176,7 +176,7 @@
           <div class="w-full md:w-auto order-2 md:order-1 flex items-center gap-2">
             <!-- Clear Button -->
             <button
-              class="inline-flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              class="inline-flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-sm hover:bg-gray-50 transition-colors"
               title="清空对话"
               @click="$emit('clear')"
             >
@@ -189,7 +189,7 @@
             <!-- 图片上传按钮 (仅多模态模型显示) -->
             <label
               v-if="supportsVision"
-              class="inline-flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-violet-300 hover:text-violet-600 transition-colors cursor-pointer"
+              class="inline-flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-sm hover:bg-gray-50 hover:border-violet-300 hover:text-violet-600 transition-colors cursor-pointer"
               :class="{ 'border-violet-400 bg-violet-50 text-violet-600': uploadedImages && uploadedImages.length > 0 }"
               title="上传图片"
             >
@@ -218,7 +218,7 @@
                 v-if="!isProcessing"
                 @click="$emit('optimize')"
                 :disabled="!userInput.trim() || isTransforming"
-                class="flex items-center gap-2 px-3 py-2 rounded-lg border border-zinc-200 text-zinc-600 bg-white hover:bg-zinc-50 hover:border-zinc-300 hover:text-zinc-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+                class="flex items-center gap-2 px-3 py-2 rounded-sm border border-zinc-200 text-zinc-600 bg-white hover:bg-zinc-50 hover:border-zinc-300 hover:text-zinc-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
                 title="AI 优化提示词"
               >
                 <svg v-if="isTransforming" class="h-4 w-4 animate-spin text-zinc-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -236,7 +236,7 @@
               <button
                 v-if="isProcessing"
                 @click="$emit('stop')"
-                class="group relative flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-white border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 hover:shadow-sm transition-all active:scale-95"
+                class="group relative flex items-center justify-center gap-2 px-6 py-2.5 rounded-sm bg-white border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 hover:shadow-sm transition-all active:scale-95"
               >
                 <span class="relative flex h-2 w-2">
                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -249,7 +249,7 @@
                 v-else
                 @click="$emit('send')"
                 :disabled="!userInput.trim()"
-                class="group relative flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-zinc-900 text-white shadow-lg shadow-zinc-900/20 hover:bg-zinc-800 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:bg-zinc-900 disabled:hover:translate-y-0"
+                class="group relative flex items-center justify-center gap-2 px-6 py-2.5 rounded-sm bg-zinc-900 text-white shadow-lg shadow-zinc-900/20 hover:bg-zinc-800 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:bg-zinc-900 disabled:hover:translate-y-0"
               >
                 <svg class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7" />

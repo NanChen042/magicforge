@@ -5,7 +5,7 @@
     w-full: 占满宽度
     relative: 为内部绝对定位提供锚点
   -->
-  <div class="relative w-full h-full bg-white rounded-2xl shadow-xl shadow-slate-200/50 overflow-hidden font-sans text-slate-700 flex flex-col">
+  <div class="relative w-full h-full bg-white rounded-md shadow-xl shadow-slate-200/50 overflow-hidden font-sans text-slate-700 flex flex-col">
 
 <transition
     enter-active-class="transition duration-700 ease-out"
@@ -25,7 +25,7 @@
         
         <!-- 模拟图片瀑布流 (这里用颜色块代替，实际请换成你的高清示例图 url) -->
         <div class="grid grid-cols-4 gap-4 transform -rotate-6 scale-110 opacity-60">
-           <div v-for="n in 12" :key="n" class="aspect-[2/3] rounded-xl bg-slate-200 shadow-lg overflow-hidden relative grayscale hover:grayscale-0 transition-all duration-700">
+           <div v-for="n in 12" :key="n" class="aspect-[2/3] rounded-sm bg-slate-200 shadow-lg overflow-hidden relative grayscale hover:grayscale-0 transition-all duration-700">
               <!-- 占位图：实际项目中请替换为真实的 AI 生成图 -->
               <img :src="`https://picsum.photos/seed/${n * 123}/300/500`" class="w-full h-full object-cover" alt="AI Example" />
            </div>
@@ -62,7 +62,7 @@
         <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
           
           <!-- Card 1: 3D Render -->
-          <button class="group relative h-32 rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-left">
+          <button class="group relative h-32 rounded-md overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-left">
             <img src="https://picsum.photos/seed/3d/400/200" class="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-110 transition-transform duration-700" />
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
             <div class="absolute bottom-0 left-0 p-4 text-white">
@@ -74,7 +74,7 @@
           </button>
 
           <!-- Card 2: Cyberpunk -->
-          <button class="group relative h-32 rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-left">
+          <button class="group relative h-32 rounded-md overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-left">
             <img src="https://picsum.photos/seed/cyber/400/200" class="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-110 transition-transform duration-700" />
             <div class="absolute inset-0 bg-gradient-to-t from-purple-900/80 via-transparent to-transparent"></div>
              <div class="absolute bottom-0 left-0 p-4 text-white">
@@ -86,7 +86,7 @@
           </button>
 
           <!-- Card 3: Watercolor -->
-          <button class="group relative h-32 rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-left">
+          <button class="group relative h-32 rounded-md overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-left">
             <img src="https://picsum.photos/seed/art/400/200" class="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-110 transition-transform duration-700" />
             <div class="absolute inset-0 bg-gradient-to-t from-indigo-900/80 via-transparent to-transparent"></div>
              <div class="absolute bottom-0 left-0 p-4 text-white">
@@ -157,7 +157,7 @@
           :style="{ left: `calc(${progress}% - 20px)` }"
         >
           <!-- 1. 对话气泡 (趣味文案) -->
-          <div class="absolute -top-12 left-1/2 -translate-x-1/2 whitespace-nowrap px-3 py-1.5 bg-slate-800 text-white text-[10px] font-bold rounded-lg shadow-lg animate-bounce-slight opacity-90 after:content-[''] after:absolute after:top-full after:left-1/2 after:-translate-x-1/2 after:border-[6px] after:border-transparent after:border-t-slate-800">
+          <div class="absolute -top-12 left-1/2 -translate-x-1/2 whitespace-nowrap px-3 py-1.5 bg-slate-800 text-white text-[10px] font-bold rounded-sm shadow-lg animate-bounce-slight opacity-90 after:content-[''] after:absolute after:top-full after:left-1/2 after:-translate-x-1/2 after:border-[6px] after:border-transparent after:border-t-slate-800">
             {{ loadingTip }}
           </div>
 
@@ -239,7 +239,7 @@
         <!-- A. 顶栏 (Gallery Header) -->
         <div class="shrink-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 px-6 py-3 flex items-center justify-between shadow-sm">
           <div class="flex items-center gap-3">
-            <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-[#4E54C8] text-white shadow-lg shadow-[#4E54C8]/30">
+            <div class="flex items-center justify-center w-8 h-8 rounded-sm bg-[#4E54C8] text-white shadow-lg shadow-[#4E54C8]/30">
               <el-icon>
                 <Picture />
               </el-icon>
@@ -271,7 +271,7 @@
           <!-- 动态网格容器 -->
           <div class="w-full h-full grid gap-4 transition-all duration-500 ease-out" :class="gridClass">
 
-            <div v-for="(image, index) in generatedImages" :key="index" class="group relative w-full h-full rounded-2xl overflow-hidden bg-slate-100 ring-1 ring-black/5 shadow-sm hover:shadow-2xl transition-all duration-500" :class="{ 'md:col-span-2 md:row-span-2': generatedImages.length === 3 && index === 0 }">
+            <div v-for="(image, index) in generatedImages" :key="index" class="group relative w-full h-full rounded-md overflow-hidden bg-slate-100 ring-1 ring-black/5 shadow-sm hover:shadow-2xl transition-all duration-500" :class="{ 'md:col-span-2 md:row-span-2': generatedImages.length === 3 && index === 0 }">
 
               <!-- 1. 氛围背景层 (Blur Background) -->
               <!-- 这一层负责撑满盒子，用模糊的图片做背景 -->
@@ -284,7 +284,7 @@
               <!-- 2. 真实图片层 (Real Image Stage) -->
               <!-- flex + object-contain 保证完整显示且居中 -->
               <div class="absolute inset-0 flex items-center justify-center p-4 md:p-6 z-10 transition-all duration-500 group-hover:scale-[1.02]">
-                <img :src="image.url" alt="AI Art" loading="lazy" class="max-w-full max-h-full object-contain rounded-lg shadow-xl shadow-black/10 cursor-zoom-in ring-1 ring-black/5" @click="$emit('show-preview', image.url)" />
+                <img :src="image.url" alt="AI Art" loading="lazy" class="max-w-full max-h-full object-contain rounded-sm shadow-xl shadow-black/10 cursor-zoom-in ring-1 ring-black/5" @click="$emit('show-preview', image.url)" />
               </div>
 
               <!-- 3. 悬浮交互层 (HUD) -->

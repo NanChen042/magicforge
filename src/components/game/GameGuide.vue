@@ -75,12 +75,12 @@ const lastChoiceImpactText = computed(() => {
         <!-- 头部 (Header) -->
         <div class="relative bg-gradient-to-r from-amber-900/40 to-black px-6 py-5 border-b border-amber-500/20 flex justify-between items-center">
           <div class="flex items-center gap-3">
-             <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+             <div class="w-8 h-8 rounded-sm bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
                 📖
              </div>
              <h3 class="text-amber-100 font-bold tracking-wider text-lg">江湖录</h3>
           </div>
-          <button @click="emit('close')" class="text-slate-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/5">
+          <button @click="emit('close')" class="text-slate-400 hover:text-white transition-colors p-2 rounded-sm hover:bg-white/5">
              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
         </div>
@@ -90,12 +90,12 @@ const lastChoiceImpactText = computed(() => {
           
           <!-- A. 玩家档案 -->
           <div class="relative group">
-             <div class="absolute -inset-2 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 rounded-xl blur-lg pointer-events-none"></div>
+             <div class="absolute -inset-2 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 rounded-sm blur-lg pointer-events-none"></div>
              <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-2">
                 <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
                 当前状态 (Status)
              </h4>
-             <div class="bg-[#1A1D24] rounded-xl border border-white/5 p-4 space-y-2 relative overflow-hidden">
+             <div class="bg-[#1A1D24] rounded-sm border border-white/5 p-4 space-y-2 relative overflow-hidden">
                 <!-- 装饰线 -->
                 <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500/50"></div>
                 
@@ -170,7 +170,7 @@ const lastChoiceImpactText = computed(() => {
                 <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
                 天机推演 (Analysis)
              </h4>
-             <div class="bg-[#1A1D24] rounded-xl border border-white/5 p-4 text-xs space-y-3 relative">
+             <div class="bg-[#1A1D24] rounded-sm border border-white/5 p-4 text-xs space-y-3 relative">
                 <!-- 引用 -->
                 <div class="border-l-2 border-slate-600 pl-3 italic text-slate-400">
                    "{{ lastChoiceAnalysis.text }}"
@@ -216,7 +216,7 @@ const lastChoiceImpactText = computed(() => {
 
              <!-- Log Console -->
              <transition name="slide-down">
-                <div v-if="showDebugInfo" class="mt-4 bg-black rounded-lg border border-slate-800 p-3 font-mono text-[10px] text-green-400/80 overflow-x-auto max-h-40 custom-scrollbar shadow-inner">
+                <div v-if="showDebugInfo" class="mt-4 bg-black rounded-sm border border-slate-800 p-3 font-mono text-[10px] text-green-400/80 overflow-x-auto max-h-40 custom-scrollbar shadow-inner">
                    <div class="opacity-50 mb-2">// SYSTEM LOGS STREAM</div>
                    <pre>{{ JSON.stringify(debugInfo, null, 2) }}</pre>
                 </div>

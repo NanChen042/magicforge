@@ -2,7 +2,7 @@
   <Teleport to="body">
     <div v-if="visible" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
       <div :class="[
-        'message-notification px-4 py-3 rounded-lg shadow-md flex items-center',
+        'message-notification px-4 py-3 rounded-sm shadow-md flex items-center',
         typeClass
       ]">
         <span class="mr-2">

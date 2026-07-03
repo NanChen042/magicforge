@@ -9,7 +9,7 @@
         <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
 
         <div
-          class="relative bg-white rounded-lg shadow-xl max-w-md mx-auto w-full max-h-[90vh] flex flex-col overflow-hidden transition-all"
+          class="relative bg-white rounded-sm shadow-xl max-w-md mx-auto w-full max-h-[90vh] flex flex-col overflow-hidden transition-all"
           @click.stop
         >
           <!-- Header -->

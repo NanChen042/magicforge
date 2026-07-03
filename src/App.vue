@@ -22,7 +22,7 @@
     </div>
 
     <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 h-16 md:h-20">
-      <div class="absolute inset-0 bg-white/70 backdrop-blur-2xl border-b border-zinc-200/50 shadow-[0_1px_2px_rgba(0,0,0,0.02)]"></div>
+      <div class="absolute inset-0 bg-white border-b border-zinc-200 shadow-[0_1px_2px_rgba(0,0,0,0.02)]"></div>
       
       <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
         <div class="flex justify-between items-center h-full">
@@ -87,14 +87,20 @@
     </header>
 
     <main class="flex-1 w-full pt-16 md:pt-20 box-border relative overflow-auto flex flex-col min-h-0">
-      <div class="max-w-7xl mx-auto w-full px-4 md:px-8 flex-1 flex flex-col min-h-0">
+      <!-- 首页不需要包裹 max-w-7xl 限制，以便背景和页脚完整铺满全宽 -->
+      <div v-if="$route.path !== '/'" class="max-w-7xl mx-auto w-full px-4 md:px-8 flex-1 flex flex-col min-h-0">
         <router-view v-slot="{ Component }">
           <component :is="Component" class="flex-1 min-h-0" />
         </router-view>
       </div>
+      <template v-else>
+        <router-view v-slot="{ Component }">
+          <component :is="Component" class="flex-1 min-h-0" />
+        </router-view>
+      </template>
     </main>
 
-<footer class="relative z-1 border-t border-zinc-200/50 bg-white/40 backdrop-blur-md">
+<footer class="relative z-1 border-t border-zinc-200 bg-white" v-if="$route.path !== '/'">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
     <div class="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white/60 border border-zinc-100 shadow-sm">
       <div class="relative flex h-2 w-2">

@@ -1,7 +1,7 @@
 <template>
-  <div class="bg-white/80 backdrop-blur-xl rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-zinc-100/80 p-5 md:p-7 lg:w-full order-2 lg:order-1 overflow-y-auto h-full">    <div class="flex items-center justify-between mb-8">
+  <div class="bg-white/80 backdrop-blur-xl rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-zinc-100/80 p-5 md:p-7 lg:w-full order-2 lg:order-1 overflow-y-auto h-full">    <div class="flex items-center justify-between mb-8">
       <div class="flex items-center space-x-3">
-        <div class="bg-zinc-900 p-2.5 rounded-xl shadow-sm">
+        <div class="bg-zinc-900 p-2.5 rounded-sm shadow-sm">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -12,7 +12,7 @@
       
       <button
         @click="showSettingsDialog = true"
-        class="p-2.5 rounded-xl bg-white border border-zinc-200 text-zinc-500 hover:border-zinc-900 hover:text-zinc-900 hover:shadow-md transition-all duration-300 cursor-pointer group"
+        class="p-2.5 rounded-sm bg-white border border-zinc-200 text-zinc-500 hover:border-zinc-900 hover:text-zinc-900 hover:shadow-md transition-all duration-300 cursor-pointer group"
         title="API 设置"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:rotate-45 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -21,7 +21,7 @@
       </button>
     </div>
 
-    <div class="mb-8 p-5 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 rounded-2xl shadow-xl shadow-zinc-900/10 ring-1 ring-white/10 relative overflow-hidden">
+    <div class="mb-8 p-5 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 rounded-md shadow-xl shadow-zinc-900/10 ring-1 ring-white/10 relative overflow-hidden">
       <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
       
       <div class="flex items-center gap-4 relative z-10">
@@ -71,7 +71,7 @@
               :value="modelName"
               @input="$emit('update:modelName', ($event.target as HTMLInputElement).value)"
               placeholder="输入模型 ID，如: vendor/model-name"
-              class="peer w-full pl-4 pr-10 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm font-mono text-zinc-900 placeholder:text-zinc-400 focus:bg-white focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 focus:outline-none transition-all duration-300 shadow-sm"
+              class="peer w-full pl-4 pr-10 py-3.5 bg-zinc-50 border border-zinc-200 rounded-sm text-sm font-mono text-zinc-900 placeholder:text-zinc-400 focus:bg-white focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 focus:outline-none transition-all duration-300 shadow-sm"
             />
             <span class="absolute inset-y-0 right-0 flex items-center pr-4 text-zinc-400 peer-focus:text-zinc-900 transition-colors duration-300 pointer-events-none">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -87,14 +87,14 @@
           v-for="model in modelConfigs"
           :key="model.id"
           @click="selectModel(model.id)"
-          class="group relative p-3.5 rounded-xl border cursor-pointer transition-all duration-300"
+          class="group relative p-3.5 rounded-sm border cursor-pointer transition-all duration-300"
           :class="modelName === model.id
             ? 'bg-zinc-900 border-zinc-900 shadow-lg shadow-zinc-900/10'
             : 'bg-white border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 hover:shadow-md hover:shadow-black/5'"
         >
           <div class="flex items-center gap-3.5">
             <div 
-              class="w-10 h-10 rounded-lg flex items-center justify-center transition-colors duration-300"
+              class="w-10 h-10 rounded-sm flex items-center justify-center transition-colors duration-300"
               :class="modelName === model.id ? 'bg-white/10 text-white' : 'bg-zinc-100 text-zinc-500 group-hover:bg-white group-hover:text-zinc-900 group-hover:shadow-sm'"
             >
               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -312,7 +312,7 @@
               :value="apiKey"
               @input="$emit('update:apiKey', ($event.target as HTMLInputElement).value)"
               placeholder="sk-..."
-              class="peer w-full pl-4 pr-10 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm font-mono text-zinc-900 placeholder:text-zinc-400 focus:bg-white focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 focus:outline-none transition-all duration-300 shadow-sm"
+              class="peer w-full pl-4 pr-10 py-3.5 bg-zinc-50 border border-zinc-200 rounded-sm text-sm font-mono text-zinc-900 placeholder:text-zinc-400 focus:bg-white focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 focus:outline-none transition-all duration-300 shadow-sm"
             />
             <span class="absolute inset-y-0 right-0 flex items-center pr-4 text-zinc-400 peer-focus:text-zinc-900 transition-colors duration-300 pointer-events-none">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -338,7 +338,7 @@
               :value="apiUrl"
               @input="$emit('update:apiUrl', ($event.target as HTMLInputElement).value)"
               placeholder="https://api.siliconflow.cn/v1"
-              class="peer w-full pl-4 pr-10 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm font-mono text-zinc-900 placeholder:text-zinc-400 focus:bg-white focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 focus:outline-none transition-all duration-300 shadow-sm"
+              class="peer w-full pl-4 pr-10 py-3.5 bg-zinc-50 border border-zinc-200 rounded-sm text-sm font-mono text-zinc-900 placeholder:text-zinc-400 focus:bg-white focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 focus:outline-none transition-all duration-300 shadow-sm"
             />
             <span class="absolute inset-y-0 right-0 flex items-center pr-4 text-zinc-400 peer-focus:text-zinc-900 transition-colors duration-300 pointer-events-none">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -355,14 +355,14 @@
           <div class="grid grid-cols-2 gap-3">
             <div
               @click="$emit('update:apiStyle', 'openai')"
-              class="group relative p-4 rounded-xl border cursor-pointer transition-all duration-300"
+              class="group relative p-4 rounded-sm border cursor-pointer transition-all duration-300"
               :class="apiStyle === 'openai'
                 ? 'bg-zinc-900 border-zinc-900 shadow-lg shadow-zinc-900/10'
                 : 'bg-white border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50'"
             >
               <div class="flex items-center gap-3">
                 <div
-                  class="p-2 rounded-lg transition-colors duration-300"
+                  class="p-2 rounded-sm transition-colors duration-300"
                   :class="apiStyle === 'openai' ? 'bg-white/10 text-white' : 'bg-zinc-100 text-zinc-500 group-hover:bg-white'"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -384,14 +384,14 @@
 
             <div
               @click="$emit('update:apiStyle', 'adapter')"
-              class="group relative p-4 rounded-xl border cursor-pointer transition-all duration-300"
+              class="group relative p-4 rounded-sm border cursor-pointer transition-all duration-300"
               :class="apiStyle === 'adapter'
                 ? 'bg-zinc-900 border-zinc-900 shadow-lg shadow-zinc-900/10'
                 : 'bg-white border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50'"
             >
               <div class="flex items-center gap-3">
                 <div
-                  class="p-2 rounded-lg transition-colors duration-300"
+                  class="p-2 rounded-sm transition-colors duration-300"
                   :class="apiStyle === 'adapter' ? 'bg-white/10 text-white' : 'bg-zinc-100 text-zinc-500 group-hover:bg-white'"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -418,13 +418,13 @@
         <div class="flex justify-end gap-3 border-t border-zinc-100 pt-5 mt-2">
           <button
             @click="showSettingsDialog = false"
-            class="px-5 py-2.5 text-sm font-semibold text-zinc-600 bg-white border border-zinc-200 rounded-xl hover:bg-zinc-50 hover:text-zinc-900 transition-all cursor-pointer"
+            class="px-5 py-2.5 text-sm font-semibold text-zinc-600 bg-white border border-zinc-200 rounded-sm hover:bg-zinc-50 hover:text-zinc-900 transition-all cursor-pointer"
           >
             取消
           </button>
           <button
             @click="showSettingsDialog = false"
-            class="px-5 py-2.5 text-sm font-semibold text-white bg-zinc-900 rounded-xl hover:bg-zinc-800 transition-all shadow-md shadow-zinc-900/20 cursor-pointer"
+            class="px-5 py-2.5 text-sm font-semibold text-white bg-zinc-900 rounded-sm hover:bg-zinc-800 transition-all shadow-md shadow-zinc-900/20 cursor-pointer"
           >
             保存配置
           </button>

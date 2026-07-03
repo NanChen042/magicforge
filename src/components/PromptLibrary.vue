@@ -42,7 +42,7 @@
           v-for="cat in ['全部', '代码', '创作', '内容']"
           :key="cat"
           @click="setActiveCategory(cat)"
-          class="px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap"
+          class="px-4 py-2 rounded-sm text-sm font-medium transition-all whitespace-nowrap"
           :class="activeCategory === cat 
             ? 'bg-slate-900 text-white shadow-sm' 
             : 'text-slate-600 hover:bg-slate-100'"
@@ -56,7 +56,7 @@
         <div
           v-for="(example, type) in filteredExamples"
           :key="String(type)"
-          class="group relative bg-white rounded-2xl border border-slate-200 p-6 transition-all duration-200 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-100 cursor-pointer"
+          class="group relative bg-white rounded-md border border-slate-200 p-6 transition-all duration-200 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-100 cursor-pointer"
           @click="usePrompt(String(type))"
         >
           <!-- 分类标签 -->

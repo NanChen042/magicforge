@@ -25,19 +25,19 @@
       </div>
 
       <!-- 配置面板 -->
-      <div class="w-full max-w-md space-y-6 bg-slate-900/80 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
+      <div class="w-full max-w-md space-y-6 bg-slate-900/80 backdrop-blur-xl rounded-md p-6 border border-white/10">
         <!-- 模式选择 -->
         <div>
           <div class="text-sm font-medium text-slate-400 mb-3">游戏模式</div>
           <div class="grid grid-cols-2 gap-3">
             <button 
               @click="enableAI = true"
-              class="p-4 rounded-xl border-2 transition-all text-left"
+              class="p-4 rounded-sm border-2 transition-all text-left"
               :class="enableAI 
                 ? 'border-emerald-500 bg-emerald-500/10' 
                 : 'border-slate-700 hover:border-slate-600 bg-slate-800/50'"
             >
-              <div class="w-8 h-8 mb-2 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+              <div class="w-8 h-8 mb-2 rounded-sm bg-emerald-500/20 flex items-center justify-center">
                 <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                 </svg>
@@ -47,12 +47,12 @@
             </button>
             <button 
               @click="enableAI = false"
-              class="p-4 rounded-xl border-2 transition-all text-left"
+              class="p-4 rounded-sm border-2 transition-all text-left"
               :class="!enableAI 
                 ? 'border-blue-500 bg-blue-500/10' 
                 : 'border-slate-700 hover:border-slate-600 bg-slate-800/50'"
             >
-              <div class="w-8 h-8 mb-2 rounded-lg bg-blue-500/20 flex items-center justify-center">
+              <div class="w-8 h-8 mb-2 rounded-sm bg-blue-500/20 flex items-center justify-center">
                 <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
@@ -86,7 +86,7 @@
           </el-select>
           
           <!-- API Key 提示 -->
-          <div v-if="!apiStore.apiKey" class="mt-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+          <div v-if="!apiStore.apiKey" class="mt-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-sm">
             <div class="text-sm text-amber-400">
               未配置 API Key，请先在主页设置
             </div>
@@ -97,7 +97,7 @@
         <button 
           @click="startGame"
           :disabled="enableAI && !apiStore.apiKey"
-          class="w-full py-4 rounded-xl font-bold text-lg tracking-wider transition-all duration-300"
+          class="w-full py-4 rounded-sm font-bold text-lg tracking-wider transition-all duration-300"
           :class="enableAI && !apiStore.apiKey 
             ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
             : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-400 hover:to-orange-400 shadow-lg shadow-amber-500/30'"
@@ -157,7 +157,7 @@
         <el-tooltip :content="enableAI ? `AI 模式 (${selectedModelName}) - 点击返回设置` : '静态模式 - 点击返回设置'" placement="bottom">
           <button 
             @click="gameStarted = false"
-            class="px-3 py-1.5 rounded-lg text-xs font-bold tracking-wider transition-all duration-300 border backdrop-blur-md"
+            class="px-3 py-1.5 rounded-sm text-xs font-bold tracking-wider transition-all duration-300 border backdrop-blur-md"
             :class="enableAI 
               ? 'bg-emerald-500/20 border-emerald-400/50 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.3)]' 
               : 'bg-slate-800/50 border-slate-600/50 text-slate-400'"
@@ -169,7 +169,7 @@
         <!-- 碎片收集 -->
         <div class="flex gap-3">
           <el-tooltip v-for="frag in allFragments" :key="frag.id" :content="hasFragment(frag.id) ? frag.name : '未解锁'" placement="bottom" effect="dark">
-            <div class="relative flex items-center justify-center w-10 h-10 rounded-lg border backdrop-blur-md transition-all duration-500" :class="hasFragment(frag.id)
+            <div class="relative flex items-center justify-center w-10 h-10 rounded-sm border backdrop-blur-md transition-all duration-500" :class="hasFragment(frag.id)
               ? 'border-amber-400/50 bg-amber-500/10 shadow-[0_0_15px_rgba(251,191,36,0.2)]'
               : 'border-white/10 bg-black/20 grayscale'">
               <el-icon v-if="hasFragment(frag.id)" class="w-4 h-4 text-amber-100"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg></el-icon>
@@ -206,7 +206,7 @@
         </transition>
 
         <!-- 对话框本体 -->
-        <div class="relative bg-gradient-to-b from-slate-900/90 to-slate-950/95 backdrop-blur-xl border border-white/10 p-6 md:p-10 rounded-tr-3xl rounded-bl-3xl shadow-2xl transition-all duration-300 min-h-[180px] flex flex-col justify-between group active:scale-[0.99]" :class="{ 'cursor-pointer hover:border-amber-500/30': canClickNext }" @click.stop="handleBoxClick">
+        <div class="relative bg-gradient-to-b from-slate-900/90 to-slate-950/95 backdrop-blur-xl border border-white/10 p-6 md:p-10 rounded-tr-md rounded-bl-md shadow-2xl transition-all duration-300 min-h-[180px] flex flex-col justify-between group active:scale-[0.99]" :class="{ 'cursor-pointer hover:border-amber-500/30': canClickNext }" @click.stop="handleBoxClick">
           <!-- 装饰线 -->
           <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
 

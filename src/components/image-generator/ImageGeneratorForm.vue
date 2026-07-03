@@ -65,7 +65,7 @@
         <div class="relative">
           <el-input v-model="formData.prompt" type="textarea" :rows="5" resize="none" placeholder="描述您脑海中的画面，例如：赛博朋克风格的街道，霓虹灯光，雨夜..." class="atomic-textarea transition-all duration-300" />
           <!-- 聚焦光晕装饰 -->
-          <div class="absolute inset-0 rounded-xl border-2 border-[#4E54C8]/0 pointer-events-none transition-all duration-300 group-focus-within:border-[#4E54C8]/10 group-focus-within:shadow-[0_0_20px_rgba(78,84,200,0.1)]"></div>
+          <div class="absolute inset-0 rounded-sm border-2 border-[#4E54C8]/0 pointer-events-none transition-all duration-300 group-focus-within:border-[#4E54C8]/10 group-focus-within:shadow-[0_0_20px_rgba(78,84,200,0.1)]"></div>
         </div>
 
         <!-- 负面提示词 (折叠) -->
@@ -86,7 +86,7 @@
       <div class="w-full h-px bg-slate-100"></div>
 
       <!-- 外层容器：模拟设计工作台面板 -->
-      <section class="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-50/50 p-5">
+      <section class="relative overflow-hidden rounded-md border border-slate-200 bg-slate-50/50 p-5">
 
         <!-- 装饰：背景点阵纹理 (CSS 绘制) -->
         <div class="absolute inset-0 opacity-[0.4]" style="background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 20px 20px;">
@@ -111,13 +111,13 @@
 
         <!-- 选项网格 -->
         <div class="relative z-10 grid grid-cols-3 gap-2">
-          <button v-for="(value, key) in imageSizeOptions" :key="key" @click="formData.image_size = value.value" class="group relative flex flex-col items-center justify-center py-4 rounded-xl border transition-all duration-300" :class="[
+          <button v-for="(value, key) in imageSizeOptions" :key="key" @click="formData.image_size = value.value" class="group relative flex flex-col items-center justify-center py-4 rounded-sm border transition-all duration-300" :class="[
             formData.image_size === value.value
               ? 'bg-white border-indigo-500/30 shadow-lg shadow-indigo-500/10 scale-[1.02]'
               : 'bg-slate-100/80 border-transparent hover:bg-white hover:border-slate-200 hover:shadow-sm'
           ]">
             <!-- 选中态的高级装饰：边框流光效果 (伪元素) -->
-            <div v-if="formData.image_size === value.value" class="absolute inset-0 rounded-xl border-2 border-indigo-500/10 pointer-events-none"></div>
+            <div v-if="formData.image_size === value.value" class="absolute inset-0 rounded-sm border-2 border-indigo-500/10 pointer-events-none"></div>
 
             <!-- 取景框四角装饰 (仅在 Hover 或 选中时出现) -->
             <div class="absolute inset-1.5 pointer-events-none transition-opacity duration-300" :class="formData.image_size === value.value || 'group-hover:opacity-100' ? 'opacity-100' : 'opacity-0'">
@@ -149,7 +149,7 @@
       </section>
 
       <!-- C. 高级参数 (Control Panel) -->
-      <section class="p-4 rounded-2xl bg-slate-50/80 border border-slate-100 space-y-5">
+      <section class="p-4 rounded-md bg-slate-50/80 border border-slate-100 space-y-5">
         <!-- 数量 -->
         <div class="space-y-2">
           <div class="flex justify-between items-center text-[11px] font-medium text-slate-500">
@@ -187,7 +187,7 @@
 
         <el-upload class="w-full group" :show-file-list="false" :before-upload="beforeImageUpload" :http-request="handleCustomUpload" action="#" drag>
           <!-- 状态：已上传 -->
-          <div v-if="imageUrl" class="relative w-full h-32 rounded-xl overflow-hidden border border-slate-200 group-hover:border-[#4E54C8]/50 transition-all">
+          <div v-if="imageUrl" class="relative w-full h-32 rounded-sm overflow-hidden border border-slate-200 group-hover:border-[#4E54C8]/50 transition-all">
             <img :src="imageUrl" class="w-full h-full object-cover" />
             <!-- 遮罩操作层 -->
             <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 backdrop-blur-[2px]" @click.stop>
@@ -201,7 +201,7 @@
           </div>
 
           <!-- 状态：未上传 -->
-          <div v-else class="w-full h-24 border border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center gap-2 bg-slate-50/50 hover:bg-[#4E54C8]/5 hover:border-[#4E54C8] transition-all duration-300">
+          <div v-else class="w-full h-24 border border-dashed border-slate-300 rounded-sm flex flex-col items-center justify-center gap-2 bg-slate-50/50 hover:bg-[#4E54C8]/5 hover:border-[#4E54C8] transition-all duration-300">
             <div class="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-[#4E54C8] group-hover:scale-110 transition-all">
               <el-icon class="text-lg">
                 <Plus />

@@ -29,13 +29,13 @@ const emit = defineEmits<{
   <div class="space-y-6 font-sans text-slate-800">
     
     <!-- ==================== 1. 场景描述卡片 (Scene Description) - 顶部背景铺垫 ==================== -->
-    <div class="relative overflow-hidden bg-white rounded-2xl p-6 border border-slate-200 shadow-sm group hover:shadow-md transition-all duration-300">
+    <div class="relative overflow-hidden bg-white rounded-md p-6 border border-slate-200 shadow-sm group hover:shadow-md transition-all duration-300">
        <!-- 顶部装饰条 -->
        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-orange-400"></div>
        
        <div class="flex items-start gap-5 pt-2">
           <div class="flex-shrink-0">
-             <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-2xl text-amber-600 border border-amber-100">
+             <div class="w-12 h-12 bg-amber-50 rounded-sm flex items-center justify-center text-2xl text-amber-600 border border-amber-100">
                 📜
              </div>
           </div>
@@ -74,11 +74,11 @@ const emit = defineEmits<{
     <div class="space-y-4">
       
       <!-- Tab 切换 (iOS 分段风格) -->
-      <div class="bg-slate-100 p-1 rounded-xl flex gap-1 shadow-inner">
+      <div class="bg-slate-100 p-1 rounded-sm flex gap-1 shadow-inner">
         <!-- Tab 1: 对话内容 -->
         <button
           @click="emit('switchTab', 'dialog')"
-          class="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2"
+          class="flex-1 py-2.5 rounded-sm text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2"
           :class="activeTab === 'dialog' 
             ? 'bg-white text-indigo-600 shadow-sm ring-1 ring-black/5' 
             : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'"
@@ -91,7 +91,7 @@ const emit = defineEmits<{
         <button
           v-if="modelName !== 'deepseek-chat'"
           @click="emit('switchTab', 'reasoning')"
-          class="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 relative"
+          class="flex-1 py-2.5 rounded-sm text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 relative"
           :class="activeTab === 'reasoning'
             ? 'bg-white text-purple-600 shadow-sm ring-1 ring-black/5'
             : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'"
@@ -110,7 +110,7 @@ const emit = defineEmits<{
         <button
           v-if="apiError.show"
           @click="emit('switchTab', 'error')"
-          class="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 animate-pulse"
+          class="flex-1 py-2.5 rounded-sm text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 animate-pulse"
           :class="activeTab === 'error' ? 'bg-red-50 text-red-600 ring-1 ring-red-200' : 'text-red-400 hover:bg-red-50'"
         >
           <span class="text-base">⚠️</span>
@@ -123,7 +123,7 @@ const emit = defineEmits<{
         
       <!-- Content A: 对话 (Dialog) -->
         <transition name="fade" mode="out-in">
-          <div v-if="activeTab === 'dialog'" key="dialog" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm transition-all duration-300">
+          <div v-if="activeTab === 'dialog'" key="dialog" class="bg-white rounded-md p-6 border border-slate-200 shadow-sm transition-all duration-300">
              <!-- 使用 items-stretch 确保左侧线条跟随高度 -->
              <div class="flex gap-5 h-full items-stretch">
                 
@@ -141,7 +141,7 @@ const emit = defineEmits<{
                 <div class="flex-1 pt-1 min-w-0">
                    
                    <!-- Loading 状态：高度适中 -->
-                   <div v-if="isGenerating && !currentDialogStream" class="min-h-[120px] flex flex-col items-center justify-center gap-3 bg-slate-50/50 rounded-xl border border-slate-100 border-dashed">
+                   <div v-if="isGenerating && !currentDialogStream" class="min-h-[120px] flex flex-col items-center justify-center gap-3 bg-slate-50/50 rounded-sm border border-slate-100 border-dashed">
                       <div class="flex gap-1.5">
                         <div class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce"></div>
                         <div class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce delay-100"></div>
@@ -156,7 +156,7 @@ const emit = defineEmits<{
                    </div>
 
                    <!-- 错误状态 -->
-                   <div v-else-if="aiErrorMessage" class="min-h-[120px] flex items-center justify-center p-4 rounded-lg bg-red-50 border border-red-100 text-red-600 text-sm">
+                   <div v-else-if="aiErrorMessage" class="min-h-[120px] flex items-center justify-center p-4 rounded-sm bg-red-50 border border-red-100 text-red-600 text-sm">
                       <div class="flex flex-col items-center gap-2">
                          <span class="text-xl">🚫</span>
                          <span class="font-medium">{{ aiErrorMessage }}</span>
@@ -176,7 +176,7 @@ const emit = defineEmits<{
 
           <!-- Content B: 思维链 (Reasoning) -->
         <transition name="fade" mode="out-in">
-          <div v-if="activeTab === 'reasoning'" key="reasoning" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+          <div v-if="activeTab === 'reasoning'" key="reasoning" class="bg-white rounded-md p-6 border border-slate-200 shadow-sm">
              <!-- 使用 items-stretch 确保左右高度一致 -->
              <div class="flex gap-5 h-full items-stretch">
                 
@@ -194,7 +194,7 @@ const emit = defineEmits<{
                 <div class="flex-1 pt-1 min-w-0"> <!-- min-w-0 防止 flex 子元素溢出 -->
                    
                    <!-- 状态：思考中 -->
-                   <div v-if="isGenerating && !reasoningContent" class="h-[400px] flex flex-col items-center justify-center gap-4 bg-slate-50 rounded-xl border border-slate-100 border-dashed">
+                   <div v-if="isGenerating && !reasoningContent" class="h-[400px] flex flex-col items-center justify-center gap-4 bg-slate-50 rounded-sm border border-slate-100 border-dashed">
                       <div class="relative">
                         <div class="w-12 h-12 rounded-full border-4 border-purple-100 border-t-purple-500 animate-spin"></div>
                         <div class="absolute inset-0 flex items-center justify-center text-xs font-bold text-purple-500">AI</div>
@@ -204,7 +204,7 @@ const emit = defineEmits<{
                    
                    <!-- 状态：显示内容 (固定高度窗口) -->
                    <!-- 改动：h-[400px] 固定高度，overflow-y-auto 内部滚动 -->
-                   <div v-else class="h-[400px] overflow-y-auto custom-scrollbar font-mono text-xs sm:text-sm text-slate-600 leading-relaxed bg-slate-50 rounded-xl p-5 border border-slate-200 shadow-inner">
+                   <div v-else class="h-[400px] overflow-y-auto custom-scrollbar font-mono text-xs sm:text-sm text-slate-600 leading-relaxed bg-slate-50 rounded-sm p-5 border border-slate-200 shadow-inner">
                       <div v-if="reasoningContent" class="whitespace-pre-wrap">{{ reasoningContent }}</div>
                       <div v-else class="h-full flex items-center justify-center text-slate-400 italic">
                         暂无思维链数据...
@@ -218,7 +218,7 @@ const emit = defineEmits<{
 
         <!-- Content C: 错误详情 (Error) -->
         <transition name="fade" mode="out-in">
-          <div v-if="activeTab === 'error'" key="error" class="bg-red-50 rounded-2xl p-6 border border-red-100 shadow-sm">
+          <div v-if="activeTab === 'error'" key="error" class="bg-red-50 rounded-md p-6 border border-red-100 shadow-sm">
              <div class="flex gap-4">
                 <div class="text-3xl text-red-500">⚠️</div>
                 <div class="flex-1 space-y-3">
@@ -236,7 +236,7 @@ const emit = defineEmits<{
                       </div>
                    </div>
 
-                   <button @click="emit('clearApiError')" class="mt-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs rounded-lg transition-colors shadow-sm font-medium">
+                   <button @click="emit('clearApiError')" class="mt-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs rounded-sm transition-colors shadow-sm font-medium">
                       确认并关闭
                    </button>
                 </div>
@@ -248,7 +248,7 @@ const emit = defineEmits<{
 
     <!-- ==================== 3. 特殊事件卡片 (Special Event) ==================== -->
     <transition name="slide-up">
-      <div v-if="currentScene?.specialEvent" class="relative overflow-hidden bg-emerald-50 rounded-xl p-4 border border-emerald-200 shadow-sm mt-6">
+      <div v-if="currentScene?.specialEvent" class="relative overflow-hidden bg-emerald-50 rounded-sm p-4 border border-emerald-200 shadow-sm mt-6">
          <div class="flex items-center gap-4 relative z-10">
             <div class="text-2xl animate-bounce">⚡</div>
             <div>

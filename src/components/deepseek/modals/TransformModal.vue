@@ -13,7 +13,7 @@
     <template #header>
       <div class="flex items-center justify-between w-full">
         <div class="flex items-center gap-3">
-          <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30">
+          <div class="flex items-center justify-center w-10 h-10 rounded-sm bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
             </svg>
@@ -26,7 +26,7 @@
         
         <button 
           @click="$emit('close')" 
-          class="p-2 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 rounded-xl transition-all duration-200"
+          class="p-2 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 rounded-sm transition-all duration-200"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -46,7 +46,7 @@
             :key="mode.value"
             @click="$emit('update:selectedMode', mode.value)"
             :class="[
-              'group relative p-4 rounded-xl text-left border-2 transition-all duration-200',
+              'group relative p-4 rounded-sm text-left border-2 transition-all duration-200',
               selectedMode === mode.value
                 ? 'bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-400 shadow-md shadow-indigo-100'
                 : 'bg-white border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50'
@@ -79,7 +79,7 @@
       <!-- 原始输入 -->
       <section>
         <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">原始输入</label>
-        <div class="p-4 bg-zinc-50 rounded-xl border border-zinc-200 text-sm text-zinc-700 leading-relaxed max-h-24 overflow-y-auto custom-scrollbar">
+        <div class="p-4 bg-zinc-50 rounded-sm border border-zinc-200 text-sm text-zinc-700 leading-relaxed max-h-24 overflow-y-auto custom-scrollbar">
           {{ userInput || '暂无输入内容' }}
         </div>
       </section>
@@ -91,7 +91,7 @@
           <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">✨ AI 生成</span>
         </div>
         
-        <div class="rounded-xl border-2 border-emerald-200 bg-gradient-to-br from-emerald-50/50 to-white overflow-hidden">
+        <div class="rounded-sm border-2 border-emerald-200 bg-gradient-to-br from-emerald-50/50 to-white overflow-hidden">
           <div class="p-5">
             <p class="text-zinc-800 text-sm leading-relaxed whitespace-pre-wrap">{{ transformResult.transformedText }}</p>
           </div>
@@ -105,7 +105,7 @@
                 :key="index"
                 @click="appendSuggestion(suggestion)"
                 :class="[
-                  'px-2.5 py-1 rounded-lg text-xs font-medium shadow-sm cursor-pointer transition-all',
+                  'px-2.5 py-1 rounded-sm text-xs font-medium shadow-sm cursor-pointer transition-all',
                   appliedSuggestions.has(suggestion)
                     ? 'bg-emerald-500 text-white border border-emerald-500'
                     : 'bg-white border border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:border-emerald-300'
@@ -130,7 +130,7 @@
       <div class="flex justify-between items-center gap-3">
         <button
           @click="$emit('close')"
-          class="px-4 py-2.5 text-sm font-medium text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 rounded-xl transition-colors"
+          class="px-4 py-2.5 text-sm font-medium text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 rounded-sm transition-colors"
         >
           取消
         </button>
@@ -139,7 +139,7 @@
           <button
             @click="$emit('transform')"
             :disabled="isTransforming || !userInput"
-            class="px-5 py-2.5 bg-zinc-900 text-white text-sm font-bold rounded-xl hover:bg-zinc-800 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2 shadow-lg shadow-zinc-900/20"
+            class="px-5 py-2.5 bg-zinc-900 text-white text-sm font-bold rounded-sm hover:bg-zinc-800 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2 shadow-lg shadow-zinc-900/20"
           >
             <svg v-if="isTransforming" class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -152,7 +152,7 @@
           <button
             v-if="transformResult"
             @click="$emit('apply')"
-            class="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-bold rounded-xl hover:from-emerald-600 hover:to-teal-600 active:scale-[0.98] transition-all shadow-lg shadow-emerald-500/30 flex items-center gap-2"
+            class="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-bold rounded-sm hover:from-emerald-600 hover:to-teal-600 active:scale-[0.98] transition-all shadow-lg shadow-emerald-500/30 flex items-center gap-2"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
             应用结果

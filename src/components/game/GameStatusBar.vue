@@ -24,7 +24,7 @@ const emit = defineEmits<{
         <!-- 头像容器 -->
         <div class="relative group cursor-default">
            <!-- 头像本体 -->
-           <div class="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-50 to-white border border-indigo-100 flex items-center justify-center overflow-hidden shadow-sm">
+           <div class="relative w-12 h-12 rounded-md bg-gradient-to-br from-indigo-50 to-white border border-indigo-100 flex items-center justify-center overflow-hidden shadow-sm">
               <span class="text-2xl filter drop-shadow-sm group-hover:scale-110 transition-transform duration-300">🤠</span>
            </div>
            <!-- 等级角标 -->
@@ -53,7 +53,7 @@ const emit = defineEmits<{
       <div class="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end">
         
         <!-- 章节指示器 -->
-        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-100 text-xs sm:text-sm">
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-sm bg-slate-50 border border-slate-100 text-xs sm:text-sm">
           <span class="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Chapter</span>
           <span class="font-bold text-slate-700 text-base font-mono">{{ sceneId || 0 }}</span>
         </div>
@@ -61,7 +61,7 @@ const emit = defineEmits<{
         <!-- 模型切换按钮 -->
         <button
           @click="emit('toggleModelInfo')"
-          class="flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-200 text-xs sm:text-sm font-medium group hover:shadow-sm"
+          class="flex items-center gap-2 px-3 py-1.5 rounded-sm border transition-all duration-200 text-xs sm:text-sm font-medium group hover:shadow-sm"
           :class="modelName.includes('deepseek')
             ? 'bg-white border-indigo-100 text-indigo-600 hover:border-indigo-200'
             : 'bg-white border-purple-100 text-purple-600 hover:border-purple-200'"
@@ -79,7 +79,7 @@ const emit = defineEmits<{
         <button
           @click="emit('resetGame')"
           :disabled="isGenerating"
-          class="p-2 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed group relative"
+          class="p-2 rounded-sm text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed group relative"
           title="重新开始"
         >
           <svg class="w-5 h-5 group-hover:-rotate-180 transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
@@ -88,7 +88,7 @@ const emit = defineEmits<{
         <!-- 返回首页按钮 -->
         <button
           @click="emit('backToHomepage')"
-          class="p-2 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors group"
+          class="p-2 rounded-sm text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors group"
           title="返回首页"
         >
           <svg class="w-5 h-5 group-hover:scale-110 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>

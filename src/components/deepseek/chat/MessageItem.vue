@@ -18,13 +18,13 @@
 
         <div 
           :class="[
-            'w-9 h-9 rounded-xl flex items-center justify-center shadow-md ring-1 transition-transform duration-300',
+            'w-9 h-9 rounded-sm flex items-center justify-center shadow-md ring-1 transition-transform duration-300',
             message.role === 'user' 
               ? 'bg-white ring-black/5' 
               : 'bg-linear-to-br from-zinc-900 to-zinc-700 ring-black/5 text-white shadow-zinc-900/20'
           ]"
         >
-          <img v-if="message.role === 'user'" src="@/assets/user.jpg" alt="User" class="w-full h-full object-cover rounded-xl opacity-90" />
+          <img v-if="message.role === 'user'" src="@/assets/user.jpg" alt="User" class="w-full h-full object-cover rounded-sm opacity-90" />
           
           <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -42,7 +42,7 @@
             :key="idx"
             :src="img" 
             :alt="`图片 ${idx + 1}`"
-            class="max-w-[200px] max-h-[200px] object-cover rounded-lg border border-white/20 shadow-sm cursor-pointer hover:opacity-90 transition-opacity"
+            class="max-w-[200px] max-h-[200px] object-cover rounded-sm border border-white/20 shadow-sm cursor-pointer hover:opacity-90 transition-opacity"
             @click="openImagePreview(img)"
           />
         </div>
@@ -52,7 +52,7 @@
           <!-- 折叠按钮 -->
           <button 
             @click="toggleReasoning"
-            class="w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200"
+            class="w-full flex items-center gap-2 px-3 py-2 rounded-sm transition-all duration-200"
             :class="showThinking 
               ? 'bg-zinc-100 text-zinc-600' 
               : 'bg-zinc-50 hover:bg-zinc-100 text-zinc-500 hover:text-zinc-700'"
@@ -95,7 +95,7 @@
             leave-to-class="max-h-0 opacity-0"
           >
             <div v-show="isReasoningExpanded" class="overflow-hidden">
-              <div class="mt-2 p-3 bg-zinc-50 rounded-lg border border-zinc-100">
+              <div class="mt-2 p-3 bg-zinc-50 rounded-sm border border-zinc-100">
                 <!-- 思考中骨架屏 -->
                 <div v-if="showThinking && !reasoning" class="space-y-2">
                   <div class="h-2 bg-zinc-200 rounded w-3/4 animate-pulse"></div>
@@ -236,11 +236,11 @@ const wrapperClasses = computed(() => [
   'relative px-5 py-3.5 text-sm leading-7 transition-all duration-200 shadow-sm',
   props.message.role === 'user'
     // User: 深色渐变背景，白色文字，完全复用 Hero Logo 的质感
-    ? 'bg-gradient-to-br from-zinc-900 to-zinc-700 text-white rounded-2xl rounded-tr-md shadow-zinc-900/10 ring-1 ring-black/5'
+    ? 'bg-gradient-to-br from-zinc-900 to-zinc-700 text-white rounded-md rounded-tr-md shadow-zinc-900/10 ring-1 ring-black/5'
     
     // AI: 白色卡片背景，深灰文字，复用 Suggestions 的质感
     // ring-zinc-900/5 是关键，它提供了那个“高级感”的极细边框
-    : 'bg-white text-zinc-800 rounded-2xl rounded-tl-md ring-1 ring-zinc-900/5'
+    : 'bg-white text-zinc-800 rounded-md rounded-tl-md ring-1 ring-zinc-900/5'
 ]);
 
 const formattedContent = computed(() => formatMarkdown(props.message.content));

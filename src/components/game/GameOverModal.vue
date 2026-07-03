@@ -125,7 +125,7 @@ const theme = computed(() => {
           <!-- 卡片本体 -->
           <div
             v-if="show"
-            class="relative w-full max-w-md overflow-hidden rounded-2xl border backdrop-blur-xl"
+            class="relative w-full max-w-md overflow-hidden rounded-md border backdrop-blur-xl"
             :class="[theme.wrapperBorder, theme.wrapperShadow]"
           >
             <!-- 背景光效 -->
@@ -163,7 +163,7 @@ const theme = computed(() => {
               <!-- 操作按钮：流光效果 -->
               <button
                 @click="emit('close')"
-                class="relative w-full py-3.5 rounded-xl font-bold text-sm uppercase tracking-[0.1em] transition-all transform hover:-translate-y-1 hover:shadow-xl active:scale-[0.98] overflow-hidden group shadow-lg"
+                class="relative w-full py-3.5 rounded-sm font-bold text-sm uppercase tracking-[0.1em] transition-all transform hover:-translate-y-1 hover:shadow-xl active:scale-[0.98] overflow-hidden group shadow-lg"
                 :class="theme.buttonClass"
               >
                 <!-- 按钮内容 -->
