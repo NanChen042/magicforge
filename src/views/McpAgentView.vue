@@ -504,6 +504,11 @@ const filteredAgents = computed(() => {
   return agentList.value.filter(a => a.name.toLowerCase().includes(searchKeyword.value.toLowerCase()))
 })
 
+const selectAgent = (agent: any) => {
+  currentRoute.value = 'agents'
+  chatWithAgent(agent)
+}
+
 // --- Methods ---
 
 const getToolDisplayName = (val: string) => availableToolsList.find(t => t.value === val)?.label || val

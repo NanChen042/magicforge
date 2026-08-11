@@ -386,7 +386,7 @@ const getAspectRatioStyle = () => {
 };
 
 const scrollToPrompt = () => {
-  const promptElement = document.querySelector(".atomic-input textarea");
+  const promptElement = document.querySelector<HTMLTextAreaElement>(".atomic-input textarea");
   if (promptElement) {
     promptElement.scrollIntoView({ behavior: "smooth", block: "center" });
     promptElement.focus();

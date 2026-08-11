@@ -298,7 +298,7 @@ const removeImage = () => {
   props.formData.image = undefined;
 };
 
-const getRatioPreviewStyle = (ratioStr) => {
+const getRatioPreviewStyle = (ratioStr: string) => {
   const [w, h] = ratioStr.split(':').map(Number);
   const maxDim = 24;
   // 这里的逻辑保持不变，确保图形比例正确

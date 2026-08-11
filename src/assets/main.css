@@ -2,18 +2,18 @@
 @config "../../tailwind.config.js";
 
 :root {
-  --primary-color: #5b48da;
-  --secondary-color: #ff5a5f;
-  --accent-color: #ffc107;
-  --dark-color: #292639;
-  --medium-color: #3d3654;
+  --primary-color: #2563eb;
+  --secondary-color: #dc2626;
+  --accent-color: #0ea5e9;
+  --dark-color: #18181b;
+  --medium-color: #3f3f46;
   --light-color: #ffffff;
-  --text-color: #292639;
-  --text-light: #6e6a86;
-  --text-dark: #1c1b29;
-  --gray-100: #f4f2f8;
-  --gray-200: #e9e7f0;
-  --gray-300: #d2cfe3;
+  --text-color: #18181b;
+  --text-light: #71717a;
+  --text-dark: #09090b;
+  --gray-100: #f7f8fa;
+  --gray-200: #e4e4e7;
+  --gray-300: #d4d4d8;
   --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
@@ -21,13 +21,21 @@
   --transition-normal: all 0.3s ease;
 }
 
-button{
+button {
   cursor: pointer;
 }
+
 body {
-  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Microsoft YaHei", "微软雅黑", "PingFang SC", "Hiragino Sans GB", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   background-color: var(--gray-100);
   color: var(--text-color);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+code, pre, kbd, .font-mono {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
 }
 
 /* 自定义按钮样式 */
@@ -36,7 +44,7 @@ body {
 }
 
 .btn-primary {
-  @apply bg-[#5b48da] hover:bg-[#4a3bc9] text-white;
+  @apply bg-[#2563eb] hover:bg-[#1d4ed8] text-white;
 }
 
 .btn-secondary {

@@ -88,8 +88,9 @@ export class DeepseekClient {
    * 使用OpenAI API格式创建聊天完成
    */
   async chatCompletion(params: {
-    messages: Array<{role: string; content: string}>;
+    messages: Array<{role: string; content: string | Array<{ type: string; text?: string; image_url?: { url: string } }>}>;
     stream?: boolean;
+    [key: string]: unknown;
   }): Promise<any> {
     try {
       // 确保API地址格式正确
@@ -153,8 +154,10 @@ export class DeepseekClient {
   get completions() {
     return {
       create: (params: {
-        messages: Array<{role: string; content: string}>;
+        model?: string;
+        messages: Array<{role: string; content: string | Array<{ type: string; text?: string; image_url?: { url: string } }>}>;
         stream?: boolean;
+        [key: string]: unknown;
       }) => this.chatCompletion(params)
     };
   }
@@ -167,8 +170,10 @@ export class DeepseekClient {
     return {
       completions: {
         create: (params: {
-          messages: Array<{role: string; content: string}>;
+          model?: string;
+          messages: Array<{role: string; content: string | Array<{ type: string; text?: string; image_url?: { url: string } }>}>;
           stream?: boolean;
+          [key: string]: unknown;
         }) => self.chatCompletion(params)
       }
     };

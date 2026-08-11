@@ -3,14 +3,14 @@ import type { GameScene, StoryProgress } from '../stores/game'
 interface Checkpoint {
   id: string;
   timestamp: number;
-  sceneHistory: {
+  sceneHistory?: {
     type: string;
     description: string;
     dialog: string;
   }[];
-  storyProgress: StoryProgress;
+  storyProgress?: StoryProgress;
   currentScene?: GameScene;
-  lastChoices: string[];
+  lastChoices?: string[];
 }
 
 /**
@@ -59,9 +59,12 @@ export class CheckpointService {
   }): string {
     const checkpointId = `cp_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
     this.checkpoints.set(checkpointId, {
+      id: checkpointId,
       timestamp: Date.now(),
       ...data
     });
+    this.trimToLimit();
+    this.saveToStorage();
     return checkpointId;
   }
 
@@ -109,6 +112,13 @@ export class CheckpointService {
     }
   }
 
+  private static trimToLimit(): void {
+    const expired = Array.from(this.checkpoints.values())
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(this.MAX_CHECKPOINTS);
+    expired.forEach(checkpoint => this.checkpoints.delete(checkpoint.id));
+  }
+
   /**
    * 生成唯一ID
    */
@@ -123,9 +133,12 @@ export class CheckpointService {
   public static async saveCheckpoint(scene: GameScene): Promise<string> {
     const checkpointId = `cp_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
     this.checkpoints.set(checkpointId, {
+      id: checkpointId,
       timestamp: Date.now(),
-      scene
+      currentScene: scene
     });
+    this.trimToLimit();
+    this.saveToStorage();
     console.log('已创建检查点:', checkpointId);
     return checkpointId;
   }
@@ -142,7 +155,7 @@ export class CheckpointService {
     }
 
     console.log('已加载检查点:', checkpointId);
-    return checkpoint.scene;
+    return checkpoint.currentScene || null;
   }
 
   /**

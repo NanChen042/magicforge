@@ -4,7 +4,7 @@ import { ElMessage } from 'element-plus'
 // API 配置
 const API_CONFIG = {
   baseURL: 'https://api.siliconflow.cn/v1',
-  apiKey: import.meta.env.VITE_DEEPSEEK_API_KEY || 'sk-etybbrewlaafxjjqtlgfeqaaskzrmryfndjtjjecyixbsznw'
+  apiKey: import.meta.env.VITE_DEEPSEEK_API_KEY || ''
 }
 
 // 添加调试信息

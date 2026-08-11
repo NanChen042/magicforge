@@ -1,6 +1,5 @@
 import { useApiStore } from '../stores/api';
 import DeepseekClient from './DeepseekClient';
-import type { AsyncIterableResponse } from '../types/api';
 
 /**
  * 统一API接口层

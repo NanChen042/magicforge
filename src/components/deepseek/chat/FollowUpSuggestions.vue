@@ -19,7 +19,7 @@
 
     <!-- 加载状态 -->
     <div v-if="isLoading" class="flex flex-wrap gap-2">
-      <div v-for="i in 3" :key="i" class="h-8 bg-zinc-100 rounded-full animate-pulse" :style="{ width: `${80 + i * 20}px` }"></div>
+      <div v-for="i in 3" :key="i" class="h-7 bg-zinc-100 rounded-sm animate-pulse" :style="{ width: `${80 + i * 20}px` }"></div>
     </div>
 
     <!-- 推荐问题列表 -->
@@ -28,9 +28,9 @@
         v-for="(suggestion, index) in suggestions"
         :key="index"
         @click="$emit('select', suggestion)"
-        class="group inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-zinc-600 bg-zinc-50 border border-zinc-200 rounded-full hover:bg-zinc-100 hover:border-zinc-300 hover:text-zinc-900 transition-all duration-200 active:scale-95"
+        class="group inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-zinc-700 bg-zinc-50 border border-zinc-200 rounded-sm hover:bg-zinc-100 hover:border-zinc-300 hover:text-zinc-900 transition-all duration-200 active:scale-95 cursor-pointer"
       >
-        <span class="max-w-[200px] truncate">{{ suggestion }}</span>
+        <span class="max-w-[220px] truncate">{{ suggestion }}</span>
         <svg class="w-3 h-3 text-zinc-400 group-hover:text-zinc-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
         </svg>

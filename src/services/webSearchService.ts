@@ -801,7 +801,9 @@ ${searchContent}
             ...(Array.isArray(parsed.suggestions) ? parsed.suggestions : []),
             ...(Array.isArray(parsed.keyPoints) ? parsed.keyPoints : []),
             ...(Array.isArray(parsed.key_points) ? parsed.key_points : [])
-          ].filter(item => typeof item === 'string' && item.trim().length > 0).slice(0, 6)
+          ].filter(item => typeof item === 'string' && item.trim().length > 0).slice(0, 6),
+          searchResults: [],
+          searchProcess: []
         };
       }
     } catch (error) {
@@ -828,9 +830,11 @@ ${searchContent}
       originalQuery,
       enhancedQuery,
       searchSummary: content.slice(0, 300) + (content.length > 300 ? '...' : ''),
-      suggestions: lines.slice(0, 5).map(line =>
+      suggestions: lines.slice(0, 5).map((line: string) =>
         line.replace(/^[^\u4e00-\u9fa5a-zA-Z]*/, '').trim()
-      ).filter(line => line.length > 0 && line.length < 100)
+      ).filter((line: string) => line.length > 0 && line.length < 100),
+      searchResults: [],
+      searchProcess: []
     };
   }
 
@@ -899,8 +903,8 @@ ${searchContent}
 
       const content = response.data.choices[0].message.content
       return content.split('\n')
-        .map(line => line.replace(/^[^\u4e00-\u9fa5a-zA-Z]*/, '').trim())
-        .filter(line => line.length > 0)
+        .map((line: string) => line.replace(/^[^\u4e00-\u9fa5a-zA-Z]*/, '').trim())
+        .filter((line: string) => line.length > 0)
         .slice(0, 5)
     } catch (error) {
       console.error('获取搜索建议失败:', error)

@@ -49,14 +49,14 @@
       <div class="relationship-cards">
         <div v-for="(relation, name) in storyProgress.relationships" :key="name" class="relationship-card" :class="getRelationshipClass(relation.affinity)">
           <div class="character-avatar">
-            <img :src="getCharacterAvatar(name)" :alt="name">
+          <img :src="getCharacterAvatar(String(name))" :alt="String(name)">
           </div>
           <div class="character-info">
             <div class="character-name">{{ name }}</div>
             <div class="affinity-meter">
               <div class="affinity-bar" :style="{ width: `${Math.abs(relation.affinity).toString()}%` }"></div>
             </div>
-            <div class="relationship-status">{{ getRelationshipStatus(name) }}</div>
+          <div class="relationship-status">{{ getRelationshipStatus(String(name)) }}</div>
           </div>
           <div class="recent-events" v-if="relation.events.length">
             <div class="event-title">最近事件：</div>
@@ -90,7 +90,8 @@ const getRelationshipClass = (affinity: number) => {
 }
 
 const getRelationshipStatus = (character: string) => {
-  return gameStore.getRelationshipStatus(character)
+  const relationship = gameStore.storyProgress.relationships[character]
+  return relationship ? getRelationshipClass(relationship.affinity) : 'relationship-neutral'
 }
 
 const getCharacterAvatar = (name: string) => {

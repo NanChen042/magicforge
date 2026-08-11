@@ -1,34 +1,20 @@
 <template>
-  <div
+  <div 
     :class="[
-      'flex mb-6 transition-all duration-500 ease-out group',
+      'flex mb-6 transition-all duration-500 ease-out group w-full',
       message.role === 'user' ? 'justify-end' : 'justify-start'
     ]"
   >
-    <div
+    <div 
       :class="[
-        'flex max-w-[90%] md:max-w-[80%] gap-4',
+        'flex w-full max-w-4xl mx-auto gap-4',
         message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
       ]"
     >
-      <!-- 头像：复用 Welcome 页面的圆润方块风格 -->
-      <div class="shrink-0 mt-0.5 relative">
-        <!-- 装饰背景光 (仅 AI) -->
-        <div v-if="message.role !== 'user'" class="absolute -inset-2 bg-zinc-200/50 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-        <div 
-          :class="[
-            'w-9 h-9 rounded-sm flex items-center justify-center shadow-md ring-1 transition-transform duration-300',
-            message.role === 'user' 
-              ? 'bg-white ring-black/5' 
-              : 'bg-linear-to-br from-zinc-900 to-zinc-700 ring-black/5 text-white shadow-zinc-900/20'
-          ]"
-        >
-          <img v-if="message.role === 'user'" src="@/assets/user.jpg" alt="User" class="w-full h-full object-cover rounded-sm opacity-90" />
-          
-          <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
+      <!-- 头像：仅 AI 显示头像 -->
+      <div v-if="message.role !== 'user'" class="shrink-0 mt-0.5 relative">
+        <div class="w-8 h-8 rounded-sm overflow-hidden flex items-center justify-center shadow-2xs border border-zinc-200/80 bg-white">
+          <img src="@/assets/ai.png" alt="AI Avatar" class="w-full h-full object-cover" />
         </div>
       </div>
 
@@ -117,7 +103,14 @@
         </div>
 
         <!-- 内容区域 -->
-        <div class="message-content" v-html="formattedContent"></div>
+        <div v-if="formattedContent" class="message-content" v-html="formattedContent"></div>
+        <div v-else-if="message.role === 'assistant' && !hasReasoning && isProcessing && isLast" class="flex items-center gap-2 text-xs text-zinc-400 py-0.5 font-mono">
+          <div class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-ping"></div>
+          <span class="text-blue-600">生成响应中...</span>
+        </div>
+        <div v-else-if="message.role === 'assistant' && !hasReasoning && !isProcessing" class="text-zinc-400 italic text-[13px] py-1">
+          [响应内容为空]
+        </div>
 
         <!-- 底部工具栏 (悬停显示) -->
         <div v-if="message.role !== 'user'" class="mt-2 flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 select-none">
@@ -155,6 +148,7 @@ const props = defineProps<{
   index: number;
   isLast: boolean;
   isThinking?: boolean;
+  isProcessing?: boolean;
   isStopped?: boolean;
   reasoning?: string;
   isReasoningModel?: boolean; // 是否是支持思考的模型
@@ -177,9 +171,14 @@ const hasReasoning = computed(() =>
 
 // 当正在思考时，自动展开思考区域（仅限支持思考的模型）
 watch(() => props.isThinking, (thinking) => {
-  if (props.isReasoningModel && thinking && props.isLast && props.message.role === 'assistant') {
-    isReasoningExpanded.value = true;
-    shouldAutoScrollReasoning.value = true;
+  if (props.isReasoningModel && props.message.role === 'assistant') {
+    if (thinking && props.isLast) {
+      isReasoningExpanded.value = true;
+      shouldAutoScrollReasoning.value = true;
+    } else if (!thinking) {
+      // 思考结束后自动收起
+      isReasoningExpanded.value = false;
+    }
   }
 }, { immediate: true });
 
@@ -233,14 +232,13 @@ const openImagePreview = (imgUrl: string) => {
 };
 
 const wrapperClasses = computed(() => [
-  'relative px-5 py-3.5 text-sm leading-7 transition-all duration-200 shadow-sm',
+  'relative transition-all duration-200 min-w-0',
   props.message.role === 'user'
-    // User: 深色渐变背景，白色文字，完全复用 Hero Logo 的质感
-    ? 'bg-gradient-to-br from-zinc-900 to-zinc-700 text-white rounded-md rounded-tr-md shadow-zinc-900/10 ring-1 ring-black/5'
+    // User: 现代灰底气泡，右对齐展示，无头像
+    ? 'bg-zinc-100/80 text-zinc-900 px-5 py-3 rounded-[20px] rounded-tr-[4px] max-w-[85%] md:max-w-[75%] ml-auto text-[15px] w-fit'
     
-    // AI: 白色卡片背景，深灰文字，复用 Suggestions 的质感
-    // ring-zinc-900/5 是关键，它提供了那个“高级感”的极细边框
-    : 'bg-white text-zinc-800 rounded-md rounded-tl-md ring-1 ring-zinc-900/5'
+    // AI: 无边框，纯净正文排版，左对齐
+    : 'text-zinc-800 px-1 py-1 text-[15px] leading-relaxed flex-1'
 ]);
 
 const formattedContent = computed(() => formatMarkdown(props.message.content));

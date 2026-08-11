@@ -1,5 +1,5 @@
 <template>
-  <div class="api-demo-container">
+  <div class="api-demo-container flex-1 min-h-0 w-full flex flex-col py-4 md:py-6">
     <DeepseekDemo />
   </div>
 </template>
@@ -10,11 +10,6 @@ import DeepseekDemo from '../components/DeepseekDemo.vue';
 
 <style scoped>
 .api-demo-container {
-  width: 100%;
-  height: calc(100vh - 5rem);
   min-height: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
 }
 </style>

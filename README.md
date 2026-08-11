@@ -1,16 +1,16 @@
-# AI Vista - 探索AI的无限可能，体验智能对话的未来
+# MagicForge - 探索AI的无限可能，体验智能对话的未来
 
 <p align="center">
-  <img src="assets/README/image.png" alt="AI Vista Preview" width="100%">
+  <img src="assets/README/image.png" alt="MagicForge Preview" width="100%">
 </p>
 <p align="center">
-  <img src="assets/README.md/101.png" alt="AI Vista Chat" width="49%">
-  <img src="assets/README.md/102.png" alt="AI Vista Game" width="49%">
+  <img src="assets/README.md/101.png" alt="MagicForge Chat" width="49%">
+  <img src="assets/README.md/102.png" alt="MagicForge Game" width="49%">
 </p>
 
 ## 项目概述
 
-AI Vista 是一个基于 **Vue 3 + TypeScript + Vite** 构建的下一代 AI 演示平台，集成多种大模型接口，提供企业级的流式响应、思维链展示与多模态创作体验。项目包含智能对话、AI 图像生成、交互式游戏、无限流小说等多个功能模块。
+MagicForge 是一个基于 **Vue 3 + TypeScript + Vite** 构建的下一代 AI 演示平台，集成多种大模型接口，提供企业级的流式响应、思维链展示与多模态创作体验。项目包含智能对话、AI 图像生成、交互式游戏、无限流小说等多个功能模块。
 
 ## 📢 最新更新
 
@@ -300,5 +300,5 @@ MIT License
 ---
 
 <p align="center">
-  <strong>© 2025 AI Vista Platform. Design for Future.</strong>
+  <strong>© 2026 MagicForge Platform. Design for Future.</strong>
 </p>

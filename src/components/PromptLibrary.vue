@@ -281,7 +281,7 @@ const promptExamples = ref<PromptExamples>({
   }
 });
 
-const promptTemplates = ref({
+const promptTemplates = ref<Record<string, string>>({
     // ... 模板数据 ...
     '代码改写': '...',
     // ...

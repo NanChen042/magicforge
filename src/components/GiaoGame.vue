@@ -1,6 +1,6 @@
-<script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { useGameStore } from '../stores/game'
+import { useApiStore } from '../stores/api'
 import { updateApiConfig } from '../services/deepseekService'
 
 // 子组件
@@ -22,13 +22,14 @@ const props = defineProps({
 
 // Store
 const gameStore = useGameStore()
+const apiStore = useApiStore()
 
 // 基础状态
 const playerName = ref('')
 const showIntro = ref(true)
-const apiUrl = ref('https://api.siliconflow.cn/v1/chat/completions')
-const apiKey = ref('sk-etybbrewlaafxjjqtlgfeqaaskzrmryfndjtjjecyixbsznw')
-const modelName = ref('Qwen/Qwen2.5-7B-Instruct')
+const apiUrl = ref(apiStore.apiUrl)
+const apiKey = ref(apiStore.apiKey)
+const modelName = ref(apiStore.modelName)
 const loading = ref(false)
 
 // UI 状态
@@ -454,27 +455,18 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 relative">
-    <!-- 全局背景装饰 -->
-    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-      <!-- 柔和光效 -->
-      <div class="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-indigo-200/30 rounded-full blur-[100px]"></div>
-      <div class="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-purple-200/20 rounded-full blur-[80px]"></div>
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-100/20 rounded-full blur-[120px]"></div>
-    </div>
-
+  <div class="min-h-screen bg-zinc-50/60 relative">
     <!-- 开始界面 -->
     <GameIntro
       v-if="showIntro"
       @start-game="startGame"
-      @update-api-config="handleApiConfigUpdate"
     />
 
     <!-- 游戏主界面 -->
-    <div v-else class="relative z-10 min-h-screen">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+    <div v-else class="relative z-10 min-h-screen pb-12">
+      <div class="max-w-6xl mx-auto px-2 sm:px-4 py-4">
         <!-- 主容器 -->
-        <div class="rounded-md sm:rounded-md overflow-hidden bg-white/80 backdrop-blur-xl border border-slate-200/50 shadow-xl shadow-slate-200/50">
+        <div class="rounded-md overflow-hidden bg-white border border-zinc-200 shadow-2xs">
           <!-- 状态栏 -->
           <GameStatusBar
             :player-name="playerName"
@@ -581,9 +573,9 @@ onMounted(() => {
                 <div class="pt-4">
                   <button
                     @click="changeModel"
-                    class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-sm font-medium text-sm sm:text-base transition-all shadow-lg shadow-indigo-200"
+                    class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white rounded-sm font-semibold text-xs transition-all shadow-2xs cursor-pointer"
                   >
-                    切换模型
+                    切换下一个模型
                   </button>
                 </div>
               </div>
@@ -602,19 +594,19 @@ onMounted(() => {
         >
           <div
             v-if="isGenerating && !isStreamResponseActive"
-            class="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50"
+            class="fixed inset-0 bg-black/20 backdrop-blur-xs flex items-center justify-center z-50"
           >
-            <div class="bg-white rounded-md p-6 sm:p-8 border border-slate-100 shadow-2xl shadow-slate-200/50">
-              <div class="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4">
-                <svg class="animate-spin w-full h-full text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <div class="bg-white rounded-md p-6 max-w-xs w-full border border-zinc-200 shadow-xl text-center">
+              <div class="w-10 h-10 mx-auto mb-3">
+                <svg class="animate-spin w-full h-full text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
               </div>
-              <p class="text-slate-800 text-base sm:text-lg font-medium text-center">正在书写剧情...</p>
-              <p class="text-slate-500 text-xs sm:text-sm text-center mt-2">AI正在创作，故事即将呈现...</p>
-              <div class="w-full h-1.5 bg-slate-100 rounded-full mt-4 overflow-hidden">
-                <div class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full animate-progressBar"></div>
+              <p class="text-zinc-900 text-sm font-bold">正在书写剧情...</p>
+              <p class="text-zinc-500 text-xs mt-1">AI 正在根据你的抉择推演后续发展</p>
+              <div class="w-full h-1 bg-zinc-100 rounded-full mt-4 overflow-hidden">
+                <div class="h-full bg-blue-600 rounded-full animate-progressBar"></div>
               </div>
             </div>
           </div>

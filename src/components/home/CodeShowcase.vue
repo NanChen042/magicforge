@@ -3,10 +3,10 @@
   <section class="max-w-5xl mx-auto mb-8 relative z-20">
     <!-- 标题区 -->
     <div class="text-center mb-10">
-      <p class="text-xs font-bold text-indigo-500 uppercase tracking-widest mb-3">Developer First</p>
+      <p class="text-xs font-bold text-blue-500 uppercase tracking-widest mb-3">Developer First</p>
       <h2 class="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight mb-4">
         几行代码，接入
-        <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">全栈 AI 能力</span>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-sky-600">全栈 AI 能力</span>
       </h2>
       <p class="text-slate-500 text-base max-w-xl mx-auto font-light">
         从流式对话到多模态理解，API 设计遵循直觉，让你专注于产品而非基础设施。
@@ -30,11 +30,11 @@
         <!-- Left Code: 流式对话 + 思维链 -->
         <div class="p-6 md:p-8">
           <div class="flex items-center gap-2 mb-6">
-            <span class="px-2 py-1 bg-indigo-500/20 text-indigo-300 text-xs font-mono rounded border border-indigo-500/30">流式对话 + 思维链</span>
+            <span class="px-2 py-1 bg-blue-500/20 text-blue-300 text-xs font-mono rounded border border-blue-500/30">流式对话 + 思维链</span>
           </div>
           <div class="relative group">
-            <div class="absolute -inset-4 bg-indigo-500/5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <pre class="relative text-sm font-mono leading-relaxed text-slate-300 overflow-x-auto"><code><span class="text-purple-400">import</span> { DeepseekClient } <span class="text-purple-400">from</span> <span class="text-green-400">'@/services'</span>;
+            <div class="absolute -inset-4 bg-blue-500/5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <pre class="relative text-sm font-mono leading-relaxed text-slate-300 overflow-x-auto"><code><span class="text-blue-400">import</span> { DeepseekClient } <span class="text-blue-400">from</span> <span class="text-green-400">'@/services'</span>;
 
 // 初始化客户端
 const client = new DeepseekClient({
@@ -64,11 +64,11 @@ const stream = await client.streamChat({
         <!-- Right Code: 多模态 + 图像理解 -->
         <div class="p-6 md:p-8">
           <div class="flex items-center gap-2 mb-6">
-            <span class="px-2 py-1 bg-violet-500/20 text-violet-300 text-xs font-mono rounded border border-violet-500/30">多模态图像理解</span>
+            <span class="px-2 py-1 bg-sky-500/20 text-sky-300 text-xs font-mono rounded border border-sky-500/30">多模态图像理解</span>
           </div>
           <div class="relative group">
-            <div class="absolute -inset-4 bg-violet-500/5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <pre class="relative text-sm font-mono leading-relaxed text-slate-300 overflow-x-auto"><code><span class="text-purple-400">import</span> { imageService } from '@/services';
+            <div class="absolute -inset-4 bg-sky-500/5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <pre class="relative text-sm font-mono leading-relaxed text-slate-300 overflow-x-auto"><code><span class="text-blue-400">import</span> { imageService } from '@/services';
 
 // 图像生成
 const result = await imageService.generate({

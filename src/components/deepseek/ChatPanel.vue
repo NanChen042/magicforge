@@ -1,21 +1,60 @@
 <template>
-  <div class="col-span-1 lg:col-span-2 flex flex-col bg-white rounded-md shadow-2xl shadow-zinc-200/50 order-1 lg:order-2 overflow-hidden ring-1 ring-zinc-100 h-full">
+  <div class="w-full h-full flex flex-col bg-white overflow-hidden min-h-0">
 
-    <!-- 1. 头部：视图切换和状态 -->
-    <div class="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-b border-zinc-100 bg-white/80 backdrop-blur-sm sticky top-0 z-30">
-      <div class="flex items-center gap-3 w-full sm:w-auto mb-3 sm:mb-0">
-        <!-- 模型类型标签 -->
-        <span 
-          class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md"
-          :class="getModelTypeBadgeClass()"
+    <!-- 1. 头部：系统配置抽屉唤起按钮 + Element Plus 高级模型下拉选择器 -->
+    <div class="flex flex-col sm:flex-row items-center justify-between px-4 py-2.5 border-b border-zinc-200 bg-white sticky top-0 z-30 shrink-0 gap-2">
+      <div class="flex items-center gap-2 w-full sm:w-auto">
+        <!-- 唤起系统配置 Element Drawer 按钮 -->
+        <button
+          @click="$emit('open-settings')"
+          class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-zinc-700 bg-white hover:bg-blue-50 hover:text-blue-600 rounded-sm transition-all cursor-pointer shadow-2xs border border-zinc-200 hover:border-blue-200"
+          title="系统配置与 API 参数"
         >
-          {{ getModelTypeLabel() }}
-        </span>
-        
-        <!-- 模型功能提示 -->
-        <span class="hidden lg:inline-flex text-[10px] text-zinc-400 font-medium px-2 py-1 bg-zinc-50 rounded-md">
-          {{ getModelFeatureHint() }}
-        </span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span class="hidden sm:inline">系统配置</span>
+        </button>
+
+        <div class="h-4 w-[1px] bg-zinc-200 mx-0.5"></div>
+
+        <!-- 模型下拉选择组件 -->
+        <el-dropdown trigger="click" @command="(modelId: string) => $emit('update:modelName', modelId)">
+          <button class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-blue-50 border border-zinc-200 hover:border-blue-300 rounded-md text-xs font-bold text-zinc-900 hover:text-blue-700 shadow-2xs transition-all cursor-pointer">
+            <span>{{ currentModelConfig?.name || modelName || '选择模型' }}</span>
+            <svg class="w-3 h-3 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          <template #dropdown>
+            <el-dropdown-menu class="p-1.5 min-w-[220px] max-h-[380px] overflow-y-auto custom-scrollbar shadow-xl border-zinc-100">
+              <div v-for="(group, index) in Object.keys(groupedModels)" :key="group" class="mb-1">
+                <!-- 分类标题 -->
+                <div class="px-2 flex items-center gap-2" :class="index === 0 ? 'mb-1.5' : 'mt-3 mb-1.5'">
+                  <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{{ group }}</span>
+                  <div class="h-[1px] flex-1 bg-zinc-100"></div>
+                </div>
+                
+                <el-dropdown-item 
+                  v-for="model in groupedModels[group]" 
+                  :key="model.id"
+                  :command="model.id"
+                  :class="{'!bg-blue-50/50 !text-blue-700': model.id === modelName}"
+                  class="rounded-md mb-0.5 transition-colors duration-200"
+                >
+                  <div class="flex flex-col py-1.5 w-full">
+                    <div class="flex items-center justify-between gap-3">
+                      <span class="text-[13px] font-medium" :class="model.id === modelName ? 'text-blue-700 font-semibold' : 'text-zinc-700'">{{ model.name }}</span>
+                      <span v-if="model.free" class="text-[9px] px-1.5 py-[2px] bg-zinc-100/80 border border-zinc-200/80 text-zinc-500 rounded font-medium shrink-0 tracking-wide">免费</span>
+                    </div>
+                    <span class="text-[11px] mt-0.5 leading-relaxed truncate opacity-80" :class="model.id === modelName ? 'text-blue-600/80' : 'text-zinc-500'">{{ model.description }}</span>
+                  </div>
+                </el-dropdown-item>
+              </div>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
       </div>
 
       <div v-if="isProcessing" class="flex items-center gap-3 w-full sm:w-auto justify-end">
@@ -23,7 +62,7 @@
           生成中... {{ streamProgress }}%
         </span>
         <div class="w-24 h-1.5 bg-zinc-100 rounded-full overflow-hidden">
-          <div class="h-full bg-zinc-900 rounded-full transition-all duration-300 ease-out" :style="{ width: streamProgress + '%' }"></div>
+          <div class="h-full bg-blue-600 rounded-full transition-all duration-300 ease-out" :style="{ width: streamProgress + '%' }"></div>
         </div>
       </div>
     </div>
@@ -40,14 +79,14 @@
           <!-- 思考状态提示 -->
           <transition enter-active-class="transition duration-300 ease-out" enter-from-class="opacity-0 -translate-y-2" enter-to-class="opacity-100 translate-y-0" leave-active-class="transition duration-200 ease-in" leave-from-class="opacity-100 translate-y-0" leave-to-class="opacity-0 -translate-y-2">
             <div v-if="isThinking" class="sticky top-0 z-20 mb-8 mx-auto max-w-fit">
-              <div class="relative overflow-hidden flex items-center gap-3 px-4 py-2 bg-white/80 backdrop-blur-md rounded-full border border-zinc-200 shadow-sm ring-1 ring-zinc-900/5">
+              <div class="relative overflow-hidden flex items-center gap-3 px-4 py-2 bg-white rounded-sm border border-zinc-200 shadow-sm ring-1 ring-zinc-900/5">
                 <div class="absolute inset-0 bg-gradient-to-r from-transparent via-zinc-100/50 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
                 <div class="relative flex items-center gap-2.5">
                   <div class="flex h-2.5 w-2.5">
-                    <span class="animate-ping absolute inline-flex h-2.5 w-2.5 rounded-full bg-zinc-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-zinc-900"></span>
+                    <span class="animate-ping absolute inline-flex h-2.5 w-2.5 rounded-full bg-blue-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-600"></span>
                   </div>
-                  <span class="text-[10px] font-bold text-zinc-900 uppercase tracking-widest leading-none">AI Processing</span>
+                  <span class="text-[10px] font-bold text-blue-700 uppercase tracking-widest leading-none">AI Processing</span>
                 </div>
               </div>
             </div>
@@ -92,13 +131,13 @@
       <!-- 错误提示 Toast -->
       <Transition
         enter-active-class="transition duration-300 ease-out"
-        enter-from-class="opacity-0 translate-y-4"
+        enter-from-class="opacity-0 -translate-y-4"
         enter-to-class="opacity-100 translate-y-0"
         leave-active-class="transition duration-200 ease-in"
         leave-from-class="opacity-100 translate-y-0"
-        leave-to-class="opacity-0 translate-y-4"
+        leave-to-class="opacity-0 -translate-y-4"
       >
-        <div v-if="error" class="absolute bottom-4 left-4 right-4 z-20 mx-auto max-w-lg">
+        <div v-if="error" class="absolute top-16 left-4 right-4 z-40 mx-auto max-w-lg">
           <div class="flex items-start gap-3 p-4 bg-white border border-red-100 rounded-sm shadow-xl shadow-red-500/5 ring-1 ring-red-500/10">
             <div class="shrink-0 w-8 h-8 rounded-full bg-red-50 flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500" viewBox="0 0 20 20" fill="currentColor">
@@ -144,34 +183,25 @@
         <!-- Textarea Input -->
         <div class="relative group w-full">
           <textarea
+            ref="textareaRef"
             id="message-input"
             :value="userInput"
-            @input="$emit('update:userInput', ($event.target as HTMLTextAreaElement).value)"
-            class="block w-full resize-none bg-white rounded-sm border-0 ring-1 ring-zinc-200 shadow-sm
+            @input="handleInput"
+            class="block w-full resize-none bg-white rounded-sm border-0 ring-1 ring-zinc-200 shadow-2xs
                    text-sm text-zinc-800 placeholder:text-zinc-400 leading-relaxed
-                   focus:ring-2 focus:ring-zinc-900 focus:outline-none focus:shadow-md
+                   focus:ring-2 focus:ring-blue-600 focus:outline-none focus:shadow-xs
                    hover:ring-zinc-300
                    disabled:bg-zinc-50 disabled:text-zinc-400 disabled:cursor-not-allowed
-                   min-h-[100px] py-4 pl-4 pr-4 md:pr-36 transition-all duration-200 ease-out
-                   custom-scrollbar caret-zinc-900"
+                   min-h-[64px] max-h-[240px] py-3 px-3.5 transition-[height] duration-150 ease-out
+                   custom-scrollbar caret-blue-600"
             :placeholder="supportsVision ? '输入你的问题，可上传图片进行视觉分析...' : '输入你的问题...'"
             :disabled="isProcessing"
-            @keydown.ctrl.enter.prevent="$emit('send')"
-            @keydown.meta.enter.prevent="$emit('send')"
+            @keydown.enter.exact.prevent="$emit('send')"
           ></textarea>
-
-          <!-- 快捷键提示 -->
-          <div class="absolute bottom-3 right-3 hidden md:flex items-center gap-1.5 pointer-events-none select-none transition-opacity duration-200"
-               :class="isProcessing ? 'opacity-0' : 'opacity-40 group-focus-within:opacity-100'">
-            <kbd class="flex items-center justify-center min-w-[24px] h-6 px-1.5 bg-zinc-100 border-b-2 border-zinc-300 rounded text-[10px] font-mono font-bold text-zinc-500 tracking-tight shadow-sm">Ctrl</kbd>
-            <span class="text-[10px] text-zinc-300 font-bold">+</span>
-            <kbd class="flex items-center justify-center min-w-[24px] h-6 px-1.5 bg-zinc-100 border-b-2 border-zinc-300 rounded text-[10px] font-mono font-bold text-zinc-500 tracking-tight shadow-sm">Enter</kbd>
-            <span class="ml-1 text-[10px] text-zinc-400 font-medium tracking-wide">发送</span>
-          </div>
         </div>
 
         <!-- Action Buttons Row -->
-        <div class="flex flex-wrap md:flex-nowrap justify-between items-center gap-2 mt-3">
+        <div class="flex flex-wrap md:flex-nowrap justify-between items-center gap-2 mt-2">
           <!-- Left Buttons -->
           <div class="w-full md:w-auto order-2 md:order-1 flex items-center gap-2">
             <!-- Clear Button -->
@@ -249,7 +279,7 @@
                 v-else
                 @click="$emit('send')"
                 :disabled="!userInput.trim()"
-                class="group relative flex items-center justify-center gap-2 px-6 py-2.5 rounded-sm bg-zinc-900 text-white shadow-lg shadow-zinc-900/20 hover:bg-zinc-800 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:bg-zinc-900 disabled:hover:translate-y-0"
+                class="group relative flex items-center justify-center gap-2 px-6 py-2.5 rounded-sm bg-blue-600 text-white shadow-md shadow-blue-600/20 hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:bg-blue-600 disabled:hover:translate-y-0"
               >
                 <svg class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7" />
@@ -266,7 +296,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
 import MessageItem from './chat/MessageItem.vue';
 import EmptyState from './chat/EmptyState.vue';
 import FollowUpSuggestions from './chat/FollowUpSuggestions.vue';
@@ -283,6 +313,7 @@ interface UploadedImage {
 }
 
 const props = defineProps<{
+  modelName?: string;
   conversationHistory: Message[];
   reasoningContent: string;
   isProcessing: boolean;
@@ -302,6 +333,59 @@ const props = defineProps<{
   supportsVision?: boolean;
   uploadedImages?: UploadedImage[];
 }>();
+
+const emit = defineEmits<{
+  'update:userInput': [value: string];
+  'update:modelName': [value: string];
+  'send': [];
+  'clear': [];
+  'optimize': [];
+  'stop': [];
+  'select-question': [question: string];
+  'refresh-topics': [];
+  'scroll': [event: Event];
+  'select-follow-up': [question: string];
+  'refresh-follow-up': [];
+  'open-settings': [];
+  'upload-images': [files: File[]];
+  'remove-image': [index: number];
+}>();
+
+import { MODEL_CONFIGS } from '@/constants/modelConfig';
+
+const textareaRef = ref<HTMLTextAreaElement | null>(null);
+
+const adjustTextareaHeight = () => {
+  const el = textareaRef.value;
+  if (!el) return;
+  el.style.height = 'auto';
+  const newHeight = Math.min(Math.max(el.scrollHeight, 64), 240);
+  el.style.height = `${newHeight}px`;
+};
+
+const handleInput = (event: Event) => {
+  const value = (event.target as HTMLTextAreaElement).value;
+  emit('update:userInput', value);
+  adjustTextareaHeight();
+};
+
+watch(() => props.userInput, () => {
+  nextTick(adjustTextareaHeight);
+});
+
+const groupedModels = computed(() => {
+  const groups: Record<string, typeof MODEL_CONFIGS> = {};
+  MODEL_CONFIGS.forEach(model => {
+    const provider = model.provider || 'Other';
+    if (!groups[provider]) groups[provider] = [];
+    groups[provider].push(model);
+  });
+  return groups;
+});
+
+const currentModelConfig = computed(() => {
+  return MODEL_CONFIGS.find(m => m.id === props.modelName);
+});
 
 // 是否支持视觉输入
 const supportsVision = computed(() => props.supportsVision || props.modelType === 'multimodal');
@@ -373,20 +457,7 @@ const getModelTypeBadgeClass = () => {
   }
 };
 
-const emit = defineEmits<{
-  'update:userInput': [value: string];
-  send: [];
-  clear: [];
-  optimize: [];
-  stop: [];
-  'select-question': [question: string];
-  'refresh-topics': [];
-  scroll: [event: Event];
-  'select-follow-up': [question: string];
-  'refresh-follow-up': [];
-  'upload-images': [files: File[]];
-  'remove-image': [index: number];
-}>();
+
 
 const chatContainerRef = ref<HTMLElement | null>(null);
 

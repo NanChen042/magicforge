@@ -183,12 +183,12 @@ export function supportsVision(modelId: string): boolean {
  */
 export function getModelTypeLabel(type: ModelType): string {
   const labels: Record<ModelType, string> = {
-    chat: '💬 对话',
-    reasoning: '🧠 思考',
-    multimodal: '👁️ 多模态',
-    ocr: '📄 OCR',
-    translate: '🌐 翻译',
-    coder: '💻 代码'
+    chat: '对话',
+    reasoning: '思考',
+    multimodal: '多模态',
+    ocr: 'OCR',
+    translate: '翻译',
+    coder: '代码'
   };
   return labels[type];
 }

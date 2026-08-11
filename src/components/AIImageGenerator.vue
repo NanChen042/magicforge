@@ -62,7 +62,7 @@
             :last-seed="lastSeed"
             :image-size="formData.image_size"
             @show-preview="(url) => showPreview(url, lastSeed)"
-            @download-image="downloadImage"
+            @download-image="(url, index) => downloadImage(url, lastSeed, index)"
             @use-seed="() => useSeed(lastSeed, formData)"
             @regenerate="() => regenerateWithSeed(lastSeed)"
             @apply-random-template="applyRandomTemplate"
@@ -156,6 +156,7 @@ const {
 const applyRandomTemplate = () => {
   const randomIndex = Math.floor(Math.random() * promptTemplates.length);
   const template = promptTemplates[randomIndex];
+  if (!template) return;
   formData.prompt = template.prompt;
   formData.negative_prompt = template.negative_prompt;
   if (template.parameters) {

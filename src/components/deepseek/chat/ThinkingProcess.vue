@@ -6,7 +6,7 @@
   >
     
     <!-- 头部：固定不动的 Status Bar 风格 -->
-    <div class="sticky top-0 bg-white/80 backdrop-blur-md border-b border-zinc-100 px-6 py-4 z-10 flex items-center justify-between">
+    <div class="sticky top-0 bg-white border-b border-zinc-100 px-6 py-4 z-10 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <!-- 图标：极简的流程图符号 -->
         <div class="flex items-center justify-center w-6 h-6 rounded border border-zinc-200 bg-zinc-50">

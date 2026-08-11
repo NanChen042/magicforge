@@ -1,23 +1,21 @@
 <template>
-  <div class="w-full flex-1 flex flex-col bg-slate-50/0 overflow-hidden min-h-0 py-4">
-    <!-- 主内容区域：配置面板和聊天面板 -->
-    <div class="flex-1 w-full grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 px-4 min-h-0 overflow-hidden">
-      <ConfigPanel
-        v-model:apiKey="apiKey"
-        v-model:apiUrl="apiUrl"
-        v-model:modelName="modelName"
-        v-model:apiStyle="apiStyle"
-        v-model:streaming="streaming"
-        v-model:temperature="temperature"
-        v-model:maxTokens="maxTokens"
-        v-model:topP="topP"
-        v-model:topK="topK"
-        v-model:frequencyPenalty="frequencyPenalty"
-        v-model:presencePenalty="presencePenalty"
-      />
+  <div class="w-full flex-1 flex flex-row min-h-0 relative border border-zinc-200 rounded-sm overflow-hidden bg-white shadow-2xs">
+    
+    <!-- 左侧会话历史目录 Sidebar -->
+    <SessionSidebar
+      :sessions="sessions"
+      :currentSessionId="currentSessionId"
+      @create-new="handleCreateNewSession"
+      @select-session="handleSelectSession"
+      @delete-session="handleDeleteSession"
+      @clear-all="handleClearAllSessions"
+    />
 
+    <!-- 主内容区域：全屏沉浸式 Chat 界面 -->
+    <div class="flex-1 w-full flex flex-col min-h-0">
       <ChatPanel
         ref="chatPanelRef"
+        v-model:modelName="modelName"
         :conversationHistory="conversationHistory"
         :reasoningContent="reasoningContent"
         :isProcessing="isProcessing"
@@ -36,6 +34,7 @@
         :showFollowUp="showFollowUp"
         :supportsVision="supportsVision"
         :uploadedImages="uploadedImages"
+        @open-settings="showSettingsDrawer = true"
         @update:userInput="userInput = $event"
         @send="handleSendMessage"
         @clear="handleClearConversation"
@@ -50,6 +49,29 @@
         @remove-image="handleRemoveImage"
       />
     </div>
+
+    <!-- Element Plus 左侧抽屉：系统配置与参数设置 -->
+    <el-drawer
+      v-model="showSettingsDrawer"
+      title="系统配置与 API 参数"
+      direction="ltr"
+      size="380px"
+      append-to-body
+      :destroy-on-close="false"
+      class="config-drawer"
+    >
+      <ConfigPanel
+        v-model:apiKey="apiKey"
+        v-model:modelName="modelName"
+        v-model:streaming="streaming"
+        v-model:temperature="temperature"
+        v-model:maxTokens="maxTokens"
+        v-model:topP="topP"
+        v-model:topK="topK"
+        v-model:frequencyPenalty="frequencyPenalty"
+        v-model:presencePenalty="presencePenalty"
+      />
+    </el-drawer>
 
     <!-- 关键词转换模态框 -->
     <TransformModal
@@ -72,8 +94,10 @@ import { ref, watch, nextTick, onMounted, computed } from 'vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import ConfigPanel from './deepseek/ConfigPanel.vue';
 import ChatPanel from './deepseek/ChatPanel.vue';
+import SessionSidebar from './deepseek/SessionSidebar.vue';
 import TransformModal from './deepseek/modals/TransformModal.vue';
 import { useDeepseekApi } from '@/composables/useDeepseekApi';
+import { useSessionHistory } from '@/composables/useSessionHistory';
 import { usePromptStore } from '@/stores/prompt';
 import { useHotTopics } from '@/composables/useHotTopics';
 import { useScroll } from '@/composables/useScroll';
@@ -105,9 +129,32 @@ const topP = ref(0.9);
 const topK = ref(0);
 const frequencyPenalty = ref(0);
 const presencePenalty = ref(0);
-const apiStyle = ref<'openai' | 'adapter'>("openai");
 const modelName = ref(localStorage.getItem('modelName') || DEFAULT_MODEL_ID);
+watch(modelName, (newModel) => {
+  if (newModel) {
+    localStorage.setItem('modelName', newModel);
+    const config = getModelConfig(newModel);
+    const name = config ? config.name : newModel;
+    ElMessage.success({
+      message: `已切换至 ${name}`,
+      duration: 2000,
+      plain: true
+    });
+  }
+});
 const isSending = ref(false);
+const showSettingsDrawer = ref(false);
+
+// 使用会话历史 Composable
+const {
+  sessions,
+  currentSessionId,
+  createNewSession,
+  deleteSession,
+  clearAllSessions,
+  updateCurrentSession,
+  switchSession
+} = useSessionHistory();
 
 // 判断当前模型是否支持思考过程
 const showReasoningTab = computed(() => isReasoningModel(modelName.value));
@@ -130,7 +177,6 @@ const promptStore = usePromptStore();
 // 使用API Hooks
 const {
   apiKey,
-  apiUrl,
   isProcessing,
   error,
   streamProgress,
@@ -143,6 +189,60 @@ const {
   stopGeneration,
   clearHistory
 } = useDeepseekApi();
+
+// 初始化时将保存的当前会话消息同步至 conversationHistory
+onMounted(() => {
+  const current = sessions.value.find(s => s.id === currentSessionId.value);
+  if (current && current.messages.length > 0) {
+    conversationHistory.splice(0, conversationHistory.length, ...current.messages);
+  }
+});
+
+// 监听对话历史更新并回写到 SessionHistory
+watch(conversationHistory, (newMsgs) => {
+  updateCurrentSession(newMsgs, modelName.value);
+}, { deep: true });
+
+// 切换选中的历史会话
+const handleSelectSession = (sessionId: string) => {
+  const s = switchSession(sessionId);
+  if (s) {
+    conversationHistory.splice(0, conversationHistory.length, ...s.messages);
+  }
+};
+
+// 新建对话
+const handleCreateNewSession = () => {
+  createNewSession(modelName.value);
+  conversationHistory.splice(0, conversationHistory.length);
+};
+
+// 删除单个会话
+const handleDeleteSession = (sessionId: string) => {
+  deleteSession(sessionId);
+  const current = sessions.value.find(s => s.id === currentSessionId.value);
+  if (current) {
+    conversationHistory.splice(0, conversationHistory.length, ...current.messages);
+  } else {
+    conversationHistory.splice(0, conversationHistory.length);
+  }
+};
+
+// 清空所有历史会话
+const handleClearAllSessions = () => {
+  ElMessageBox.confirm(
+    '此操作将永久清空所有历史对话记录，不可恢复。',
+    '清空全部历史会话',
+    {
+      confirmButtonText: '确定清空',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }
+  ).then(() => {
+    clearAllSessions();
+    conversationHistory.splice(0, conversationHistory.length);
+  });
+};
 
 // 使用 Composables
 const { hotTopics, isLoading: isLoadingTopics, fetchHotTopics, refreshHotTopics } = useHotTopics();
@@ -238,7 +338,7 @@ const handleScroll = (event: Event) => {
  * 刷新热门话题（使用 AI 生成）
  */
 const handleRefreshTopics = () => {
-  refreshHotTopics(apiKey.value, apiUrl.value, modelName.value);
+  refreshHotTopics(apiKey.value, modelName.value);
 };
 
 /**
@@ -310,7 +410,6 @@ const performTransform = async () => {
   await performTransformInternal(
     userInput.value,
     apiKey.value,
-    apiUrl.value,
     modelName.value
   );
 };
@@ -357,7 +456,7 @@ const handleSelectFollowUp = (question: string) => {
  * 刷新后续问题推荐
  */
 const handleRefreshFollowUp = () => {
-  refreshSuggestions(apiKey.value, apiUrl.value, modelName.value);
+  refreshSuggestions(apiKey.value, modelName.value);
 };
 
 /**
@@ -511,7 +610,6 @@ const handleSendMessage = async () => {
               originalInput,
               lastMessage.content,
               apiKey.value,
-              apiUrl.value,
               modelName.value
             );
           }
@@ -564,7 +662,6 @@ const handleSendMessage = async () => {
           input,
           lastMessage.content,
           apiKey.value,
-          apiUrl.value,
           modelName.value
         );
       }
@@ -583,7 +680,7 @@ const handleSendMessage = async () => {
 <style scoped>
 /* 全局 Markdown 样式覆盖 */
 :deep(.markdown-body) {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Microsoft YaHei", "微软雅黑", "PingFang SC", "Hiragino Sans GB", "Segoe UI", Helvetica, Arial, sans-serif;
   font-size: 15px;
   line-height: 1.75;
   word-wrap: break-word;
@@ -665,6 +762,21 @@ const handleSendMessage = async () => {
 
 .thinking-indicator {
   animation: glow 1.5s ease-in-out infinite;
+}
+
+/* Element Plus Drawer 抽屉精细化封装覆写 */
+:deep(.config-drawer .el-drawer__header) {
+  margin-bottom: 0;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e4e4e7;
+  font-weight: 700;
+  font-size: 14px;
+  color: #09090b;
+}
+
+:deep(.config-drawer .el-drawer__body) {
+  padding: 0;
+  overflow-y: auto;
 }
 </style>
 

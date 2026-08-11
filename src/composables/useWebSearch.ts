@@ -6,7 +6,7 @@ interface SearchStep {
   action: string;
   details: string;
   timestamp: string;
-  status: 'processing' | 'completed' | 'error';
+  status: 'processing' | 'completed' | 'failed';
 }
 
 /**

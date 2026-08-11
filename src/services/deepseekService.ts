@@ -1,11 +1,11 @@
 import type { GameScene, StoryProgress } from '../stores/game'
 import CheckpointService from './CheckpointService';
 
-// API配置 - 使用字节跳动豆包API
+// API配置 - 优先从 localStorage 读取，其次从 Vite 环境变量 .env 中读取，最后为系统默认值
 export const API_CONFIG = {
-  apiKey: localStorage.getItem('apiKey') || '5f28bc1b-f678-466a-9143-f1f5f25bda86',
-  baseUrl: localStorage.getItem('apiUrl') || 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
-  model: localStorage.getItem('modelName') || 'doubao-seed-1-6-250615',
+  apiKey: localStorage.getItem('apiKey') || import.meta.env.VITE_DEEPSEEK_API_KEY || '',
+  baseUrl: localStorage.getItem('apiUrl') || import.meta.env.VITE_DEEPSEEK_BASE_URL || 'https://api.siliconflow.cn/v1',
+  model: localStorage.getItem('modelName') || import.meta.env.VITE_DEEPSEEK_MODEL || 'Qwen/Qwen2.5-7B-Instruct',
   temperature: 0.8,
   maxTokens: 2000
 };

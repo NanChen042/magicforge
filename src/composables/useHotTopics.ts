@@ -55,10 +55,10 @@ export function useHotTopics() {
   /**
    * 使用 AI 生成话题
    */
-  const generateTopicsWithAI = async (apiKey: string, apiUrl: string, model: string): Promise<string[]> => {
+  const generateTopicsWithAI = async (apiKey: string, model: string): Promise<string[]> => {
     const client = new DeepseekClient({
       apiKey,
-      baseURL: apiUrl,
+      baseURL: API_CONFIG.baseUrl,
       model,
       temperature: 1.0, // 高温度增加随机性
       maxTokens: 500
@@ -115,17 +115,16 @@ export function useHotTopics() {
   /**
    * 刷新热门话题（使用 AI 生成）
    */
-  const refreshHotTopics = async (apiKey?: string, apiUrl?: string, model?: string) => {
+  const refreshHotTopics = async (apiKey?: string, model?: string) => {
     isLoading.value = true;
     
     // 如果提供了 API 配置，尝试使用 AI 生成
     const key = apiKey || API_CONFIG.apiKey;
-    const url = apiUrl || API_CONFIG.baseUrl;
     const modelName = model || API_CONFIG.model;
 
-    if (key && url && useAIGeneration) {
+    if (key && useAIGeneration) {
       try {
-        const aiTopics = await generateTopicsWithAI(key, url, modelName);
+        const aiTopics = await generateTopicsWithAI(key, modelName);
         if (aiTopics.length >= 3) {
           hotTopics.value = aiTopics;
           isLoading.value = false;

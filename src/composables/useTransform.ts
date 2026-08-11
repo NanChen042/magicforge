@@ -1,5 +1,6 @@
 import { ref } from 'vue';
 import keywordTransformService, { type TransformResult } from '@/services/keywordTransformService';
+import { API_CONFIG } from '@/services/deepseekService';
 
 /**
  * 关键词转换管理
@@ -16,14 +17,13 @@ export function useTransform() {
   const performTransform = async (
     userInput: string,
     apiKey: string,
-    apiUrl: string,
     modelName: string
   ) => {
     if (!userInput.trim() || isTransforming.value) return;
 
-    if (!apiKey || !apiUrl) {
-      console.error('转换失败: API Key 或 API URL 未配置');
-      alert('请先配置 API Key 和 API URL');
+    if (!apiKey) {
+      console.error('转换失败: API Key 未配置');
+      alert('请先配置 API Key');
       return;
     }
 
@@ -32,14 +32,13 @@ export function useTransform() {
       console.log('开始关键词转换:', {
         query: userInput,
         mode: selectedTransformMode.value,
-        apiUrl,
         model: modelName
       });
 
       const result = await keywordTransformService.transformKeywords(userInput, {
         mode: selectedTransformMode.value,
         apiKey,
-        apiUrl,
+        apiUrl: API_CONFIG.baseUrl,
         model: modelName
       });
 

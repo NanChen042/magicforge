@@ -16,7 +16,7 @@ export function useDeepseekApi() {
   const isThinking = ref(false);
 
   // 聊天历史
-  const conversationHistory = reactive<Array<{role: string; content: string; images?: string[]}>>([]);
+  const conversationHistory = reactive<Array<{role: string; content: string; reasoning?: string; images?: string[]}>>([]);
 
   // 思维链内容
   const reasoningContent = ref('');
@@ -277,7 +277,8 @@ export function useDeepseekApi() {
       const aiResponseIndex = conversationHistory.length;
       conversationHistory.push({
         role: 'assistant',
-        content: ''
+        content: '',
+        reasoning: ''
       });
 
       // 准备消息列表（不包含最后一个空AI响应）
@@ -326,6 +327,7 @@ export function useDeepseekApi() {
           if (reasoning) {
             fullReasoning += reasoning;
             reasoningContent.value = fullReasoning;
+            conversationHistory[aiResponseIndex].reasoning = fullReasoning;
 
             if (callbacks?.onReasoning) {
               callbacks.onReasoning(reasoning);

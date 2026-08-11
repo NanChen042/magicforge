@@ -1,5 +1,6 @@
 import { ref } from 'vue';
 import DeepseekClient from '../services/DeepseekClient';
+import { API_CONFIG } from '../services/deepseekService';
 
 /**
  * 相关问题推荐
@@ -17,10 +18,9 @@ export function useFollowUpSuggestions() {
     userQuestion: string,
     aiAnswer: string,
     apiKey: string,
-    apiUrl: string,
     model: string
   ): Promise<void> => {
-    if (!apiKey || !apiUrl) {
+    if (!apiKey) {
       suggestions.value = [];
       return;
     }
@@ -30,7 +30,7 @@ export function useFollowUpSuggestions() {
 
     const client = new DeepseekClient({
       apiKey,
-      baseURL: apiUrl,
+      baseURL: API_CONFIG.baseUrl,
       model,
       temperature: 0.9,
       maxTokens: 300
@@ -83,13 +83,12 @@ AI回答摘要：${aiAnswer.slice(0, 500)}${aiAnswer.length > 500 ? '...' : ''}
    */
   const refreshSuggestions = async (
     apiKey: string,
-    apiUrl: string,
     model: string
   ): Promise<void> => {
     if (!lastContext.value) return;
     
     const [userQuestion, aiAnswer] = lastContext.value.split('\n');
-    await generateSuggestions(userQuestion || '', aiAnswer || '', apiKey, apiUrl, model);
+    await generateSuggestions(userQuestion || '', aiAnswer || '', apiKey, model);
   };
 
   /**

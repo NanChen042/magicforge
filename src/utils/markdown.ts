@@ -3,7 +3,8 @@ import hljs from 'highlight.js';
 
 // 创建 markdown-it 实例
 const md = new MarkdownIt({
-  html: true,
+  // Model output is untrusted; render Markdown only and keep raw HTML disabled.
+  html: false,
   linkify: true,
   typographer: true,
   breaks: true,
