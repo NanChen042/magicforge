@@ -1,9 +1,12 @@
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted, watch } from "vue";
 import { ElMessage } from "element-plus";
 import { imageService, ImageSize, type ImageGenerationResponse } from "../services/imageService";
 import { errorMessageMap } from "../constants/imageGeneratorConfig";
+import { useApiStore } from "@/stores/api";
+import { isImageModel, SiliconFlowClient, type SiliconFlowModel } from "@/services/siliconFlowClient";
 
 export interface FormData {
+  model: string;
   prompt: string;
   negative_prompt: string;
   image_size: ImageSize | string;
@@ -15,8 +18,12 @@ export interface FormData {
 }
 
 export function useImageGenerator() {
+  const apiStore = useApiStore();
+  const imageModels = ref<SiliconFlowModel[]>([]);
+  const modelLoadError = ref('');
   // 表单数据
   const formData = reactive<FormData>({
+    model: '',
     prompt: "",
     negative_prompt: "",
     image_size: ImageSize.Square,
@@ -26,6 +33,30 @@ export function useImageGenerator() {
     seed: undefined,
     image: undefined,
   });
+
+  const loadImageModels = async () => {
+    if (!apiStore.apiKey.trim()) {
+      imageModels.value = [];
+      modelLoadError.value = '请先配置 SiliconFlow API Key';
+      return;
+    }
+
+    try {
+      const client = new SiliconFlowClient({ apiUrl: apiStore.apiUrl, apiKey: apiStore.apiKey });
+      const models = await client.listModels();
+      imageModels.value = models.filter((model) => isImageModel(model.id));
+      if (!imageModels.value.some((model) => model.id === formData.model)) {
+        formData.model = imageModels.value[0]?.id || '';
+      }
+      modelLoadError.value = imageModels.value.length ? '' : '当前 API Key 没有可用的图像模型';
+    } catch (error) {
+      imageModels.value = [];
+      modelLoadError.value = error instanceof Error ? error.message : '无法获取图像模型列表';
+    }
+  };
+
+  watch(() => [apiStore.apiKey, apiStore.apiUrl], () => { void loadImageModels(); });
+  onMounted(() => { void loadImageModels(); });
 
   // 状态
   const loading = ref(false);
@@ -79,8 +110,12 @@ export function useImageGenerator() {
     startProgressTimer();
 
     try {
+      if (!formData.model) {
+        throw new Error(modelLoadError.value || '当前 API Key 没有可用的图像模型');
+      }
       const startTime = Date.now();
       const result = await imageService.generateImage({
+        model: formData.model,
         prompt: formData.prompt,
         negative_prompt: formData.negative_prompt || undefined,
         image_size: formData.image_size,
@@ -163,6 +198,8 @@ export function useImageGenerator() {
     generationTime,
     progress,
     estimatedTime,
+    imageModels,
+    modelLoadError,
     generateImage,
     randomizeSeed,
     regenerateWithSeed,

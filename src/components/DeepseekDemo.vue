@@ -1,18 +1,48 @@
 <template>
-  <div class="w-full flex-1 flex flex-row min-h-0 relative border border-zinc-200 rounded-sm overflow-hidden bg-white shadow-2xs">
+  <div class="w-full flex-1 flex flex-row min-h-0 relative overflow-hidden bg-white border-t border-zinc-200">
     
     <!-- 左侧会话历史目录 Sidebar -->
-    <SessionSidebar
-      :sessions="sessions"
-      :currentSessionId="currentSessionId"
-      @create-new="handleCreateNewSession"
-      @select-session="handleSelectSession"
-      @delete-session="handleDeleteSession"
-      @clear-all="handleClearAllSessions"
-    />
+    <div 
+      class="hidden xl:flex flex-col border-r border-slate-100 bg-white min-h-0 z-20 overflow-hidden relative transition-all duration-300 ease-in-out shrink-0"
+      :class="showSidebar ? 'w-64 opacity-100' : 'w-0 opacity-0 border-r-0 pointer-events-none'"
+    >
+      <div class="w-64 h-full flex flex-col">
+        <SessionSidebar
+          :sessions="sessions"
+          :currentSessionId="currentSessionId"
+          @create-new="handleCreateNewSession"
+          @select-session="handleSelectSession"
+          @delete-session="handleDeleteSession"
+          @clear-all="handleClearAllSessions"
+          @toggle-collapse="showSidebar = false"
+        />
+      </div>
+    </div>
+
+    <!-- 中间：配置参数栏 (Desktop) -->
+    <div 
+      class="hidden xl:flex flex-col border-r border-slate-200/60 bg-white min-h-0 z-10 overflow-hidden relative shadow-[4px_0_24px_rgba(0,0,0,0.02)] transition-all duration-300 ease-in-out"
+      :class="showDesktopConfig ? 'w-[300px] opacity-100' : 'w-0 opacity-0 border-r-0 pointer-events-none'"
+    >
+      <div class="w-[300px] h-full flex flex-col">
+        <ConfigPanel
+          v-model:apiKey="apiKey"
+          v-model:modelName="modelName"
+          v-model:systemPrompt="systemPrompt"
+          v-model:streaming="streaming"
+          v-model:temperature="temperature"
+          v-model:maxTokens="maxTokens"
+          v-model:topP="topP"
+          v-model:topK="topK"
+          v-model:frequencyPenalty="frequencyPenalty"
+          v-model:presencePenalty="presencePenalty"
+          @close="showDesktopConfig = false"
+        />
+      </div>
+    </div>
 
     <!-- 主内容区域：全屏沉浸式 Chat 界面 -->
-    <div class="flex-1 w-full flex flex-col min-h-0">
+    <div class="flex-1 w-full flex flex-col min-h-0 relative">
       <ChatPanel
         ref="chatPanelRef"
         v-model:modelName="modelName"
@@ -29,12 +59,19 @@
         :isLoadingTopics="isLoadingTopics"
         :showReasoningTab="showReasoningTab"
         :modelType="currentModelType"
+        :availableModels="availableModels"
+        :modelsLoading="isLoadingModels"
+        :modelLoadError="modelLoadError"
         :followUpSuggestions="followUpSuggestions"
         :isLoadingFollowUp="isLoadingFollowUp"
         :showFollowUp="showFollowUp"
         :supportsVision="supportsVision"
         :uploadedImages="uploadedImages"
-        @open-settings="showSettingsDrawer = true"
+        :isDesktopConfigVisible="showDesktopConfig"
+        :isSidebarVisible="showSidebar"
+        @toggle-sidebar="showSidebar = !showSidebar"
+        @refresh-models="loadAvailableModels"
+        @open-settings="handleOpenSettings"
         @update:userInput="userInput = $event"
         @send="handleSendMessage"
         @clear="handleClearConversation"
@@ -63,6 +100,7 @@
       <ConfigPanel
         v-model:apiKey="apiKey"
         v-model:modelName="modelName"
+        v-model:systemPrompt="systemPrompt"
         v-model:streaming="streaming"
         v-model:temperature="temperature"
         v-model:maxTokens="maxTokens"
@@ -91,19 +129,22 @@
 
 <script setup lang="ts">
 import { ref, watch, nextTick, onMounted, computed } from 'vue';
+import { storeToRefs } from 'pinia';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import ConfigPanel from './deepseek/ConfigPanel.vue';
 import ChatPanel from './deepseek/ChatPanel.vue';
 import SessionSidebar from './deepseek/SessionSidebar.vue';
 import TransformModal from './deepseek/modals/TransformModal.vue';
 import { useDeepseekApi } from '@/composables/useDeepseekApi';
+import { useApiStore } from '@/stores/api';
+import { SiliconFlowClient, type SiliconFlowModel } from '@/services/siliconFlowClient';
 import { useSessionHistory } from '@/composables/useSessionHistory';
 import { usePromptStore } from '@/stores/prompt';
 import { useHotTopics } from '@/composables/useHotTopics';
 import { useScroll } from '@/composables/useScroll';
 import { useTransform } from '@/composables/useTransform';
 import { useFollowUpSuggestions } from '@/composables/useFollowUpSuggestions';
-import { isReasoningModel, DEFAULT_MODEL_ID, getModelConfig, supportsVision as checkSupportsVision } from '@/constants/modelConfig';
+import { isReasoningModel, getModelConfig, supportsVision as checkSupportsVision } from '@/constants/modelConfig';
 
 // 图片上传接口
 interface UploadedImage {
@@ -121,18 +162,35 @@ const props = defineProps({
 });
 
 // 基本设置
+const showSidebar = ref(true);
+const showDesktopConfig = ref(true);
 const userInput = ref("");
 const streaming = ref(true);
 const temperature = ref(0.7);
 const maxTokens = ref(2000);
 const topP = ref(0.9);
-const topK = ref(0);
+// SiliconFlow uses -1 to disable top_k. Zero is invalid and causes a 400 response.
+const topK = ref(-1);
 const frequencyPenalty = ref(0);
 const presencePenalty = ref(0);
-const modelName = ref(localStorage.getItem('modelName') || DEFAULT_MODEL_ID);
+const systemPrompt = ref(localStorage.getItem('systemPrompt') || '');
+// Older builds exposed a one-click JSON preset and persisted it indefinitely.
+// Remove only that exact legacy value so ordinary conversations return natural language again.
+if (systemPrompt.value.trim() === '仅输出合法 JSON，不要使用 Markdown，也不要补充解释。') {
+  systemPrompt.value = '';
+  localStorage.removeItem('systemPrompt');
+}
+watch(systemPrompt, (newVal) => {
+  localStorage.setItem('systemPrompt', newVal || '');
+});
+const apiStore = useApiStore();
+const { modelName } = storeToRefs(apiStore);
+const availableModels = ref<SiliconFlowModel[]>([]);
+const isLoadingModels = ref(false);
+const modelLoadError = ref('');
 watch(modelName, (newModel) => {
   if (newModel) {
-    localStorage.setItem('modelName', newModel);
+    apiStore.setModelName(newModel);
     const config = getModelConfig(newModel);
     const name = config ? config.name : newModel;
     ElMessage.success({
@@ -168,6 +226,10 @@ const currentModelType = computed(() => {
 // 判断当前模型是否支持视觉输入
 const supportsVision = computed(() => checkSupportsVision(modelName.value));
 
+const isAuthorizedModel = computed(() => {
+  return !isLoadingModels.value && !modelLoadError.value && availableModels.value.some((model) => model.id === modelName.value);
+});
+
 // 上传的图片列表
 const uploadedImages = ref<UploadedImage[]>([]);
 
@@ -177,6 +239,7 @@ const promptStore = usePromptStore();
 // 使用API Hooks
 const {
   apiKey,
+  apiUrl,
   isProcessing,
   error,
   streamProgress,
@@ -189,6 +252,38 @@ const {
   stopGeneration,
   clearHistory
 } = useDeepseekApi();
+
+const loadAvailableModels = async () => {
+  if (!apiKey.value.trim()) {
+    availableModels.value = [];
+    modelLoadError.value = '请先填写 SiliconFlow API Key。';
+    return;
+  }
+
+  isLoadingModels.value = true;
+  modelLoadError.value = '';
+  try {
+    const client = new SiliconFlowClient({ apiUrl: apiUrl.value, apiKey: apiKey.value });
+    const models = await client.listModels();
+    availableModels.value = models.sort((a, b) => a.id.localeCompare(b.id));
+
+    if (!availableModels.value.some((model) => model.id === modelName.value)) {
+      const configuredDefault = import.meta.env.VITE_DEEPSEEK_MODEL;
+      const nextModel = availableModels.value.find((model) => model.id === configuredDefault) || availableModels.value[0];
+      if (nextModel) apiStore.setModelName(nextModel.id);
+    }
+  } catch (err) {
+    availableModels.value = [];
+    modelLoadError.value = err instanceof Error ? err.message : '无法获取模型列表。';
+    console.warn('Unable to load the authorized model list.', err);
+  } finally {
+    isLoadingModels.value = false;
+  }
+};
+
+watch([apiKey, apiUrl], () => {
+  void loadAvailableModels();
+});
 
 // 初始化时将保存的当前会话消息同步至 conversationHistory
 onMounted(() => {
@@ -281,7 +376,7 @@ const chatPanelRef = ref<InstanceType<typeof ChatPanel> | null>(null);
 
 // 确保API Key从localStorage中加载
 if (!apiKey.value) {
-  const savedApiKey = localStorage.getItem('apiKey');
+  const savedApiKey = '';
   if (savedApiKey) {
     apiKey.value = savedApiKey;
     console.log('从localStorage加载API Key成功');
@@ -297,6 +392,7 @@ onMounted(() => {
 
   // 获取热搜话题
   fetchHotTopics();
+  void loadAvailableModels();
 
   // 只有当prompt库中有提示词时才设置输入内容
   if (promptStore.promptText) {
@@ -332,6 +428,14 @@ const scrollToBottomHelper = (forceScroll = false) => {
  */
 const handleScroll = (event: Event) => {
   handleScrollEvent(event);
+};
+
+const handleOpenSettings = () => {
+    if (window.innerWidth >= 1280) {
+    showDesktopConfig.value = !showDesktopConfig.value;
+  } else {
+    showSettingsDrawer.value = true;
+  }
 };
 
 /**
@@ -546,6 +650,11 @@ const handleSendMessage = async () => {
     return;
   }
 
+  if (!isAuthorizedModel.value) {
+    ElMessage.error('当前模型不在 API Key 的可用列表中，请重新选择模型');
+    return;
+  }
+
   isSending.value = true;
 
   try {
@@ -553,8 +662,10 @@ const handleSendMessage = async () => {
       return;
     }
 
-    if (!apiKey.value) {
-      apiKey.value = "temp_key_for_testing";
+    if (!apiKey.value.trim()) {
+      ElMessage.warning('请先在模型配置中填写 SiliconFlow API Key');
+      handleOpenSettings();
+      return;
       console.log("使用临时API Key");
     }
 
@@ -618,6 +729,7 @@ const handleSendMessage = async () => {
         temperature: temperature.value,
         maxTokens: maxTokens.value,
         model: modelName.value,
+        systemPrompt: systemPrompt.value,
         topP: topP.value,
         topK: topK.value,
         frequencyPenalty: frequencyPenalty.value,
@@ -644,6 +756,7 @@ const handleSendMessage = async () => {
         temperature: temperature.value,
         maxTokens: maxTokens.value,
         model: modelName.value,
+        systemPrompt: systemPrompt.value,
         topP: topP.value,
         topK: topK.value,
         frequencyPenalty: frequencyPenalty.value,

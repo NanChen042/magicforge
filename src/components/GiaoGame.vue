@@ -1,7 +1,7 @@
+<script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { useGameStore } from '../stores/game'
 import { useApiStore } from '../stores/api'
-import { updateApiConfig } from '../services/deepseekService'
 
 // 子组件
 import GameIntro from './game/GameIntro.vue'
@@ -115,21 +115,25 @@ const aiErrorMessage = computed(() => gameStore.aiErrorMessage)
 watch(() => props.apiBaseUrl, (newUrl) => {
   if (newUrl) {
     apiUrl.value = newUrl
-    updateApiConfig({ baseUrl: newUrl })
+    apiStore.setApiUrl(newUrl)
   }
 }, { immediate: true })
 
 // 设置模型
 const setModel = (model: string) => {
   modelName.value = model
-  updateApiConfig({ baseUrl: apiUrl.value, apiKey: apiKey.value, model })
+  apiStore.setApiUrl(apiUrl.value)
+  apiStore.setApiKey(apiKey.value)
+  apiStore.setModelName(model)
 }
 
 // 处理 API 配置更新
 const handleApiConfigUpdate = (config: { apiKey: string; model: string }) => {
   apiKey.value = config.apiKey
   modelName.value = config.model
-  updateApiConfig({ baseUrl: apiUrl.value, apiKey: config.apiKey, model: config.model })
+  apiStore.setApiUrl(apiUrl.value)
+  apiStore.setApiKey(config.apiKey)
+  apiStore.setModelName(config.model)
 }
 
 // 启动游戏
@@ -138,7 +142,9 @@ const startGame = async (name: string) => {
   loading.value = true
 
   try {
-    updateApiConfig({ baseUrl: apiUrl.value, apiKey: apiKey.value, model: modelName.value })
+    apiStore.setApiUrl(apiUrl.value)
+    apiStore.setApiKey(apiKey.value)
+    apiStore.setModelName(modelName.value)
     gameStore.setPlayerName(name)
     showIntro.value = false
     await gameStore.startNewGame()
@@ -413,7 +419,7 @@ const switchTab = (tab: string) => {
 
 // 切换模型
 const changeModel = () => {
-  const models = ['Qwen/Qwen2.5-7B-Instruct', 'Qwen/Qwen3-8B', 'THUDM/GLM-4-9B-Chat', 'Qwen/Qwen2-7B-Instruct']
+  const models = ['Qwen/Qwen2.5-7B-Instruct', 'deepseek-ai/DeepSeek-R1-Distill-Qwen-7B', 'THUDM/glm-4-9b-chat', 'Qwen/Qwen2.5-Coder-7B-Instruct']
   const currentIndex = models.indexOf(modelName.value)
   const nextIndex = (currentIndex + 1) % models.length
 
@@ -449,13 +455,18 @@ const setDebugInfo = (scene: any) => {
 // 组件挂载
 onMounted(() => {
   if (props.apiBaseUrl) apiUrl.value = props.apiBaseUrl
-  updateApiConfig({ baseUrl: apiUrl.value, apiKey: apiKey.value, model: modelName.value })
+  apiStore.setApiUrl(apiUrl.value)
+  apiStore.setApiKey(apiKey.value)
+  apiStore.setModelName(modelName.value)
   setupStreamListeners()
 })
 </script>
 
 <template>
-  <div class="min-h-screen bg-zinc-50/60 relative">
+  <div class="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50/50 via-zinc-50 to-zinc-100/70 relative">
+    <!-- 全局背景点阵微特效 -->
+    <div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none opacity-60"></div>
+
     <!-- 开始界面 -->
     <GameIntro
       v-if="showIntro"
@@ -466,7 +477,7 @@ onMounted(() => {
     <div v-else class="relative z-10 min-h-screen pb-12">
       <div class="max-w-6xl mx-auto px-2 sm:px-4 py-4">
         <!-- 主容器 -->
-        <div class="rounded-md overflow-hidden bg-white border border-zinc-200 shadow-2xs">
+        <div class="rounded-md overflow-hidden bg-white border border-zinc-200/90 shadow-md shadow-zinc-900/5">
           <!-- 状态栏 -->
           <GameStatusBar
             :player-name="playerName"

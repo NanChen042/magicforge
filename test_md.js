@@ -1,0 +1,1 @@
+const MarkdownIt = require('markdown-it'); const md = new MarkdownIt({highlight: (str, lang) => { return '<pre><code>' + str.replace(/^[\r\n]+/, '') + '</code></pre>'; }}); console.log(md.render('\\\python\n\n\ndef foo():\n  pass\n\\\'));

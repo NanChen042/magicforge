@@ -1,6 +1,9 @@
 import { ref, reactive, watch } from 'vue';
+import { storeToRefs } from 'pinia';
 import DeepseekClient from '../services/DeepseekClient';
 import { API_CONFIG, updateApiConfig } from '../services/deepseekService';
+import { useApiStore } from '@/stores/api';
+import { getModelCapabilities } from '@/constants/modelConfig';
 
 /**
  * Deepseek API Hooks
@@ -8,15 +11,15 @@ import { API_CONFIG, updateApiConfig } from '../services/deepseekService';
  */
 export function useDeepseekApi() {
   // 基础配置
-  const apiKey = ref(API_CONFIG.apiKey);
-  const apiUrl = ref(API_CONFIG.baseUrl);
+  const apiStore = useApiStore();
+  const { apiKey, apiUrl } = storeToRefs(apiStore);
   const isProcessing = ref(false);
   const error = ref('');
   const streamProgress = ref(0);
   const isThinking = ref(false);
 
   // 聊天历史
-  const conversationHistory = reactive<Array<{role: string; content: string; reasoning?: string; images?: string[]}>>([]);
+  const conversationHistory = reactive<Array<{role: string; content: string; reasoning?: string; images?: string[]; usage?: { prompt_tokens: number; completion_tokens: number; total_tokens: number; cache_hit_tokens?: number }}>>([]);
 
   // 思维链内容
   const reasoningContent = ref('');
@@ -30,15 +33,14 @@ export function useDeepseekApi() {
   // 同步API配置变化
   watch(apiUrl, (newUrl) => {
     if (newUrl && newUrl !== API_CONFIG.baseUrl) {
-      updateApiConfig({ baseUrl: newUrl });
+      apiStore.setApiUrl(newUrl);
       console.log('API Hooks: 已更新API地址', newUrl);
     }
   });
 
   watch(apiKey, (newKey) => {
-    if (newKey && newKey !== API_CONFIG.apiKey) {
-      updateApiConfig({ apiKey: newKey });
-      localStorage.setItem('apiKey', newKey);
+    if (newKey !== API_CONFIG.apiKey) {
+      apiStore.setApiKey(newKey);
       console.log('API Hooks: 已更新API Key');
     }
   });
@@ -53,16 +55,18 @@ export function useDeepseekApi() {
     frequencyPenalty?: number;
     presencePenalty?: number;
   }) => {
+    const model = options?.model ?? API_CONFIG.model;
+    const capabilities = getModelCapabilities(model);
     return new DeepseekClient({
       apiKey: apiKey.value,
       baseURL: apiUrl.value,
-      temperature: options?.temperature || API_CONFIG.temperature,
-      maxTokens: options?.maxTokens || API_CONFIG.maxTokens,
-      model: options?.model || API_CONFIG.model,
-      topP: options?.topP,
-      topK: options?.topK,
-      frequencyPenalty: options?.frequencyPenalty,
-      presencePenalty: options?.presencePenalty
+      temperature: options?.temperature ?? API_CONFIG.temperature,
+      maxTokens: options?.maxTokens ?? API_CONFIG.maxTokens,
+      model,
+      topP: capabilities.topP ? options?.topP : undefined,
+      topK: capabilities.topK ? options?.topK : undefined,
+      frequencyPenalty: capabilities.frequencyPenalty ? options?.frequencyPenalty : undefined,
+      presencePenalty: capabilities.presencePenalty ? options?.presencePenalty : undefined
     });
   };
 
@@ -281,8 +285,8 @@ export function useDeepseekApi() {
         reasoning: ''
       });
 
-      // 准备消息列表（不包含最后一个空AI响应）
-      const historyMessages = conversationHistory.slice(0, -2); // 不包含刚添加的用户消息和空AI响应
+      // 准备消息列表（不包含最后一个空AI响应，并过滤掉历史中可能存在的空消息）
+      const historyMessages = conversationHistory.slice(0, -2).filter(m => typeof m.content === 'string' ? m.content.trim() !== '' : true);
       const messages: Array<{ role: string; content: string | Array<{ type: string; text?: string; image_url?: { url: string } }> }> = 
         historyMessages.map(m => ({ role: m.role, content: m.content }));
       
@@ -305,14 +309,12 @@ export function useDeepseekApi() {
       let fullContent = '';
       let fullReasoning = '';
       let isFirstContent = true;
-      let isCodeBlock = false;
-      let currentCodeBlock = '';
-      let currentCodeLang = '';
 
       if (client.chat?.completions?.create) {
         const stream = await client.chat.completions.create({
           messages,
           stream: true,
+          stream_options: { include_usage: true },
           // @ts-ignore: API类型定义中可能没有包含signal属性
           signal: abortController.value.signal
         });
@@ -342,46 +344,8 @@ export function useDeepseekApi() {
               isThinking.value = false;
             }
 
-            // 检测并处理代码块开始
-            if (content.includes('```') && !isCodeBlock) {
-              const parts = content.split('```');
-              if (parts.length > 1) {
-                isCodeBlock = true;
-                // 检查是否有语言标识
-                const langMatch = parts[1].match(/^([a-z]+)\n/);
-                if (langMatch) {
-                  currentCodeLang = langMatch[1];
-                  currentCodeBlock = parts[1].substring(langMatch[0].length);
-                } else {
-                  currentCodeLang = '';
-                  currentCodeBlock = parts[1];
-                }
-                fullContent += parts[0] + '```' + currentCodeLang + '\n';
-              } else {
-                fullContent += content;
-              }
-            }
-            // 检测代码块结束
-            else if (content.includes('```') && isCodeBlock) {
-              const parts = content.split('```');
-              currentCodeBlock += parts[0];
-              fullContent += currentCodeBlock + '```';
-              if (parts.length > 1) {
-                fullContent += parts[1];
-              }
-              isCodeBlock = false;
-              currentCodeBlock = '';
-              currentCodeLang = '';
-            }
-            // 在代码块内
-            else if (isCodeBlock) {
-              currentCodeBlock += content;
-              fullContent += content;
-            }
-            // 普通文本
-            else {
-              fullContent += content;
-            }
+            // 直接追加流字符，由 markdown-it 全权负责标准语法解析与代码高亮
+            fullContent += content;
 
             // 更新对话历史
             conversationHistory[aiResponseIndex].content = fullContent;
@@ -391,8 +355,15 @@ export function useDeepseekApi() {
             }
           }
 
-          // 更新进度（模拟，实际API可能没有进度信息）
-          streamProgress.value = Math.min(streamProgress.value + 1, 99);
+          // Capture usage from the final chunk (SiliconFlow sends usage on the last data chunk)
+          if (chunk.usage) {
+            conversationHistory[aiResponseIndex].usage = {
+              prompt_tokens: chunk.usage.prompt_tokens || 0,
+              completion_tokens: chunk.usage.completion_tokens || 0,
+              total_tokens: chunk.usage.total_tokens || 0,
+              cache_hit_tokens: chunk.usage.prompt_cache_hit_tokens ?? chunk.usage.cache_hit_tokens
+            };
+          }
         }
       }
 
@@ -418,6 +389,12 @@ export function useDeepseekApi() {
         reasoning: fullReasoning
       };
     } catch (err: any) {
+      // 移除刚才增加但内容为空的 AI 回复占位符，防止产生 "[响应内容为空]" 且污染下一次 API 请求
+      const lastMsg = conversationHistory[conversationHistory.length - 1];
+      if (lastMsg && lastMsg.role === 'assistant' && !lastMsg.content && !lastMsg.reasoning) {
+        conversationHistory.pop();
+      }
+
       // 判断是否为用户主动中止的请求
       if (err.name === 'AbortError') {
         console.log('请求被用户中止');

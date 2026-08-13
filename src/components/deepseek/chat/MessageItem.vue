@@ -104,27 +104,52 @@
 
         <!-- 内容区域 -->
         <div v-if="formattedContent" class="message-content" v-html="formattedContent"></div>
-        <div v-else-if="message.role === 'assistant' && !hasReasoning && isProcessing && isLast" class="flex items-center gap-2 text-xs text-zinc-400 py-0.5 font-mono">
+        <div v-else-if="message.role === 'assistant' && isProcessing && isLast" class="flex items-center gap-2 text-xs text-zinc-400 py-0.5 font-mono">
           <div class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-ping"></div>
           <span class="text-blue-600">生成响应中...</span>
         </div>
-        <div v-else-if="message.role === 'assistant' && !hasReasoning && !isProcessing" class="text-zinc-400 italic text-[13px] py-1">
+        <div v-else-if="message.role === 'assistant' && !isProcessing" class="text-zinc-400 italic text-[13px] py-1">
           [响应内容为空]
         </div>
 
         <!-- 底部工具栏 (悬停显示) -->
-        <div v-if="message.role !== 'user'" class="mt-2 flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 select-none">
-          <button 
-            @click="handleCopy" 
-            class="flex items-center gap-1.5 text-[11px] font-medium transition-colors"
-            :class="copySuccess ? 'text-zinc-900' : 'text-zinc-400 hover:text-zinc-700'"
+        <div v-if="message.role !== 'user'" class="mt-2 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-200 select-none">
+          <div class="flex items-center gap-3">
+            <button 
+              @click="handleCopy" 
+              class="flex items-center gap-1.5 text-[11px] font-medium transition-colors"
+              :class="copySuccess ? 'text-zinc-900' : 'text-zinc-400 hover:text-zinc-700'"
+            >
+              <svg v-if="!copySuccess" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              <svg v-else class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+              <span>{{ copySuccess ? '已复制' : '复制' }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Token 消耗与缓存命中统计标签 -->
+        <div 
+          v-if="message.role === 'assistant' && message.usage && (message.usage.total_tokens > 0)" 
+          class="mt-2.5 pt-2 border-t border-slate-100 flex flex-wrap items-center gap-2 text-[11px] text-zinc-400 font-mono select-none"
+        >
+          <span class="flex items-center gap-1 bg-slate-50 px-2 py-0.5 rounded border border-slate-100" title="提示词 Token 消耗">
+            <span class="text-zinc-500 font-medium">Input:</span> {{ message.usage.prompt_tokens }}
+          </span>
+          <span class="flex items-center gap-1 bg-slate-50 px-2 py-0.5 rounded border border-slate-100" title="生成的回答 Token 消耗">
+            <span class="text-zinc-500 font-medium">Output:</span> {{ message.usage.completion_tokens }}
+          </span>
+          <span class="flex items-center gap-1 bg-blue-50/80 text-blue-600 px-2 py-0.5 rounded border border-blue-100" title="本次对话总 Token">
+            <span class="font-medium">Total:</span> {{ message.usage.total_tokens }}
+          </span>
+          <span 
+            v-if="message.usage.cache_hit_tokens !== undefined && message.usage.cache_hit_tokens > 0" 
+            class="flex items-center gap-1 bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded border border-emerald-100"
+            title="上下文缓存命中 Token 数量"
           >
-            <svg v-if="!copySuccess" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-            </svg>
-            <svg v-else class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-            <span>{{ copySuccess ? '已复制' : '复制' }}</span>
-          </button>
+            <span class="font-medium">Cache Hit:</span> {{ message.usage.cache_hit_tokens }} ({{ Math.round((message.usage.cache_hit_tokens / (message.usage.prompt_tokens || 1)) * 100) }}%)
+          </span>
         </div>
 
       </div>
@@ -141,6 +166,12 @@ interface Message {
   role: string;
   content: string;
   images?: string[]; // 图片预览 URL 列表
+  usage?: {
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
+    cache_hit_tokens?: number;
+  };
 }
 
 const props = defineProps<{
@@ -235,7 +266,7 @@ const wrapperClasses = computed(() => [
   'relative transition-all duration-200 min-w-0',
   props.message.role === 'user'
     // User: 现代灰底气泡，右对齐展示，无头像
-    ? 'bg-zinc-100/80 text-zinc-900 px-5 py-3 rounded-[20px] rounded-tr-[4px] max-w-[85%] md:max-w-[75%] ml-auto text-[15px] w-fit'
+    ? 'bg-zinc-100/80 text-zinc-900 px-5 py-3 rounded-lg rounded-tr-sm max-w-[85%] md:max-w-[75%] ml-auto text-[15px] w-fit'
     
     // AI: 无边框，纯净正文排版，左对齐
     : 'text-zinc-800 px-1 py-1 text-[15px] leading-relaxed flex-1'
@@ -324,41 +355,8 @@ const formattedContent = computed(() => formatMarkdown(props.message.content));
 }
 
 /* 
-  代码块 - 模拟 Mac 窗口风格 (轻量版)
-  背景不要太黑，使用 Zinc-900
+  代码块样式统一在 deepseek.css 全局声明
 */
-.message-content :deep(.code-block-wrapper) {
-  margin: 1.25em 0;
-  background: #18181b; /* Zinc-900 */
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  border: 1px solid #000;
-}
-
-.message-content :deep(.code-block-header) {
-  padding: 8px 16px;
-  background: #27272a; /* Zinc-800 */
-  border-bottom: 1px solid #3f3f46;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.message-content :deep(.code-lang-label) {
-  color: #a1a1aa;
-  font-size: 11px;
-  font-family: 'JetBrains Mono', monospace;
-  text-transform: uppercase;
-}
-
-.message-content :deep(.code-block) {
-  padding: 16px;
-  color: #e4e4e7; /* Zinc-200 */
-  font-size: 13px;
-  background: #18181b;
-  overflow-x: auto;
-}
 
 .message-content :deep(table) {
   width: 100%;

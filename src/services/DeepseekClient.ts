@@ -76,8 +76,8 @@ export class DeepseekClient {
     this.apiKey = options.apiKey;
     this.baseURL = options.baseURL;
     this.model = options.model || 'deepseek-r1';
-    this.temperature = options.temperature || 0.8;
-    this.maxTokens = options.maxTokens || 2000;
+    this.temperature = options.temperature ?? 0.8;
+    this.maxTokens = options.maxTokens ?? 2000;
     this.topP = options.topP;
     this.topK = options.topK;
     this.frequencyPenalty = options.frequencyPenalty;
@@ -97,25 +97,28 @@ export class DeepseekClient {
       const apiURL = this.ensureCorrectApiUrl(this.baseURL);
 
       // 构建请求体
+      const { messages, stream = false, signal: _signal, ...requestOptions } = params;
       const requestBody: Record<string, any> = {
         model: this.model,
-        messages: params.messages,
+        messages,
         temperature: this.temperature,
         max_tokens: this.maxTokens,
-        stream: params.stream || false
+        stream,
+        ...requestOptions
       };
 
       // 添加可选参数（只有当值有效时才添加）
-      if (this.topP !== undefined && this.topP > 0) {
+      if (this.topP !== undefined) {
         requestBody.top_p = this.topP;
       }
-      if (this.topK !== undefined && this.topK > 0) {
-        requestBody.top_k = this.topK;
+      if (this.topK !== undefined) {
+        // SiliconFlow accepts -1 (disabled) or an integer from 1 to 100.
+        requestBody.top_k = this.topK >= 1 && this.topK <= 100 ? Math.round(this.topK) : -1;
       }
-      if (this.frequencyPenalty !== undefined && this.frequencyPenalty !== 0) {
+      if (this.frequencyPenalty !== undefined) {
         requestBody.frequency_penalty = this.frequencyPenalty;
       }
-      if (this.presencePenalty !== undefined && this.presencePenalty !== 0) {
+      if (this.presencePenalty !== undefined) {
         requestBody.presence_penalty = this.presencePenalty;
       }
 
@@ -125,7 +128,8 @@ export class DeepseekClient {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${this.apiKey}`
         },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(requestBody),
+        signal: params.signal as AbortSignal | undefined
       });
 
       if (!response.ok) {

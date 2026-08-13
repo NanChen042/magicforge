@@ -3,7 +3,7 @@ import CheckpointService from './CheckpointService';
 
 // API配置 - 优先从 localStorage 读取，其次从 Vite 环境变量 .env 中读取，最后为系统默认值
 export const API_CONFIG = {
-  apiKey: localStorage.getItem('apiKey') || import.meta.env.VITE_DEEPSEEK_API_KEY || '',
+  apiKey: import.meta.env.VITE_DEEPSEEK_API_KEY || '',
   baseUrl: localStorage.getItem('apiUrl') || import.meta.env.VITE_DEEPSEEK_BASE_URL || 'https://api.siliconflow.cn/v1',
   model: localStorage.getItem('modelName') || import.meta.env.VITE_DEEPSEEK_MODEL || 'Qwen/Qwen2.5-7B-Instruct',
   temperature: 0.8,
@@ -15,9 +15,18 @@ export function updateApiConfig(config: Partial<typeof API_CONFIG>) {
   Object.assign(API_CONFIG, config);
 
   // 将更新后的值保存到localStorage
-  if (config.apiKey) localStorage.setItem('apiKey', config.apiKey);
   if (config.baseUrl) localStorage.setItem('apiUrl', config.baseUrl);
   if (config.model) localStorage.setItem('modelName', config.model);
+}
+
+/**
+ * 确保 API 地址包含 /chat/completions
+ */
+export function getFormattedEndpoint(url: string): string {
+  if (!url) return '';
+  if (url.includes('/chat/completions')) return url;
+  const cleanUrl = url.endsWith('/') ? url.slice(0, -1) : url;
+  return `${cleanUrl}/chat/completions`;
 }
 
 /**
@@ -261,9 +270,10 @@ export class DeepseekService {
         stop: null // 移除stop参数，避免截断JSON
       };
 
-      console.log('请求体:', JSON.stringify(requestBody, null, 2));
+      const targetUrl = getFormattedEndpoint(API_CONFIG.baseUrl);
+      console.log('目标 API 地址:', targetUrl);
 
-      const response = await fetch(API_CONFIG.baseUrl, {
+      const response = await fetch(targetUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -367,7 +377,8 @@ ${specialEvent ? `特殊事件：${specialEvent}` : ''}
         console.log('使用模型:', model);
 
         try {
-          const response = await fetch(API_CONFIG.baseUrl, {
+          const targetUrl = getFormattedEndpoint(API_CONFIG.baseUrl);
+          const response = await fetch(targetUrl, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

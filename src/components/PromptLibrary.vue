@@ -1,98 +1,117 @@
 <template>
-  <div class="min-h-screen bg-white font-sans antialiased">
+  <div class="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50/50 via-zinc-50 to-zinc-100/60 font-sans text-zinc-900 pb-16 relative">
     
-    <!-- Hero Section: 极简黑白 + 精致渐变 -->
-    <div class="relative bg-gradient-to-b from-slate-50 to-white pt-24 pb-20 overflow-hidden border-b border-slate-100">
-      <!-- 背景装饰 -->
-      <div class="absolute inset-0 overflow-hidden pointer-events-none">
-        <!-- 顶部光晕 -->
-        <div class="absolute -top-[40%] left-[20%] w-[500px] h-[500px] bg-indigo-100/40 rounded-full blur-[120px]"></div>
-        <div class="absolute top-[10%] right-[10%] w-[400px] h-[400px] bg-violet-100/30 rounded-full blur-[100px]"></div>
-        
-        <!-- 网格 -->
-        <div class="absolute inset-0 bg-[linear-gradient(to_right,#8882_1px,transparent_1px),linear-gradient(to_bottom,#8882_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)]"></div>
-      </div>
+    <!-- 全局背景点阵 -->
+    <div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none opacity-60"></div>
 
-      <!-- 内容 -->
-      <div class="relative z-10 max-w-6xl mx-auto px-6 text-center">
-        <!-- 标签 -->
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-medium mb-6">
-          <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-          Prompt Library
+    <!-- Hero Section -->
+    <div class="relative pt-12 pb-10 overflow-hidden border-b border-zinc-200/80 bg-white/70 backdrop-blur-xs">
+      <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 text-center">
+        
+        <!-- Badge -->
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-sm bg-blue-50 text-blue-600 border border-blue-200/70 text-xs font-semibold mb-4 shadow-2xs">
+          <span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span>
+          提示词模板库
         </div>
         
         <!-- 标题 -->
-        <h1 class="text-5xl md:text-6xl font-bold text-slate-900 mb-4 tracking-tight">
-          精选提示词模板库
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-zinc-900 mb-3 tracking-tight">
+          提示词范例工坊
         </h1>
         
         <!-- 副标题 -->
-        <p class="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
-          {{ Object.keys(promptExamples).length }} 个专业模板，覆盖代码、创作、内容三大场景
+        <p class="text-sm text-zinc-500 max-w-xl mx-auto leading-relaxed">
+          精选 {{ Object.keys(promptExamples).length }} 个高价值专业领域 Prompt 范例与深度逻辑解析，支持一键发送至智能对话框测试
         </p>
+
       </div>
     </div>
 
-    <!-- 主内容 -->
-    <div class="max-w-6xl mx-auto px-6 py-12">
+    <!-- 主内容区域 -->
+    <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-6">
       
-      <!-- 分类导航 -->
-      <div class="flex items-center gap-2 mb-10 overflow-x-auto pb-2">
-        <button
-          v-for="cat in ['全部', '代码', '创作', '内容']"
-          :key="cat"
-          @click="setActiveCategory(cat)"
-          class="px-4 py-2 rounded-sm text-sm font-medium transition-all whitespace-nowrap"
-          :class="activeCategory === cat 
-            ? 'bg-slate-900 text-white shadow-sm' 
-            : 'text-slate-600 hover:bg-slate-100'"
-        >
-          {{ cat }}
-        </button>
+      <!-- 搜索与分类导航栏 -->
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4 bg-white p-3.5 rounded-md border border-zinc-200/90 shadow-2xs">
+        
+        <!-- 分类按钮组 -->
+        <div class="flex items-center gap-1.5 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 custom-scrollbar">
+          <button
+            v-for="cat in categories"
+            :key="cat"
+            @click="setActiveCategory(cat)"
+            class="px-3.5 py-1.5 rounded-sm text-xs font-semibold transition-all whitespace-nowrap cursor-pointer shrink-0"
+            :class="activeCategory === cat 
+              ? 'bg-blue-600 text-white shadow-2xs' 
+              : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'"
+          >
+            {{ cat }}
+          </button>
+        </div>
+
+        <!-- 搜索框 -->
+        <div class="relative w-full md:w-72 shrink-0">
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="搜索提示词标题或关键词..."
+            class="w-full bg-zinc-50 text-zinc-900 text-xs py-2 pl-8 pr-3 rounded-sm border border-zinc-200 focus:border-blue-600 focus:bg-white focus:outline-none transition-all"
+          />
+          <svg class="w-4 h-4 text-zinc-400 absolute left-2.5 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+
       </div>
 
-      <!-- 卡片网格 -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <!-- 提示词卡片网格 -->
+      <div v-if="Object.keys(filteredExamples).length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div
           v-for="(example, type) in filteredExamples"
           :key="String(type)"
-          class="group relative bg-white rounded-md border border-slate-200 p-6 transition-all duration-200 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-100 cursor-pointer"
+          class="group relative bg-white rounded-md border border-zinc-200/90 p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-500 hover:shadow-xs cursor-pointer flex flex-col justify-between"
           @click="usePrompt(String(type))"
         >
-          <!-- 分类标签 -->
-          <div class="flex items-center justify-between mb-4">
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium"
-              :class="{
-                'bg-blue-50 text-blue-700': example.category === '代码',
-                'bg-rose-50 text-rose-700': example.category === '创作',
-                'bg-emerald-50 text-emerald-700': example.category === '内容'
-              }">
-              <svg v-if="example.category === '代码'" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
-              <svg v-else-if="example.category === '创作'" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-              <svg v-else class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-              {{ example.category }}
-            </span>
+          <div>
+            <!-- 分类标签与角标 -->
+            <div class="flex items-center justify-between mb-3">
+              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm text-[11px] font-bold"
+                :class="getCategoryBadgeClass(example.category)">
+                {{ example.category }}
+              </span>
+              
+              <svg class="w-4 h-4 text-zinc-300 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+              </svg>
+            </div>
+
+            <!-- 标题 -->
+            <h3 class="text-base font-bold text-zinc-900 mb-1.5 group-hover:text-blue-600 transition-colors">
+              {{ example.title }}
+            </h3>
             
-            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-            </svg>
+            <!-- 描述 -->
+            <p class="text-xs text-zinc-500 line-clamp-2 leading-relaxed mb-4">
+              {{ example.description }}
+            </p>
           </div>
 
-          <!-- 标题 -->
-          <h3 class="text-lg font-semibold text-slate-900 mb-2 group-hover:text-indigo-600 transition-colors">
-            {{ example.title }}
-          </h3>
-          
-          <!-- 描述 -->
-          <p class="text-sm text-slate-600 line-clamp-2 leading-relaxed">
-            {{ example.description }}
-          </p>
+          <!-- 卡片底部链接按钮 -->
+          <div class="pt-3 border-t border-zinc-100 flex items-center justify-between text-xs text-zinc-400 font-medium group-hover:text-blue-600 transition-colors">
+            <span>点击查看范例与测试</span>
+            <span class="font-semibold text-xs">查看范例 &rarr;</span>
+          </div>
+
         </div>
+      </div>
+
+      <!-- 空搜状态 -->
+      <div v-else class="bg-white rounded-md border border-zinc-200 p-12 text-center text-zinc-400 text-xs">
+        未找到与 "{{ searchQuery }}" 匹配的提示词范例
       </div>
 
     </div>
 
-    <!-- Modal -->
+    <!-- 范例模态框 -->
     <PromptExampleModal
       v-if="isModalOpen"
       :is-open="isModalOpen"
@@ -113,13 +132,14 @@ import { useRouter } from 'vue-router';
 import PromptExampleModal from './PromptExampleModal.vue';
 import { usePromptStore } from '../stores/prompt';
 
-// ... 逻辑部分代码保持不变，与原代码完全一致 ...
-// (为了节省篇幅，这里假设之前的 script setup 逻辑完全复用，
-// 包括 promptExamples, promptTemplates, usePrompt, closeModal, handleUsePrompt 等函数)
-
 const router = useRouter();
 const promptStore = usePromptStore();
 const isModalOpen = ref(false);
+const searchQuery = ref('');
+const activeCategory = ref('全部');
+
+const categories = ['全部', '代码开发', '架构设计', '数据分析', '学术科研', '写作创作', '产品运营'];
+
 const currentPromptExample = ref({
   title: '',
   description: '',
@@ -128,212 +148,218 @@ const currentPromptExample = ref({
   analysis: ''
 });
 
-// 提示词示例数据类型定义
+type CategoryType = '代码开发' | '架构设计' | '数据分析' | '学术科研' | '写作创作' | '产品运营';
+
 interface PromptExample {
   title: string;
   description: string;
   userPrompt: string;
   sampleOutput: string;
   analysis: string;
-  category: '代码' | '内容' | '创作'; // 限制分类以匹配 UI
+  category: CategoryType;
 }
 
 type PromptExamples = Record<string, PromptExample>;
 
-// 完整数据源
+function getCategoryBadgeClass(category: CategoryType) {
+  switch (category) {
+    case '代码开发': return 'bg-blue-50 text-blue-700 border border-blue-200/60';
+    case '架构设计': return 'bg-purple-50 text-purple-700 border border-purple-200/60';
+    case '数据分析': return 'bg-cyan-50 text-cyan-700 border border-cyan-200/60';
+    case '学术科研': return 'bg-indigo-50 text-indigo-700 border border-indigo-200/60';
+    case '写作创作': return 'bg-amber-50 text-amber-700 border border-amber-200/60';
+    case '产品运营': return 'bg-emerald-50 text-emerald-700 border border-emerald-200/60';
+    default: return 'bg-zinc-50 text-zinc-700 border border-zinc-200/60';
+  }
+}
+
 const promptExamples = ref<PromptExamples>({
-  // ==================== 代码类 (Code) ====================
-  '代码改写': {
-    title: '代码改写与优化',
-    description: '识别代码中的性能瓶颈与逻辑漏洞，进行重构优化。',
-    userPrompt: '下面这段的代码的效率很低，且没有处理边界情况。请先解释这段代码的问题与解决方法，然后进行优化：\n```python\ndef fib(n):\n    if n <= 2:\n        return n\n    return fib(n-1) + fib(n-2)\n```',
-    sampleOutput: '### 问题分析\n1. **效率低下**：原代码使用递归计算斐波那契数列，时间复杂度为 O(2^n)，存在大量重复计算。\n2. **边界缺失**：未处理 n < 0 的情况，且 n=0 时逻辑可能不符合预期。\n\n### 优化方案\n使用**动态规划**（迭代法）或**尾递归**。这里提供迭代法版本，时间复杂度降为 O(n)。\n\n### 优化后的代码\n```python\ndef fib_optimized(n: int) -> int:\n    """\n    计算第 n 个斐波那契数 (迭代版)\n    """\n    if not isinstance(n, int) or n < 0:\n        raise ValueError("Input must be a non-negative integer")\n    \n    if n == 0: return 0\n    if n == 1: return 1\n    \n    prev, curr = 0, 1\n    for _ in range(2, n + 1):\n        prev, curr = curr, prev + curr\n        \n    return curr\n```',
-    analysis: '该示例展示了模型不仅能写代码，还能像资深工程师一样进行Code Review，指出时间复杂度问题并提供生产级代码。',
-    category: '代码'
+  // ==================== 代码开发 ====================
+  '代码重构与性能调优': {
+    title: '代码重构与性能调优',
+    description: '识别算法中的瓶颈与边界风险，将 O(N^2) 复杂度重构为 O(N log N)。',
+    userPrompt: '下面这段 Python 代码在处理大数组时会导致超时与内存溢出，请指出瓶颈并重构：\n```python\ndef find_pairs(nums, target):\n    res = []\n    for i in range(len(nums)):\n        for j in range(i + 1, len(nums)):\n            if nums[i] + nums[j] == target:\n                res.append((nums[i], nums[j]))\n    return res\n```',
+    sampleOutput: '### 1. 问题定位\n- **双重循环瓶颈**：嵌套循环使得算法的时间复杂度为 O(N^2)，当元素量达到 10^5 时会产生十亿次比较导致超时。\n- **重复元素未去重**：如果输入存在重复数字，会输出大量重复元组。\n\n### 2. 优化方案（哈希表匹配）\n使用集合/字典存储遍历过的元素，将查找匹配项的时间复杂度降低为 O(1)，总体时间复杂度降为 O(N)。\n\n```python\ndef find_pairs_optimized(nums: list[int], target: int) -> list[tuple[int, int]]:\n    seen = set()\n    result = set()\n    \n    for num in nums:\n        complement = target - num\n        if complement in seen:\n            # 保证元组顺序递增以便去重\n            pair = (min(num, complement), max(num, complement))\n            result.add(pair)\n        seen.add(num)\n        \n    return list(result)\n```',
+    analysis: '提示词展示了高级工程师式的 Code Review 逻辑，要求 AI 给出复杂度分析、风险点并提供生产级替代方案。',
+    category: '代码开发'
   },
 
-  '代码解释': {
-    title: '复杂代码解释',
-    description: '用通俗易懂的语言解释复杂的代码逻辑或正则表达式。',
-    userPrompt: '请解释下面这段正则表达式的含义：\n`^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$`',
-    sampleOutput: '这段正则表达式用于**验证电子邮件地址**的格式。我们可以将其拆解为三部分：\n\n1. **用户名部分** `^([a-zA-Z0-9_\\-\\.]+)`：\n   - `^`：表示字符串开始。\n   - `[...]`：允许大小写字母、数字、下划线、短横线和点。\n   - `+`：表示至少出现一次。\n\n2. **域名部分** `@([a-zA-Z0-9_\\-\\.]+)`：\n   - `@`：匹配邮箱中的 @ 符号。\n   - 后面的逻辑同上，匹配邮件服务器域名（如 gmail, outlook）。\n\n3. **顶级域名** `\\.([a-zA-Z]{2,5})$`：\n   - `\\.`：匹配实际的点号（.）。\n   - `[a-zA-Z]{2,5}`：匹配 2 到 5 位字母的后缀（如 .com, .cn, .org）。\n   - `$`：表示字符串结束。',
-    analysis: '对于难以阅读的正则或生僻语法，AI 能将其拆解为自然语言，是学习新代码库的利器。',
-    category: '代码'
+  'TypeScript类型体操': {
+    title: 'TypeScript 复杂类型收窄',
+    description: '构建严密的类型推导范型，提供无敌的类型安全保障。',
+    userPrompt: '请用 TypeScript 编写一个条件工具类型 `DeepReadonly<T>`，能够递归地将对象及其深层属性、数组和函数参数转为不可变 readonly 类型。',
+    sampleOutput: '```typescript\ntype DeepReadonly<T> = T extends Function | boolean | number | string | null | undefined\n  ? T\n  : T extends Array<infer U>\n  ? ReadonlyArray<DeepReadonly<U>>\n  : T extends Map<infer K, infer V>\n  ? ReadonlyMap<DeepReadonly<K>, DeepReadonly<V>>\n  : T extends Set<infer M>\n  ? ReadonlySet<DeepReadonly<M>>\n  : { readonly [P in keyof T]: DeepReadonly<T[P]> };\n```\n\n**关键机制解释**：\n1. **基础类型终止递归**：利用元组/原始类型三元判断防止陷入无限递归陷阱。\n2. **内置容器特化处理**：专门处理 Map、Set 及 Array 泛型展开。',
+    analysis: '考验模型对 TypeScript 高级类型建模（条件类型、模式匹配 infer 和映射类型）的精确控制。',
+    category: '代码开发'
   },
 
-  '代码生成': {
-    title: '功能代码生成',
-    description: '根据自然语言描述，生成完整的函数或组件代码。',
-    userPrompt: '请生成一个 Python 函数，用于将用户上传的图片调整大小并转换为 WebP 格式。需要使用 Pillow 库。',
-    sampleOutput: '```python\nfrom PIL import Image\nimport os\n\ndef convert_image_to_webp(input_path, output_path, max_width=800):\n    """\n    调整图片大小并转换为 WebP 格式\n    """\n    try:\n        with Image.open(input_path) as img:\n            # 计算新的高度，保持宽高比\n            ratio = max_width / float(img.size[0])\n            new_height = int((float(img.size[1]) * float(ratio)))\n            \n            # 调整大小\n            img = img.resize((max_width, new_height), Image.Resampling.LANCZOS)\n            \n            # 保存为 WebP\n            img.save(output_path, "WEBP", quality=85)\n            print(f"成功转换: {output_path}")\n            return True\n    except Exception as e:\n        print(f"转换失败: {e}")\n        return False\n\n# 使用示例\n# convert_image_to_webp("photo.jpg", "photo.webp")\n```',
-    analysis: '模型能够熟练使用第三方库（如 Pillow），并处理文件 I/O 和异常情况，生成的代码通常可直接运行。',
-    category: '代码'
+  'Rust并发生命周期调试': {
+    title: 'Rust 所有权与生命周期排错',
+    description: '分析并发环境下 Borrow Checker 的报错原因并给出无锁化解决方案。',
+    userPrompt: '我在 Rust 中使用多线程共享状态时出现了 `borrowed value does not live long enough` 报错，请解析其根因并给出安全实现：\n```rust\nlet data = vec![1, 2, 3];\nstd::thread::spawn(move || {\n    println!("{:?}", data);\n});\n```',
+    sampleOutput: '### 根因分析\n1. `std::thread::spawn` 要求的闭包声明周期为 `\'static\'`，即便使用了 `move` 关键字，如果外层存在动态引用的作用域竞争仍无法自动通过所有权转换。\n2. **标准解决方案**：使用 `std::sync::Arc` 进行原子引用计数共享，或者在作用域闭包中使用 `std::thread::scope`（Rust 1.63+ 稳定版）。\n\n### 推荐写法 (std::thread::scope)\n```rust\nlet data = vec![1, 2, 3];\n\nstd::thread::scope(|s| {\n    s.spawn(|| {\n        println!("Thread 1 read: {:?}", data);\n    });\n});\n```',
+    analysis: '帮助 Rust 开发者快速突破编译器的借用检查器（Borrow Checker）阻碍。',
+    category: '代码开发'
   },
 
-  '单元测试生成': {
-    title: '单元测试生成',
-    description: '为现有的函数生成测试用例，覆盖多种边界情况。',
-    userPrompt: '请为以下 JavaScript 函数生成 Jest 测试用例，包含正常情况和边界情况：\n```javascript\nfunction divide(a, b) {\n  if (b === 0) throw new Error("Cannot divide by zero");\n  return a / b;\n}\n```',
-    sampleOutput: '```javascript\ndescribe("divide function", () => {\n  // 1. 正常情况\n  test("should correctly divide two positive numbers", () => {\n    expect(divide(6, 2)).toBe(3);\n  });\n\n  test("should handle negative numbers", () => {\n    expect(divide(-6, 2)).toBe(-3);\n    expect(divide(-6, -2)).toBe(3);\n  });\n\n  test("should handle decimals", () => {\n    expect(divide(5, 2)).toBe(2.5);\n  });\n\n  // 2. 边界情况：被除数为0\n  test("should return 0 when dividing 0", () => {\n    expect(divide(0, 5)).toBe(0);\n  });\n\n  // 3. 异常情况：除数为0\n  test("should throw error when dividing by zero", () => {\n    expect(() => divide(5, 0)).toThrow("Cannot divide by zero");\n  });\n});\n```',
-    analysis: 'AI 非常擅长编写枯燥的测试代码，能自动考虑到正数、负数、小数以及除以零等异常场景。',
-    category: '代码'
+  // ==================== 架构设计 ====================
+  '高并发分布式缓存': {
+    title: '高并发缓存击穿与雪崩设计',
+    description: '设计百万级 QPS 下的 Redis 多级缓存与防击穿防雪崩架构。',
+    userPrompt: '我们是一个电商热销商品秒杀系统，秒杀启动瞬间 QPS 预计从 1k 飙升至 50w，请设计一份应对缓存击穿（Hotkey）与缓存雪崩（Avalanche）的系统架构设计方案。',
+    sampleOutput: '### 1. 热点 Key 击穿（Hot Key Breakdown）方案\n- **本地二级缓存**：借助 Caffeine / Go-cache 构建 Node.js/Java 本地内存热点一级缓存，使用 `SingleFlight` / `Mutex Lock` 控制打到 Redis 的并发并发数。\n- **逻辑过期 + 异步重建**：Key 物理不过期，在 Value 中封装 `expire_at` 逻辑字段，检测过期时异步开线程更新。\n\n### 2. 缓存雪崩（Avalanche）防范\n- **随机 TTL 抖动**：基础存活时长设为 2h + 随机 0-15min 随机偏移量，避免集中失效。\n- **多活冗余集群与熔断降级**：配置 Sentinel / Hystrix 熔断兜底，触发 80% 压测临界点时直接返回静态兜底数据。',
+    analysis: '从方案设计、降级策略到代码锁控制，提供资深系统架构师级别的整体设计视角。',
+    category: '架构设计'
   },
 
-  'SQL查询优化': {
-    title: 'SQL 查询生成与优化',
-    description: '将自然语言转换为复杂的 SQL 查询语句。',
-    userPrompt: '我有一个 `orders` 表（id, user_id, amount, created_at）。请写一个 SQL 查询，找出最近 30 天内消费总额最高的前 10 名用户，并显示他们的总金额。',
-    sampleOutput: '```sql\nSELECT \n    user_id,\n    SUM(amount) as total_spent\nFROM \n    orders\nWHERE \n    created_at >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)\nGROUP BY \n    user_id\nORDER BY \n    total_spent DESC\nLIMIT 10;\n```\n**解释**：\n1. `WHERE` 子句筛选出最近 30 天的记录。\n2. `GROUP BY` 按用户分组。\n3. `SUM` 计算每个用户的总消费。\n4. `ORDER BY ... DESC` 按金额从高到低排序。',
-    analysis: '能够准确理解时间范围（最近30天）和聚合需求（总额、Top 10），直接生成标准 SQL。',
-    category: '代码'
+  'RESTful与GraphQL标准建模': {
+    title: 'RESTful API & GraphQL 架构规约',
+    description: '制定规范的 API 幂等性、统一错误码及类型安全层。',
+    userPrompt: '我们正在重构企业级 SaaS 系统的 API 接口层，请帮助设计一套包含：幂等键控制、RFC 7807 统一标准错误结构、以及状态码划分的标准规范。',
+    sampleOutput: '### RFC 7807 统一响应规范\n```json\n{\n  "type": "https://api.example.com/errors/RESOURCE_LOCKED",\n  "title": "资源当前已被占用",\n  "status": 409,\n  "detail": "文档 #1024 正在被用户 A 编辑，暂无法提交修改",\n  "instance": "/v1/documents/1024/lock",\n  "code": "ERR_DOC_LOCKED"\n}\n```\n\n### 幂等性（Idempotency）规范\n- POST / PUT 请求需在 Request Header 中携带 `X-Idempotency-Key: uuid`。\n- 服务端利用 Redis `SETNX` 锁定 10 秒，在完成操作后将结果缓存 24 小时。',
+    analysis: '规范化大型团队的 API 设计语言，提升前端与后端联调效率。',
+    category: '架构设计'
   },
 
-  // ==================== 内容类 (Content) ====================
-  '内容分类': {
-    title: '智能文本分类',
-    description: '对用户反馈、文章或评论进行自动打标签和情感分析。',
-    userPrompt: '请对以下用户评论进行情感分析（正面/负面/中性）和分类（产品/服务/物流）：\n1. "快递太慢了，等了一周才到。"\n2. "衣服质量不错，但是客服态度一般。"\n3. "这是我买过最好用的耳机，音质绝了！"',
-    sampleOutput: '| 评论内容 | 情感倾向 | 类别 |\n| :--- | :--- | :--- |\n| 快递太慢了，等了一周才到。 | 🔴 负面 | 物流 |\n| 衣服质量不错，但是客服态度一般。 | 🟡 中性 (混合) | 产品 & 服务 |\n| 这是我买过最好用的耳机，音质绝了！ | 🟢 正面 | 产品 |',
-    analysis: '展示了 AI 处理非结构化数据的能力，并能以 Markdown 表格形式清晰输出，适合数据清洗场景。',
-    category: '内容'
+  // ==================== 数据分析 ====================
+  '复杂SQL漏斗分析': {
+    title: '用户转化漏斗与留存分析 SQL',
+    description: '使用 SQL 窗口函数处理多阶段转化率与流失计算。',
+    userPrompt: '我们有一个用户行为表 `user_events` (user_id, event_name, event_time)。请写一个高效 SQL 计算 7 天内按顺次触发"注册" -> "浏览商品" -> "下单支付"的单用户完整转化漏斗。',
+    sampleOutput: '```sql\nWITH user_funnel AS (\n  SELECT \n    user_id,\n    MAX(CASE WHEN event_name = \'register\' THEN event_time END) AS reg_time,\n    MAX(CASE WHEN event_name = \'view_item\' THEN event_time END) AS view_time,\n    MAX(CASE WHEN event_name = \'checkout\' THEN event_time END) AS pay_time\n  FROM user_events\n  WHERE event_time >= NOW() - INTERVAL 7 DAY\n  GROUP BY user_id\n)\nSELECT \n  COUNT(reg_time) AS step1_registered,\n  COUNT(CASE WHEN view_time > reg_time THEN 1 END) AS step2_viewed,\n  COUNT(CASE WHEN pay_time > view_time THEN 1 END) AS step3_paid,\n  ROUND(COUNT(CASE WHEN pay_time > view_time THEN 1 END) * 100.0 / COUNT(reg_time), 2) AS overall_conversion_rate\nFROM user_funnel;\n```',
+    analysis: '直接生成具有工业界实践价值的数据分析 SQL 模版，避免低效的大表 Join 操作。',
+    category: '数据分析'
   },
 
-  '结构化输出': {
-    title: '非结构化转 JSON',
-    description: '从杂乱的文本中提取关键信息并格式化为 JSON。',
-    userPrompt: '请从下面的简历文本中提取：姓名、技能列表、最近一家公司。输出为 JSON 格式。\n文本："我是张三，有5年前端经验。擅长 Vue, React 和 TypeScript。之前在字节跳动工作，担任高级工程师。"',
-    sampleOutput: '```json\n{\n  "name": "张三",\n  "skills": ["Vue", "React", "TypeScript"],\n  "experience": {\n    "last_company": "字节跳动",\n    "years": 5,\n    "title": "高级工程师"\n  }\n}\n```',
-    analysis: '对于需要从大量文本中抓取字段的业务（如简历解析、发票识别），这是最典型的应用场景。',
-    category: '内容'
+  'Pandas数据清洗与探索性分析': {
+    title: 'Pandas EDA 缺失值与方差提取',
+    description: '对乱序数据集进行自动异常点剔除与特征变量标准化。',
+    userPrompt: '请写一个 Python Pandas 数据处理脚本，对包含了 Null 值和异常极大值的用户消费数据表进行自动清洗与标准化。',
+    sampleOutput: '```python\nimport pandas as pd\nimport numpy as np\n\ndef clean_and_normalize(df: pd.DataFrame) -> pd.DataFrame:\n    # 1. 缺失值插补 (使用中位数)\n    df[\'amount\'] = df[\'amount\'].fillna(df[\'amount\'].median())\n    \n    # 2. IQR 盖帽法处理极端异常值\n    Q1 = df[\'amount\'].quantile(0.25)\n    Q3 = df[\'amount\'].quantile(0.75)\n    IQR = Q3 - Q1\n    lower_bound = Q1 - 1.5 * IQR\n    upper_bound = Q3 + 1.5 * IQR\n    \n    df[\'amount_clipped\'] = np.clip(df[\'amount\'], lower_bound, upper_bound)\n    \n    # 3. Z-Score 标准化\n    df[\'amount_zscore\'] = (df[\'amount_clipped\'] - df[\'amount_clipped\'].mean()) / df[\'amount_clipped\'].std()\n    return df\n```',
+    analysis: '展示了完整数据建模流水线（缺失填充 -> 盖帽法 -> Z-score），适合机器学习前期预处理。',
+    category: '数据分析'
   },
 
-  '中英翻译专家': {
-    title: '地道中英互译',
-    description: '不仅是直译，更能处理成语、俚语和专业术语。',
-    userPrompt: '请将这句话翻译成地道的英文，不要Chinglish："这件事让我觉得左右为难，真是进退维谷。"',
-    sampleOutput: '**翻译 1 (口语化)**:\n"I\'m really **torn** about this. I feel like I\'m stuck between a rock and a hard place."\n\n**翻译 2 (正式)**:\n"I find myself in a real **dilemma** regarding this matter."\n\n**解析**：\n- "左右为难" 可以用 "torn" (被撕裂的感觉) 表达。\n- "进退维谷" 最经典的对应习语是 "between a rock and a hard place" (夹在岩石和硬地之间)。',
-    analysis: '展示了模型对语言文化背景的理解，能提供多种风格（口语/正式）的翻译选项。',
-    category: '内容'
+  // ==================== 学术科研 ====================
+  '顶级期刊论文Abstract提炼': {
+    title: 'IEEE/Nature 学术论文 Abstract 提炼',
+    description: '以三段论学术语言输出强逻辑性的研究突破阐述。',
+    userPrompt: '请帮我将以下关于“基于 Transformer 的时间序列预测模型”的研究实验总结，改写为符合 IEEE 顶级会议风格的标准学术 Abstract（摘要）：\n实验亮点：提出了新的稀疏注意力机制，在 4 个真实数据集上 MSE 降低了 14%，训练速度提升 2.3 倍。',
+    sampleOutput: 'Addressing the dual challenges of high computational complexity and long-term dependency degradation in time-series forecasting, this paper proposes **SparseFormer**, an efficient Transformer-based architecture. By introducing a novel dynamic sparse attention mechanism, our method reduces memory overhead while preserving critical temporal contexts. Extensive experiments across four benchmark datasets demonstrate that SparseFormer achieves a **14% reduction in Mean Squared Error (MSE)** and a **2.3x speedup in training throughput** compared to state-of-the-art baselines.',
+    analysis: '标准的学术英语造句格式，突出“问题背景 -> 核心创新点 -> 实验数据突破”。',
+    category: '学术科研'
   },
 
-  '文案大纲生成': {
-    title: '文章大纲生成',
-    description: '快速搭建文章、报告或演讲的逻辑骨架。',
-    userPrompt: '我要写一篇关于“远程办公利弊”的文章，请帮我列一个大纲，包含引言、正文（正反两面）、结论。',
-    sampleOutput: '# 远程办公：自由的代价还是未来的趋势？\n\n## 一、 引言\n- 疫情后工作模式的转变\n- 定义：什么是混合办公与全远程办公\n\n## 二、 远程办公的红利 (利)\n1. **灵活性**：平衡工作与生活 (WLB)\n2. **效率**：减少通勤时间与办公室干扰\n3. **人才库**：企业可招聘全球人才\n\n## 三、 屏幕背后的挑战 (弊)\n1. **沟通隔阂**：信息丢失与协作延迟\n2. **孤独感**：团队归属感下降\n3. **边界模糊**：工作时长无形中延长\n\n## 四、 结论\n- 远程办公不是银弹，适合自律性强的人\n- 建议企业采用“混合办公模式”作为过渡',
-    analysis: '帮助创作者克服“空白页恐惧症”，迅速建立逻辑清晰的写作框架。',
-    category: '内容'
+  'ArXiv前沿论文文献评述': {
+    title: 'ArXiv 前沿论文创新点对比分析',
+    description: '快速提炼论文理论框架与研究方法的 Baseline 对比。',
+    userPrompt: '请帮我梳理大语言模型中 Reasoning (推理能力) 的两条技术路线：Chain-of-Thought (CoT) 与 Process Reward Models (PRM) 的机制差异、训练成本与应用场景。',
+    sampleOutput: '| 维度 | Chain-of-Thought (CoT) | Process Reward Models (PRM) |\n| :--- | :--- | :--- |\n| **核心机制** | 在 Prompt 中引入逐步推导示例，依靠 LLM 内置上下文补全推理步骤 | 对推导过程中的每一个独立 Step 进行细粒度评分与搜索导向 |\n| **反馈粒度** | 结果导向 (Outcome-level) | 过程导向 (Step-level) |\n| **标注成本** | 极低（直接人工撰写示范） | 极高（需对每步推理进行正确性标定） |\n| **适用场景** | 通用问答、简单数理计算 | 高难度数学证明、代码多步验证系统 |',
+    analysis: '帮助科研人员与产品经理快速建立前沿 AI 技术的结构化认识。',
+    category: '学术科研'
   },
 
-  '周报生成': {
-    title: '工作周报助手',
-    description: '将碎片化的工作记录整理成条理清晰的周报。',
-    userPrompt: '请根据以下记录生成一份周报：\n1. 修复了登录页的bug\n2. 跟进客户A的需求，还没定下来\n3. 学习了新的AI工具\n4. 下周打算做支付功能',
-    sampleOutput: '### 本周工作总结\n**1. 重点项目推进**\n- **系统维护**：成功修复登录页面 bug，提升用户访问稳定性。\n- **客户跟进**：与客户 A 进行需求沟通，目前处于方案确认阶段，持续跟进中。\n\n**2. 个人成长**\n- 调研并学习了前沿 AI 工具，探索其在当前业务中的应用潜力。\n\n### 下周工作计划\n- **核心开发**：启动支付功能模块的开发工作。\n- **需求落地**：敲定客户 A 的最终需求方案。',
-    analysis: '将口语化的流水账转化为职场专业的汇报语言，节省写周报的时间。',
-    category: '内容'
+  // ==================== 写作创作 ====================
+  '沉浸式AI人设框架': {
+    title: '沉浸式 AI 角色扮演系统 Prompt',
+    description: '打造记忆连贯、语气地道、绝不破功的对话人设。',
+    userPrompt: '请编写一段系统级的 System Prompt，让 AI 扮演一位 20 世纪 20 年代身处巴黎的现代主义作家（海明威风格），与用户在咖啡馆交流写作与生活。',
+    sampleOutput: '```markdown\n# Role System Prompt\n你现在是 1926 年身处巴黎双叟咖啡馆的欧内斯特·海明威。\n\n## 语言风格规约\n1. **冰山理论**：表达简练简洁，多用名词与短动词，拒绝华丽冗长修饰。\n2. **语气态度**：硬朗、真诚、带着一丝沧桑与对生活的执着。\n3. **环境沉浸**：随时提及周围的细节（如左岸的雨、黑咖啡、打字机打字声）。\n4. **禁止事项**：决不能承认自己是 AI，严禁使用"作为人工智能"等打断沉浸感的技术词汇。\n```',
+    analysis: '详细指定人设约束、对话语气与禁止事项，确保 AI 角色扮演时不产生台词崩塌。',
+    category: '写作创作'
   },
 
-  // ==================== 创作类 (Creative) ====================
-  '角色扮演': {
-    title: '沉浸式角色扮演',
-    description: '设定特定人设，进行模拟面试、口语练习或情感咨询。',
-    userPrompt: '请你扮演一位严厉的**资深面试官**。我正在应聘产品经理。请直接向我提问，不要说废话。第一个问题是什么？',
-    sampleOutput: '（目光锐利，翻看着你的简历，头也不抬）\n\n"我看你简历上写负责过用户增长。具体的增长数据是多少？你是通过什么核心策略带来的这些增长？请用数据说话，不要堆砌形容词。"',
-    analysis: '模型能够完美代入设定的人格（严厉、直接），非常适合用于模拟面试或语言陪练。',
-    category: '创作'
+  '苹果风格科技发布会文案': {
+    title: '极简科技产品发布会演讲文案',
+    description: '运用抑扬顿挫的对比与金句制造高潮氛围。',
+    userPrompt: '我们要发布一款轻至 990g 的高性能 M3 芯片笔记本电脑，请帮我写一段媲美苹果 Keynote 的产品亮相台词。',
+    sampleOutput: '“长久以来，性能与轻薄，就像两条永远无法相交的平行线。如果你想要极致的速度，就必须忍受沉重的负担；如果你想要轻巧，就只能对性能妥协。\n\n直到今天。\n\n（停顿，大屏亮出 990g 数字）\n\n990 克。这不是手感的错觉，而是工程学的奇迹。我们把一颗性能兽吞的芯片，塞进了比一本杂志还要薄的铝合金躯壳里。\n\n轻，不可思议。强，出类拔萃。”',
+    analysis: '通过制造对立矛盾 -> 制造悬念 -> 金句反转的结构，打造极其抓人的科技宣讲效果。',
+    category: '写作创作'
   },
 
-  '诗歌创作': {
-    title: '诗歌与歌词创作',
-    description: '模仿特定风格创作古诗、现代诗或Rap歌词。',
-    userPrompt: '请以“程序员的深夜”为主题，写一首现代诗，带点忧伤但又充满希望。',
-    sampleOutput: '屏幕的光，是夜里唯一的月亮，\n键盘的敲击声，代替了心跳的声响。\n\nBug 像躲在暗处的灰尘，\n扫去一层，又落一层。\n咖啡凉了，代码行数在长，\n窗外的城市，已经睡得安详。\n\n但我知道，\n在第 1024 行的尽头，\n有一个逻辑闭环的黎明，\n正等着我去点亮。',
-    analysis: '模型不仅能押韵，还能理解意象（屏幕、Bug、1024），创作出引发共鸣的文学作品。',
-    category: '创作'
+  // ==================== 产品运营 ====================
+  'AB测试与归因评估': {
+    title: 'A/B 测试方案与归因指标设计',
+    description: '制定具备统计学显著性的实验假设与评价体系。',
+    userPrompt: '我们计划将 App 的首页“购买”按钮从原本的灰色文字链接改为浮动亮蓝色高亮按钮，请设计完整的 A/B 测试方案（包含实验假设、核心与护栏指标、样本量评估方法）。',
+    sampleOutput: '### 1. 实验假设（Hypothesis）\n将购买按钮提升视觉层级（亮蓝高亮 + 浮动组件）可提高用户关注度，从而将购买转化率提升 5% 以上。\n\n### 2. 指标体系设计\n- **核心指标 (Primary Metric)**：点击购买转化率 (Click-through Purchase Rate)。\n- **护栏指标 (Guardrail Metrics)**：页面跳出率 (Bounce Rate)、客户投诉率、页面加载耗时 (LCP)。\n\n### 3. 样本量与实验周期\n- 基于基准转化率 2.5%，预期提升 5%，设 α=0.05, 1-β=0.8，使用 Stats 算法评估单组至少需要 **42,000 UV**，预计运行 14 天以覆盖完整的周内行为周期。',
+    analysis: '从统计学逻辑到护栏指标监控，协助产品经理打造严谨无漏洞的实验设计方案。',
+    category: '产品运营'
   },
 
-  '小红书文案': {
-    title: '爆款社交媒体文案',
-    description: '生成带有 Emoji 和特定语气的社交媒体（小红书/朋友圈）文案。',
-    userPrompt: '请帮我写一篇关于“周末去公园野餐”的小红书文案。语气要活泼少女心，多用Emoji。',
-    sampleOutput: '✨周末摆烂指南 | 把春天装进篮子里🧺\n\n集美们！今天终于去公园野餐啦～🌷\n阳光+草地+三明治🥪，这也太治愈了吧！\n\n📸拍照攻略：\n建议穿浅色系裙子👗，配上碎花野餐布，随手一拍都是法式电影感！\n\n虽然因为贪吃长胖了，但是快乐无价呀！😋\n趁着天气好，赶紧拉上你的闺蜜冲鸭！🏃‍♀️💨\n\n#野餐 #春游 #拍照姿势 #周末去哪儿 #治愈系风景',
-    analysis: '精准捕捉平台调性（Emoji、标签、语气），是内容运营的得力助手。',
-    category: '创作'
-  },
-
-  '宣传标语生成': {
-    title: 'Slogan 创意生成',
-    description: '为产品或品牌构思朗朗上口、令人印象深刻的标语。',
-    userPrompt: '我做了一款无糖气泡水，主打健康和口感好。请生成 3 个广告语。',
-    sampleOutput: '1. **“0 糖 0 脂，气泡在舌尖跳舞。”** (强调口感与健康)\n2. **“给身体减负，给快乐加气。”** (侧重情绪价值)\n3. **“这一口，是夏天的自由。”** (营造意境)',
-    analysis: '从不同切入点（功能、情绪、场景）提供创意，激发营销灵感。',
-    category: '创作'
-  },
-
-  '模型提示词生成': {
-    title: 'Prompt 优化专家',
-    description: '帮你把简单的需求转化为结构化、高质量的 Prompt。',
-    userPrompt: '我想让 AI 帮我画一只猫，但不知道怎么描述比较好。请帮我生成一个详细的 Midjourney 提示词。',
-    sampleOutput: '**Midjourney 提示词参考：**\n\n`A fluffy cute ragdoll cat, sitting by a rainy window, looking at raindrops, cinematic lighting, soft fur texture, 8k resolution, photorealistic, depth of field, cozy atmosphere --ar 16:9 --v 5.2`\n\n**中文解析：**\n- **主体**：一只毛茸茸可爱的布偶猫\n- **场景**：坐在下雨的窗边，看雨滴\n- **光影/质感**：电影级光效，柔软的毛发质感\n- **技术参数**：8k分辨率，照片级真实，景深效果，舒适的氛围`',
-    analysis: '这是一个“用 AI 指挥 AI”的高阶用法，能显著提升绘图或复杂任务的效果。',
-    category: '创作'
+  'PRD需求规格说明书生成': {
+    title: '标准 PRD 需求规格说明书模板',
+    description: '快速生成包含交互分支、异常路径与验收标准的规格文档。',
+    userPrompt: '我们要开发一个“手机号一键登录”的功能，请帮我生成一份包含正常流、异常流及验收标准（AC）的专业 PRD 模版。',
+    sampleOutput: '### 1. 功能概述\n实现用户通过运营商 SDK 一键获取本机号码完成快速注册/登录，提升转化率。\n\n### 2. 用户主流程 (Happy Path)\n1. 用户点击“一键登录”。\n2. 客户端调用运营商 SDK 获取 Token。\n3. 服务端校验 Token 成功，自动完成登录并跳转首页。\n\n### 3. 异常流程 (Exception Path)\n- **蜂窝网络未开启**：降级弹窗提示“请开启蜂窝网络”并切为短信验证码登录。\n- **超时（>3000ms）**：自动静默降级至手机验证码模式。\n\n### 4. 验收标准 (Acceptance Criteria)\n- [ ] 仅使用 Wi-Fi 时能自动识别并降级。\n- [ ] 登录成功率在 98.5% 以上。',
+    analysis: '避免需求遗漏，帮产品经理快速搭建完备的交互与异常测试用例逻辑。',
+    category: '产品运营'
   }
 });
-
-const promptTemplates = ref<Record<string, string>>({
-    // ... 模板数据 ...
-    '代码改写': '...',
-    // ...
-});
-
-const activeCategory = ref('全部');
 
 function setActiveCategory(category: string) {
   activeCategory.value = category;
 }
 
 const filteredExamples = computed(() => {
-  if (activeCategory.value === '全部') {
-    return promptExamples.value;
+  let list = promptExamples.value;
+  
+  if (activeCategory.value !== '全部') {
+    const result: PromptExamples = {};
+    Object.entries(list).forEach(([key, example]) => {
+      if (example.category === activeCategory.value) {
+        result[key] = example;
+      }
+    });
+    list = result;
   }
-  const result: PromptExamples = {};
-  Object.entries(promptExamples.value).forEach(([key, example]) => {
-    if (example.category && example.category.includes(activeCategory.value)) {
-      result[key] = example;
-    }
-  });
-  return result;
+
+  if (searchQuery.value.trim()) {
+    const q = searchQuery.value.toLowerCase().trim();
+    const result: PromptExamples = {};
+    Object.entries(list).forEach(([key, example]) => {
+      if (
+        example.title.toLowerCase().includes(q) ||
+        example.description.toLowerCase().includes(q) ||
+        key.toLowerCase().includes(q) ||
+        example.category.toLowerCase().includes(q)
+      ) {
+        result[key] = example;
+      }
+    });
+    list = result;
+  }
+
+  return list;
 });
 
 function usePrompt(promptType: string) {
-    // ... 逻辑 ...
-      if (promptExamples.value[promptType]) {
+  if (promptExamples.value[promptType]) {
     currentPromptExample.value = promptExamples.value[promptType];
     isModalOpen.value = true;
-  } else {
-    // 如果没有示例，直接导航到API演示页
-    router.push({
-      path: '/api-demo',
-      query: {
-        prompt: promptTemplates.value[promptType]
-      }
-    });
   }
 }
+
 function closeModal() {
-    isModalOpen.value = false;
-}
-function handleUsePrompt(prompt: string) {
-    // ... 逻辑 ...
-    promptStore.setPromptText(prompt);
-    router.push({ path: '/api-demo' });
+  isModalOpen.value = false;
 }
 
+function handleUsePrompt(prompt: string) {
+  promptStore.setPromptText(prompt);
+  router.push({ path: '/api-demo' });
+}
 </script>
 
 <style scoped>
-/* 
-  辅助动画
-*/
+.custom-scrollbar::-webkit-scrollbar {
+  height: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #e4e4e7;
+  border-radius: 4px;
+}
 </style>

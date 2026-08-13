@@ -13,6 +13,13 @@ export interface ModelConfig {
   description: string;  // 简短描述
   free: boolean;        // 是否免费
   provider: string;     // 提供商
+  capabilities?: {      // 模型支持的参数能力
+    temperature?: boolean;
+    topP?: boolean;
+    topK?: boolean;
+    frequencyPenalty?: boolean;
+    presencePenalty?: boolean;
+  };
 }
 
 /**
@@ -21,18 +28,19 @@ export interface ModelConfig {
 export const MODEL_CONFIGS: ModelConfig[] = [
   // ========== 对话型模型 ==========
   {
+    id: 'deepseek-ai/DeepSeek-V3',
+    name: 'DeepSeek V3',
+    type: 'chat',
+    description: 'DeepSeek 满血版旗舰对话模型 (671B)',
+    free: false,
+    provider: 'DeepSeek',
+    capabilities: { temperature: true, topP: true, topK: false, frequencyPenalty: true, presencePenalty: true }
+  },
+  {
     id: 'Qwen/Qwen2.5-7B-Instruct',
     name: 'Qwen2.5 7B',
     type: 'chat',
-    description: '通用对话，响应快速',
-    free: true,
-    provider: 'Qwen'
-  },
-  {
-    id: 'Qwen/Qwen2-7B-Instruct',
-    name: 'Qwen2 7B',
-    type: 'chat',
-    description: '稳定可靠的对话模型',
+    description: '通义千问 2.5 7B，通用对话全免费',
     free: true,
     provider: 'Qwen'
   },
@@ -40,15 +48,7 @@ export const MODEL_CONFIGS: ModelConfig[] = [
     id: 'THUDM/glm-4-9b-chat',
     name: 'GLM-4 9B Chat',
     type: 'chat',
-    description: '智谱 AI 对话模型，128K上下文',
-    free: true,
-    provider: 'GLM'
-  },
-  {
-    id: 'THUDM/GLM-4-9B-0414',
-    name: 'GLM-4 9B 0414',
-    type: 'chat',
-    description: '智谱最新版，支持工具调用',
+    description: '智谱 GLM-4 9B 对话模型，128K 上下文',
     free: true,
     provider: 'GLM'
   },
@@ -56,83 +56,46 @@ export const MODEL_CONFIGS: ModelConfig[] = [
     id: 'internlm/internlm2_5-7b-chat',
     name: 'InternLM2.5 7B',
     type: 'chat',
-    description: '书生·浦语，中英双语',
+    description: '书生·浦语 2.5 7B 中英双语免费模型',
     free: true,
     provider: 'InternLM'
   },
 
-  // ========== 思考型模型 ==========
+  // ========== 思考型推理模型 ==========
   {
-    id: 'Qwen/Qwen3-8B',
-    name: 'Qwen3 8B',
+    id: 'deepseek-ai/DeepSeek-R1',
+    name: 'DeepSeek R1',
     type: 'reasoning',
-    description: '支持深度思考推理',
-    free: true,
-    provider: 'Qwen'
-  },
-  {
-    id: 'deepseek-ai/DeepSeek-R1-0528-Qwen3-8B',
-    name: 'DeepSeek-R1 Qwen3 8B',
-    type: 'reasoning',
-    description: 'R1蒸馏版，SOTA推理性能',
-    free: true,
-    provider: 'DeepSeek'
+    description: 'DeepSeek 满血版 R1 深度逻辑推理模型',
+    free: false,
+    provider: 'DeepSeek',
+    capabilities: { temperature: true, topP: true, topK: false, frequencyPenalty: true, presencePenalty: true }
   },
   {
     id: 'deepseek-ai/DeepSeek-R1-Distill-Qwen-7B',
-    name: 'DeepSeek-R1 Distill 7B',
+    name: 'DeepSeek R1 Distill 7B',
     type: 'reasoning',
-    description: 'R1蒸馏版，数学编程强',
+    description: 'R1 蒸馏 Qwen 7B，极速免费逻辑推理',
     free: true,
     provider: 'DeepSeek'
   },
   {
-    id: 'THUDM/GLM-Z1-9B-0414',
-    name: 'GLM-Z1 9B',
+    id: 'deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B',
+    name: 'DeepSeek R1 Distill 1.5B',
     type: 'reasoning',
-    description: '智谱推理模型，数学能力强',
+    description: 'R1 蒸馏轻量模型，超高吞吐低延迟',
     free: true,
-    provider: 'GLM'
+    provider: 'DeepSeek'
   },
 
-  // ========== 多模态模型 ==========
-  {
-    id: 'THUDM/GLM-4.1V-9B-Thinking',
-    name: 'GLM-4.1V 9B Thinking',
-    type: 'multimodal',
-    description: '视觉推理，支持4K图像',
-    free: true,
-    provider: 'GLM'
-  },
-
-  // ========== 代码模型 ==========
+  // ========== 代码与专精模型 ==========
   {
     id: 'Qwen/Qwen2.5-Coder-7B-Instruct',
     name: 'Qwen2.5 Coder 7B',
     type: 'coder',
-    description: '代码生成与修复',
+    description: '通义千问代码生成与 Bug 修复模型',
     free: true,
     provider: 'Qwen'
-  },
-
-  // ========== OCR 模型 ==========
-  {
-    id: 'deepseek-ai/DeepSeek-OCR',
-    name: 'DeepSeek OCR',
-    type: 'ocr',
-    description: '文档识别转 Markdown（限免）',
-    free: true,
-    provider: 'DeepSeek'
-  },
-
-  // ========== 翻译模型 ==========
-  {
-    id: 'tencent/Hunyuan-MT-7B',
-    name: '混元翻译 7B',
-    type: 'translate',
-    description: '33语种互译，WMT25冠军（限免）',
-    free: true,
-    provider: 'Tencent'
   }
 ];
 
@@ -151,6 +114,21 @@ export const DEFAULT_API_URL = 'https://api.siliconflow.cn/v1';
  */
 export function getModelConfig(modelId: string): ModelConfig | undefined {
   return MODEL_CONFIGS.find(m => m.id === modelId);
+}
+
+/**
+ * 获取模型配置参数支持能力（默认全部支持）
+ */
+export function getModelCapabilities(modelId: string) {
+  const config = getModelConfig(modelId);
+  const defaultCaps = {
+    temperature: true,
+    topP: false,
+    topK: false,
+    frequencyPenalty: false,
+    presencePenalty: false
+  };
+  return config?.capabilities ? { ...defaultCaps, ...config.capabilities } : defaultCaps;
 }
 
 /**

@@ -98,7 +98,8 @@ export function useSessionHistory() {
     }
     const session = sessions.value.find(s => s.id === currentSessionId.value);
     if (session) {
-      session.messages = messages;
+      // Object URLs are valid only for the live page. Persist text history, not stale image URLs.
+      session.messages = messages.map(({ role, content, reasoning }) => ({ role, content, reasoning }));
       session.updatedAt = Date.now();
       if (modelName) session.modelName = modelName;
 

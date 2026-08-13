@@ -1,182 +1,162 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const props = defineProps<{
+  isOpen: boolean
+  title: string
+  description: string
+  userPrompt: string
+  sampleOutput: string
+  analysis?: string
+}>()
+
+const emit = defineEmits<{
+  close: []
+  'use-prompt': [prompt: string]
+}>()
+
+const isCopied = ref(false)
+
+const copyPrompt = async () => {
+  if (!props.userPrompt) return
+  try {
+    await navigator.clipboard.writeText(props.userPrompt)
+    isCopied.value = true
+    setTimeout(() => { isCopied.value = false }, 2000)
+  } catch (err) {
+    console.error('复制失败:', err)
+  }
+}
+
+const handleUsePrompt = () => {
+  emit('use-prompt', props.userPrompt)
+  emit('close')
+}
+</script>
+
 <template>
-  <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none">
-    <!-- 背景遮罩 -->
-    <div class="fixed inset-0 bg-black transition-opacity"
-         :class="{ 'opacity-50': isOpen }"
-         @click="close"></div>
-
-    <!-- 弹窗内容 -->
-    <div class="relative w-full max-w-3xl mx-auto my-6 bg-white rounded-sm shadow-2xl transform transition-all"
-         :class="{ 'opacity-100 translate-y-0': isOpen, 'opacity-0 translate-y-4': !isOpen }">
-      <!-- 弹窗头部 -->
-      <div class="flex items-start justify-between p-6 border-b border-gray-200 rounded-t-sm bg-gray-50">
-        <h3 class="text-xl font-semibold text-gray-900">{{ title }}</h3>
-        <button class="p-1 ml-auto text-gray-500 hover:text-gray-800 transition-colors rounded-full hover:bg-gray-200" @click="close">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </button>
-      </div>
-
-      <!-- 弹窗内容 -->
-      <div class="p-6 space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
-        <!-- 描述 -->
-        <div class="mb-6">
-          <p class="text-gray-600 text-lg">{{ description }}</p>
-        </div>
-
-        <!-- 提示词 -->
-        <div class="p-5 bg-gray-50 rounded-sm border border-gray-200 hover:border-blue-200 transition-colors">
-          <h4 class="font-medium text-gray-700 mb-3 flex items-center">
-            <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
-            </svg>
-            提示词
-          </h4>
-          <div class="flex mb-2 bg-white p-4 rounded-sm border border-gray-100">
-            <span class="font-bold text-blue-600 mr-3">USER</span>
-            <p class="text-gray-800 whitespace-pre-wrap">{{ userPrompt }}</p>
-          </div>
-        </div>
-
-        <!-- 样例输出 -->
-        <div class="p-5 bg-gray-50 rounded-sm border border-gray-200 hover:border-green-200 transition-colors">
-          <h4 class="font-medium text-gray-700 mb-3 flex items-center">
-            <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            样例输出
-          </h4>
-          <div class="prose prose-sm max-w-none bg-white p-4 rounded-sm border border-gray-100">
-            <p class="text-gray-800 whitespace-pre-wrap">{{ sampleOutput }}</p>
-          </div>
-        </div>
-
-        <!-- 赏析 -->
-        <div v-if="analysis" class="p-5 bg-gray-50 rounded-sm border border-gray-200 hover:border-purple-200 transition-colors">
-          <h4 class="font-medium text-gray-700 mb-3 flex items-center">
-            <svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-            </svg>
-            赏析
-          </h4>
-          <p class="text-gray-800 bg-white p-4 rounded-sm border border-gray-100">{{ analysis }}</p>
-        </div>
-      </div>
-
-      <!-- 弹窗底部 -->
-      <div class="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50 rounded-b-sm">
-        <button
-          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm hover:bg-gray-50 hover:border-gray-400 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-200"
-          @click="close"
+  <Teleport to="body">
+    <Transition
+      enter-active-class="transition-opacity duration-200"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition-opacity duration-150"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div
+        v-if="isOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs font-sans"
+        @click.self="emit('close')"
+      >
+        <Transition
+          enter-active-class="transition-all duration-200 ease-out"
+          enter-from-class="opacity-0 scale-95"
+          enter-to-class="opacity-100 scale-100"
+          leave-active-class="transition-all duration-150 ease-in"
+          leave-from-class="opacity-100 scale-100"
+          leave-to-class="opacity-0 scale-95"
         >
-          关闭
-        </button>
-        <button
-          class="px-5 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-sm hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center"
-          @click="useThisPrompt"
-        >
-          前往测试
-          <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-          </svg>
-        </button>
+          <div
+            v-if="isOpen"
+            class="relative w-full max-w-2xl bg-white rounded-md border border-zinc-200 shadow-xl overflow-hidden flex flex-col max-h-[85vh]"
+          >
+            <!-- 头部 -->
+            <div class="px-6 py-4 border-b border-zinc-200 bg-zinc-50/70 flex items-center justify-between">
+              <div>
+                <h3 class="text-base font-bold text-zinc-900 tracking-tight">{{ title }}</h3>
+                <p class="text-xs text-zinc-500 mt-0.5">{{ description }}</p>
+              </div>
+              <button
+                @click="emit('close')"
+                class="p-1 rounded-sm text-zinc-400 hover:text-zinc-700 hover:bg-zinc-200/60 transition-colors cursor-pointer"
+              >
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- 内容体 -->
+            <div class="p-6 overflow-y-auto space-y-5 text-left custom-scrollbar">
+              
+              <!-- 提示词块 -->
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-zinc-700 flex items-center gap-1.5 uppercase tracking-wide">
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                    Prompt 模板代码
+                  </span>
+                  <button
+                    @click="copyPrompt"
+                    class="text-[11px] font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors cursor-pointer"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <span>{{ isCopied ? '已复制！' : '复制提示词' }}</span>
+                  </button>
+                </div>
+
+                <div class="bg-zinc-900 text-zinc-200 p-4 rounded-sm font-mono text-xs leading-relaxed overflow-x-auto border border-zinc-800 whitespace-pre-wrap">
+                  {{ userPrompt }}
+                </div>
+              </div>
+
+              <!-- 示例输出 -->
+              <div class="space-y-2">
+                <span class="text-xs font-bold text-zinc-700 flex items-center gap-1.5 uppercase tracking-wide">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                  期待效果 / 样例输出 (Sample Output)
+                </span>
+                <div class="bg-zinc-50 text-zinc-800 p-4 rounded-sm border border-zinc-200 text-xs leading-relaxed whitespace-pre-wrap">
+                  {{ sampleOutput }}
+                </div>
+              </div>
+
+              <!-- 分析赏析 -->
+              <div v-if="analysis" class="p-3.5 bg-blue-50/50 border border-blue-200/70 rounded-sm text-xs space-y-1">
+                <span class="font-bold text-blue-700 block">提示词专家解析：</span>
+                <p class="text-zinc-700 leading-relaxed">{{ analysis }}</p>
+              </div>
+
+            </div>
+
+            <!-- 底部按钮 -->
+            <div class="px-6 py-3.5 border-t border-zinc-200 bg-zinc-50/70 flex items-center justify-end gap-2.5">
+              <button
+                @click="emit('close')"
+                class="px-4 py-2 text-xs font-semibold text-zinc-700 bg-white border border-zinc-200 rounded-sm hover:bg-zinc-100 transition-colors cursor-pointer"
+              >
+                关闭
+              </button>
+              <button
+                @click="handleUsePrompt"
+                class="px-5 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-sm shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer"
+              >
+                <span>前往智能对话测试</span>
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </button>
+            </div>
+
+          </div>
+        </Transition>
       </div>
-    </div>
-  </div>
+    </Transition>
+  </Teleport>
 </template>
 
-<script setup lang="ts">
-import { defineProps, defineEmits } from 'vue';
-
-const props = defineProps({
-  isOpen: {
-    type: Boolean,
-    default: false
-  },
-  title: {
-    type: String,
-    default: ''
-  },
-  description: {
-    type: String,
-    default: ''
-  },
-  userPrompt: {
-    type: String,
-    default: ''
-  },
-  sampleOutput: {
-    type: String,
-    default: ''
-  },
-  analysis: {
-    type: String,
-    default: ''
-  }
-});
-
-const emit = defineEmits(['close', 'use-prompt']);
-
-const close = () => {
-  emit('close');
-};
-
-const useThisPrompt = () => {
-  emit('use-prompt', props.userPrompt);
-  close();
-};
-</script>
-
-<script lang="ts">
-export default {
-  name: 'PromptExampleModal'
-};
-</script>
-
 <style scoped>
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: #CBD5E1 transparent;
-}
-
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
-
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
-
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #CBD5E1;
-  border-radius: 3px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: #94A3B8;
-}
-
-/* 动画效果 */
-.transform {
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 300ms;
-}
-
-.opacity-0 {
-  opacity: 0;
-}
-
-.opacity-100 {
-  opacity: 1;
-}
-
-.translate-y-0 {
-  transform: translateY(0);
-}
-
-.translate-y-4 {
-  transform: translateY(1rem);
+  background: #e4e4e7;
+  border-radius: 4px;
 }
 </style>

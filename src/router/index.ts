@@ -22,6 +22,12 @@ const router = createRouter({
       meta: { title: 'AI图像生成' }
     },
     {
+      path: '/ai-audio',
+      name: 'ai-audio',
+      component: () => import('../views/AIAudioView.vue'),
+      meta: { title: 'AI Audio' }
+    },
+    {
       path: '/game',
       name: 'game',
       component: () => import('../views/GameView.vue'),

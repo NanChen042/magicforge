@@ -1,10 +1,10 @@
 <template>
-  <div class="w-64 shrink-0 bg-zinc-50 border-r border-zinc-200 flex flex-col h-full min-h-0 select-none text-zinc-900 font-sans">
+  <div class="w-64 shrink-0 bg-white border-r border-slate-100 flex flex-col h-full min-h-0 select-none text-slate-800 font-sans shadow-[4px_0_24px_rgba(0,0,0,0.01)] relative z-20 overflow-hidden">
     
     <!-- Top Brand Header & Sidebar Toggle -->
-    <div class="px-4 py-3.5 flex items-center justify-between border-b border-zinc-200/60">
+    <div class="px-4 py-3.5 flex items-center justify-between border-b border-slate-100">
       <div class="flex items-center gap-2">
-        <div class="w-6 h-6 rounded-md overflow-hidden flex items-center justify-center border border-zinc-200/80 bg-white shadow-2xs">
+        <div class="w-6 h-6 rounded-md overflow-hidden flex items-center justify-center border border-slate-100 bg-white shadow-sm">
           <img src="@/assets/ai.png" alt="MagicForge Logo" class="w-full h-full object-cover" />
         </div>
         <span class="font-bold text-sm text-zinc-900 tracking-tight">MagicForge</span>
@@ -27,7 +27,7 @@
     <div class="px-3 py-3">
       <button
         @click="$emit('create-new')"
-        class="w-full flex items-center justify-center gap-2 py-2 px-4 bg-white hover:bg-blue-50 text-blue-600 border border-blue-200/80 rounded-full text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-98"
+          class="w-full flex items-center justify-center gap-2 py-2 px-4 bg-white hover:bg-blue-50 text-blue-600 border border-blue-200/80 rounded-sm text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
       >
         <svg class="w-3.5 h-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
@@ -73,7 +73,7 @@
     </div>
 
     <!-- Bottom Toolbar -->
-    <div class="p-3 border-t border-zinc-200/80 bg-zinc-100/50 flex items-center justify-between">
+    <div class="p-3 border-t border-slate-100 bg-white/50 flex items-center justify-between">
       <span class="text-[11px] font-mono text-zinc-400">历史会话 ({{ sessions.length }})</span>
       
       <button

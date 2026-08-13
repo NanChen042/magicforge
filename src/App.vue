@@ -1,24 +1,9 @@
 <template>
-  <div class="h-screen w-full relative font-sans selection:bg-indigo-500/30 flex flex-col overflow-hidden">
+  <div class="h-screen w-full relative font-sans selection:bg-blue-500/20 flex flex-col overflow-hidden bg-white">
 
-    <div class="fixed inset-0 -z-50 overflow-hidden bg-slate-50">
-      <div class="absolute top-0 left-0 w-[40vw] h-full bg-gradient-to-r from-indigo-200/40 via-indigo-50/20 to-transparent blur-[80px] pointer-events-none"></div>
-      <div class="absolute top-0 left-0 w-[100px] h-full bg-gradient-to-r from-indigo-400/20 to-transparent blur-[40px] pointer-events-none"></div>
-      <div class="absolute top-0 right-0 w-[40vw] h-full bg-gradient-to-l from-violet-200/40 via-fuchsia-50/20 to-transparent blur-[80px] pointer-events-none"></div>
-      <div class="absolute top-0 right-0 w-[100px] h-full bg-gradient-to-l from-violet-400/20 to-transparent blur-[40px] pointer-events-none"></div>
-
-      <div class="absolute inset-y-0 left-0 w-[25vw] overflow-hidden pointer-events-none">
-        <div class="absolute bottom-[-50px] left-[15%] w-2 h-2 bg-indigo-500/20 rounded-full animate-float-slow blur-[1px]"></div>
-        <div class="absolute bottom-[-50px] left-[35%] w-3 h-3 bg-blue-500/10 rounded-full animate-float-medium animation-delay-2000 blur-[2px]"></div>
-        <div class="absolute bottom-[-50px] left-[5%] w-1.5 h-1.5 bg-indigo-400/30 rounded-full animate-float-fast animation-delay-4000"></div>
-      </div>
-      <div class="absolute inset-y-0 right-0 w-[25vw] overflow-hidden pointer-events-none">
-        <div class="absolute bottom-[-50px] right-[15%] w-2.5 h-2.5 bg-violet-500/20 rounded-full animate-float-medium animation-delay-1000 blur-[1px]"></div>
-        <div class="absolute bottom-[-50px] right-[40%] w-1.5 h-1.5 bg-fuchsia-500/30 rounded-full animate-float-slow animation-delay-3000"></div>
-      </div>
-
-      <div class="absolute inset-0 bg-[linear-gradient(to_right,#80808015_1px,transparent_1px),linear-gradient(to_bottom,#80808015_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)] pointer-events-none"></div>
-      <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none"></div>
+    <!-- 全局统一后台背景 (Classic Blue & Neutral Grid) -->
+    <div class="fixed inset-0 -z-50 overflow-hidden bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50/40 via-white to-slate-50/60 pointer-events-none">
+      <div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px] opacity-60"></div>
     </div>
 
     <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 h-14">
@@ -88,14 +73,14 @@
 
     <main class="flex-1 w-full pt-14 box-border relative overflow-auto flex flex-col min-h-0">
       <!-- 首页与API演示不需要包裹 max-w-7xl 限制 -->
-      <div v-if="$route.path !== '/'" class="max-w-[1600px] mx-auto w-full px-3 md:px-6 flex-1 flex flex-col min-h-0">
+      <div v-if="$route.path !== '/' && $route.path !== '/api-demo'" class="max-w-[1600px] mx-auto w-full px-3 md:px-6 flex-1 flex flex-col min-h-0">
         <router-view v-slot="{ Component }">
           <component :is="Component" class="flex-1 min-h-0" />
         </router-view>
       </div>
       <template v-else>
         <router-view v-slot="{ Component }">
-          <component :is="Component" class="flex-1 min-h-0" />
+          <component :is="Component" class="flex-1 min-h-0 w-full" />
         </router-view>
       </template>
     </main>
@@ -133,6 +118,7 @@ import {
   House,
   Monitor,
   Picture,
+  Microphone,
   MagicStick,
   Film,
   Document,
@@ -145,6 +131,7 @@ const mobileMenuOpen = ref(false);
 const imageUrl = ref('https://q1.qlogo.cn/g?b=qq&nk=1159063863&s=640');
 
 const navItems = [
+  { path: '/ai-audio', name: '语音工具', icon: Microphone },
   { path: '/', name: '首页', icon: House },
   { path: '/api-demo', name: 'API演示', icon: Monitor },
   { path: '/ai-image', name: '灵感画板', icon: Picture },

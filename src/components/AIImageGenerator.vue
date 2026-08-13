@@ -46,6 +46,8 @@
           <ImageGeneratorForm
             :form-data="formData"
             :loading="loading"
+            :image-models="imageModels"
+            :model-load-error="modelLoadError"
             @generate="generateImage"
             @randomize-seed="randomizeSeed"
           />
@@ -135,6 +137,8 @@ const {
   generationTime,
   progress,
   estimatedTime,
+  imageModels,
+  modelLoadError,
   generateImage,
   randomizeSeed,
   regenerateWithSeed,

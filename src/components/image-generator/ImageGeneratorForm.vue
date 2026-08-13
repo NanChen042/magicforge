@@ -40,6 +40,16 @@
          2. 滚动内容区 (Scrollable)
          ========================================== -->
     <div class="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-6 w-full ">
+      <section class="space-y-2 border-b border-slate-100 pb-5">
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-bold text-slate-500">图像模型</label>
+          <span v-if="imageModels.length" class="font-mono text-[10px] text-slate-400">{{ imageModels.length }} 个可用</span>
+        </div>
+        <el-select v-model="formData.model" class="w-full" placeholder="选择图像模型" :disabled="!imageModels.length">
+          <el-option v-for="model in imageModels" :key="model.id" :label="model.id" :value="model.id" />
+        </el-select>
+        <p v-if="modelLoadError" class="text-[11px] leading-5 text-amber-700">{{ modelLoadError }}</p>
+      </section>
 
       <!-- A. 提示词 (Prompt) -->
       <section class="space-y-3 group">
@@ -251,10 +261,13 @@ import {
 import { imageService } from "../../services/imageService";
 import { imageSizeOptions, promptTemplates } from "../../constants/imageGeneratorConfig";
 import type { FormData } from "../../composables/useImageGenerator";
+import type { SiliconFlowModel } from "../../services/siliconFlowClient";
 
 interface Props {
   formData: FormData;
   loading: boolean;
+  imageModels: SiliconFlowModel[];
+  modelLoadError: string;
 }
 
 const props = defineProps<Props>();
