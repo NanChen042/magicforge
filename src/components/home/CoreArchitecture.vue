@@ -1,113 +1,175 @@
 <template>
   <!-- =========================================================================
-       3. 全新板块：模块化核心面板 (Modular Core Panel)
+       3. 模块化核心面板 (Core Technical & Creative Engine)
        ========================================================================= -->
-  <section class="relative pb-24">
-
-    <!-- 背景装饰：淡雅的点阵 -->
-    <div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none"></div>
+  <section class="relative pb-24 font-sans select-none">
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
       <!-- 标题区 -->
-      <div class="flex flex-col md:flex-row items-end justify-between mb-12 gap-6">
+      <div class="flex flex-col md:flex-row items-start md:items-end justify-between mb-10 gap-4">
         <div>
-          <h2 class="text-sm font-bold text-blue-600 tracking-widest uppercase mb-2">Power Under The Hood</h2>
-          <h3 class="text-3xl font-bold text-slate-900">核心架构参数</h3>
+          <div class="text-xs font-bold text-blue-600 uppercase tracking-widest mb-2 font-mono">
+            CORE ARCHITECTURE
+          </div>
+          <h3 class="text-3xl font-bold text-slate-900 tracking-tight">核心架构与创作能力</h3>
         </div>
-        <!-- 装饰性编号 -->
-        <div class="text-4xl font-mono font-bold text-slate-200 select-none">SYS_V2.0</div>
+
+        <!-- 架构状态规格 (全中文，无冗余英文) -->
+        <div class="flex items-center gap-2 bg-white/90 border border-slate-200/80 px-4 py-2 rounded-md shadow-xs backdrop-blur-sm">
+          <span class="text-xs font-medium text-slate-700">全系统就绪</span>
+          <span class="text-slate-300">·</span>
+          <span class="text-xs text-slate-500">多模态引擎全量连接</span>
+        </div>
       </div>
 
       <!-- [核心面板容器] -->
-      <div class="relative bg-white rounded-md shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden group">
+      <div class="relative bg-white rounded-md shadow-xl shadow-slate-200/50 border border-slate-200/80 overflow-hidden group">
 
         <!-- 顶部动态扫描线 (Scanner) -->
         <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500 to-transparent -translate-x-full group-hover:animate-[scan-fast_2s_linear_infinite] z-20"></div>
 
         <!-- Grid 布局：无 Gap，用边框线分割 -->
-        <div class="grid grid-cols-1 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
 
-          <!-- Module 1: Stream -->
-          <div class="relative p-8 hover:bg-slate-50/50 transition-colors duration-300 flex flex-col h-full">
-            <!-- 顶部标签 -->
-            <div class="flex justify-between items-start mb-6">
-              <div class="w-10 h-10 rounded-sm bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
+          <!-- ==================== Module 1: 流式传输 ==================== -->
+          <div class="relative p-7 hover:bg-blue-50/20 transition-all duration-300 flex flex-col justify-between h-full group/card">
+            <div>
+              <div class="flex justify-between items-center mb-5">
+                <div class="w-10 h-10 rounded-sm bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-2xs group-hover/card:scale-105 transition-transform">
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <span class="text-[10px] font-semibold text-blue-600 bg-blue-50/80 border border-blue-200/60 px-2 py-0.5 rounded">模块 01</span>
               </div>
-              <span class="text-[10px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">MOD_01</span>
+
+              <h4 class="text-base font-bold text-slate-900 mb-2 group-hover/card:text-blue-600 transition-colors">毫秒级流式响应</h4>
+              <p class="text-xs text-slate-500 leading-relaxed font-normal mb-5">
+                基于高速流式通信机制，实现如打字机般的逐字流畅渲染，对话告别漫长等待。
+              </p>
             </div>
-            <!-- 内容 -->
-            <h4 class="text-lg font-bold text-slate-900 mb-2">Stream I/O</h4>
-            <p class="text-xs text-slate-500 leading-relaxed mb-8 flex-1">
-              采用 SSE (Server-Sent Events) 协议。实现打字机般的逐字渲染体验，首字延迟低于 50ms。
-            </p>
-            <!-- 底部状态 -->
-            <div class="pt-4 border-t border-slate-100 flex items-center gap-2">
-              <div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></div>
-              <span class="text-[10px] font-bold text-blue-600 uppercase tracking-wider">Active</span>
+
+            <div class="space-y-3 pt-2">
+              <div class="p-2 rounded bg-slate-50/80 border border-slate-200/60 flex items-center justify-between text-xs">
+                <span class="text-slate-400">首字响应耗时</span>
+                <span class="font-bold text-blue-600">&lt; 50 毫秒</span>
+              </div>
+
+              <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                  <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                  <span class="text-xs font-semibold text-slate-600">实时流式运行中</span>
+                </div>
+                <span class="text-[10px] text-slate-400">极速响应</span>
+              </div>
             </div>
           </div>
 
-          <!-- Module 2: CoT -->
-          <div class="relative p-8 hover:bg-slate-50/50 transition-colors duration-300 flex flex-col h-full">
-            <div class="flex justify-between items-start mb-6">
-              <div class="w-10 h-10 rounded-sm bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+          <!-- ==================== Module 2: 思维链引擎 ==================== -->
+          <div class="relative p-7 hover:bg-blue-50/20 transition-all duration-300 flex flex-col justify-between h-full group/card">
+            <div>
+              <div class="flex justify-between items-center mb-5">
+                <div class="w-10 h-10 rounded-sm bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-2xs group-hover/card:scale-105 transition-transform">
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <span class="text-[10px] font-semibold text-blue-600 bg-blue-50/80 border border-blue-200/60 px-2 py-0.5 rounded">模块 02</span>
               </div>
-              <span class="text-[10px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">MOD_02</span>
+
+              <h4 class="text-base font-bold text-slate-900 mb-2 group-hover/card:text-blue-600 transition-colors">深度思维链推演</h4>
+              <p class="text-xs text-slate-500 leading-relaxed font-normal mb-5">
+                搭载逻辑推理核心，将复杂问题层层拆解为可视化思考步骤，推理过程清晰透明。
+              </p>
             </div>
-            <h4 class="text-lg font-bold text-slate-900 mb-2">CoT Engine</h4>
-            <p class="text-xs text-slate-500 leading-relaxed mb-8 flex-1">
-              Deepseek 驱动的思维链引擎。将复杂逻辑拆解为可视化步骤，让推理过程透明可控。
-            </p>
-            <div class="pt-4 border-t border-slate-100 flex items-center gap-2">
-              <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
-              <span class="text-[10px] font-bold text-blue-600 uppercase tracking-wider">Reasoning</span>
+
+            <div class="space-y-3 pt-2">
+              <div class="p-2 rounded bg-slate-50/80 border border-slate-200/60 flex items-center justify-between text-xs">
+                <span class="text-slate-400">推演能力</span>
+                <span class="font-bold text-blue-600">多步骤反思求证</span>
+              </div>
+
+              <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                  <div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></div>
+                  <span class="text-xs font-semibold text-slate-600">思维链透出开启</span>
+                </div>
+                <span class="text-[10px] text-slate-400">深度推理</span>
+              </div>
             </div>
           </div>
 
-          <!-- Module 3: REST -->
-          <div class="relative p-8 hover:bg-slate-50/50 transition-colors duration-300 flex flex-col h-full">
-            <div class="flex justify-between items-start mb-6">
-              <div class="w-10 h-10 rounded-sm bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
+          <!-- ==================== Module 3: 多模态矩阵 (替换无关的REST API) ==================== -->
+          <div class="relative p-7 hover:bg-blue-50/20 transition-all duration-300 flex flex-col justify-between h-full group/card">
+            <div>
+              <div class="flex justify-between items-center mb-5">
+                <div class="w-10 h-10 rounded-sm bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-2xs group-hover/card:scale-105 transition-transform">
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <span class="text-[10px] font-semibold text-blue-600 bg-blue-50/80 border border-blue-200/60 px-2 py-0.5 rounded">模块 03</span>
               </div>
-              <span class="text-[10px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">MOD_03</span>
+
+              <h4 class="text-base font-bold text-slate-900 mb-2 group-hover/card:text-blue-600 transition-colors">多模态创作工坊</h4>
+              <p class="text-xs text-slate-500 leading-relaxed font-normal mb-5">
+                涵盖智能对话、AI绘图、视频生成、声音克隆与互动小说，一站式赋能多维创作。
+              </p>
             </div>
-            <h4 class="text-lg font-bold text-slate-900 mb-2">REST API</h4>
-            <p class="text-xs text-slate-500 leading-relaxed mb-8 flex-1">
-              完全兼容 OpenAI 接口标准。开发者无需修改现有 SDK，改个 URL 即可无缝接入。
-            </p>
-            <div class="pt-4 border-t border-slate-100 flex items-center gap-2">
-              <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
-              <span class="text-[10px] font-bold text-blue-600 uppercase tracking-wider">Compatible</span>
+
+            <div class="space-y-3 pt-2">
+              <div class="p-2 rounded bg-slate-50/80 border border-slate-200/60 flex items-center justify-between text-xs">
+                <span class="text-slate-400">工坊生态</span>
+                <span class="font-bold text-blue-600">文 · 图 · 视频 · 语音</span>
+              </div>
+
+              <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                  <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                  <span class="text-xs font-semibold text-slate-600">全模态互联就绪</span>
+                </div>
+                <span class="text-[10px] text-emerald-600 font-bold">全场景</span>
+              </div>
             </div>
           </div>
 
-          <!-- Module 4: Config -->
-          <div class="relative p-8 hover:bg-slate-50/50 transition-colors duration-300 flex flex-col h-full">
-            <div class="flex justify-between items-start mb-6">
-              <div class="w-10 h-10 rounded-sm bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                </svg>
+          <!-- ==================== Module 4: 精细参数调控 ==================== -->
+          <div class="relative p-7 hover:bg-blue-50/20 transition-all duration-300 flex flex-col justify-between h-full group/card">
+            <div>
+              <div class="flex justify-between items-center mb-5">
+                <div class="w-10 h-10 rounded-sm bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-2xs group-hover/card:scale-105 transition-transform">
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                  </svg>
+                </div>
+                <span class="text-[10px] font-semibold text-blue-600 bg-blue-50/80 border border-blue-200/60 px-2 py-0.5 rounded">模块 04</span>
               </div>
-              <span class="text-[10px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">MOD_04</span>
+
+              <h4 class="text-base font-bold text-slate-900 mb-2 group-hover/card:text-blue-600 transition-colors">高自由度参数微调</h4>
+              <p class="text-xs text-slate-500 leading-relaxed font-normal mb-5">
+                支持发散度、生成长度等参数精细设定，满足从严谨分析到创意发散的多元诉求。
+              </p>
             </div>
-            <h4 class="text-lg font-bold text-slate-900 mb-2">Full Control</h4>
-            <p class="text-xs text-slate-500 leading-relaxed mb-8 flex-1">
-              开放 Temperature, Top-P, Presence Penalty 等全量参数。精准控制生成结果的随机性。
-            </p>
-            <div class="pt-4 border-t border-slate-100 flex items-center gap-2">
-              <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
-              <span class="text-[10px] font-bold text-blue-600 uppercase tracking-wider">Ready</span>
+
+            <div class="space-y-3 pt-2">
+              <div class="p-2 rounded bg-slate-50/80 border border-slate-200/60 space-y-1.5 text-xs">
+                <div class="flex justify-between items-center">
+                  <span class="text-slate-500">创意发散度 (温度)</span>
+                  <span class="font-bold text-blue-600">60%</span>
+                </div>
+                <div class="w-full bg-slate-200 h-1 rounded-full overflow-hidden">
+                  <div class="bg-blue-600 h-full w-[60%] rounded-full"></div>
+                </div>
+              </div>
+
+              <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                  <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                  <span class="text-xs font-semibold text-slate-600">参数引擎已生效</span>
+                </div>
+                <span class="text-[10px] text-slate-400">随心调优</span>
+              </div>
             </div>
           </div>
 
@@ -117,3 +179,16 @@
     </div>
   </section>
 </template>
+
+<script setup lang="ts">
+// 模块化核心架构与创作能力面板
+</script>
+
+<style scoped>
+@keyframes scan-fast {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+</style>
+
+

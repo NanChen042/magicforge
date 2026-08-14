@@ -38,8 +38,8 @@
           <ul class="space-y-3">
             <li><router-link to="/api-demo" class="text-sm text-slate-500 hover:text-blue-600 transition-colors">智能对话 (Chat)</router-link></li>
             <li><router-link to="/ai-image" class="text-sm text-slate-500 hover:text-blue-600 transition-colors">图像生成 (Image)</router-link></li>
-            <li><router-link to="/game" class="text-sm text-slate-500 hover:text-blue-600 transition-colors">互动游戏 (Game)</router-link></li>
-            <li><router-link to="/mcp-agent" class="text-sm text-slate-500 hover:text-blue-600 transition-colors">API 服务</router-link></li>
+            <li><router-link to="/ai-audio" class="text-sm text-slate-500 hover:text-blue-600 transition-colors">智能语音 (Audio)</router-link></li>
+            <li><router-link to="/game" class="text-sm text-slate-500 hover:text-blue-600 transition-colors">互动推演 (Game)</router-link></li>
           </ul>
         </div>
 

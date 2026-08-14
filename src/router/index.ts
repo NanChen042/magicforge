@@ -40,13 +40,6 @@ const router = createRouter({
       meta: { title: '提示库' }
     },
     {
-      path: '/mcp-agent',
-      name: 'mcp-agent',
-      component: () => import('../views/McpAgentView.vue'),
-      meta: { title: 'MCP智能体' }
-    },
-        // 🔥 新增：情景模拟页面
-    {
       path: '/scenario',
       name: 'scenario',
       component: () => import('../views/ScenarioView.vue'),

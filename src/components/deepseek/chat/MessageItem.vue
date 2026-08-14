@@ -18,7 +18,7 @@
         </div>
       </div>
 
-      <!-- 消息气泡 -->
+      <!-- 消息气泡容器 -->
       <div :class="wrapperClasses">
         
         <!-- 用户消息的图片 -->
@@ -33,7 +33,7 @@
           />
         </div>
         
-        <!-- 可折叠的思考过程区域 (ChatGPT 风格) -->
+        <!-- 可折叠的思考过程区域 (ChatGPT / DeepSeek 风格) -->
         <div v-if="hasReasoning || showThinking" class="mb-3">
           <!-- 折叠按钮 -->
           <button 
@@ -103,7 +103,7 @@
         </div>
 
         <!-- 内容区域 -->
-        <div v-if="formattedContent" class="message-content" v-html="formattedContent"></div>
+        <div ref="contentContainerRef" v-if="formattedContent" class="message-content" v-html="formattedContent"></div>
         <div v-else-if="message.role === 'assistant' && isProcessing && isLast" class="flex items-center gap-2 text-xs text-zinc-400 py-0.5 font-mono">
           <div class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-ping"></div>
           <span class="text-blue-600">生成响应中...</span>
@@ -114,17 +114,32 @@
 
         <!-- 底部工具栏 (悬停显示) -->
         <div v-if="message.role !== 'user'" class="mt-2 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-200 select-none">
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2">
+            <!-- 复制按钮 -->
             <button 
               @click="handleCopy" 
-              class="flex items-center gap-1.5 text-[11px] font-medium transition-colors"
+              class="flex items-center gap-1 text-[11px] font-medium transition-colors px-2 py-0.5 rounded hover:bg-slate-100 cursor-pointer"
               :class="copySuccess ? 'text-zinc-900' : 'text-zinc-400 hover:text-zinc-700'"
+              title="复制回答"
             >
               <svg v-if="!copySuccess" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
               </svg>
-              <svg v-else class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+              <svg v-else class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
               <span>{{ copySuccess ? '已复制' : '复制' }}</span>
+            </button>
+
+            <!-- 重新生成按钮 (仅最后一条 AI 回答显示) -->
+            <button 
+              v-if="isLast && !isProcessing"
+              @click="$emit('regenerate')" 
+              class="flex items-center gap-1 text-[11px] font-medium text-zinc-400 hover:text-blue-600 transition-colors px-2 py-0.5 rounded hover:bg-blue-50 cursor-pointer"
+              title="重新生成本次回答"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span>重新生成</span>
             </button>
           </div>
         </div>
@@ -158,8 +173,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, nextTick } from 'vue';
-import { formatMarkdown } from '@/utils/markdown';
+import { computed, ref, watch, nextTick, onMounted } from 'vue';
+import { formatMarkdown, renderMermaidCharts } from '@/utils/markdown';
 import { copyToClipboard, extractPlainText } from '@/utils/clipboard';
 
 interface Message {
@@ -185,9 +200,14 @@ const props = defineProps<{
   isReasoningModel?: boolean; // 是否是支持思考的模型
 }>();
 
+defineEmits<{
+  'regenerate': [];
+}>();
+
 const copySuccess = ref(false);
 const isReasoningExpanded = ref(false);
 const reasoningContainerRef = ref<HTMLElement | null>(null);
+const contentContainerRef = ref<HTMLElement | null>(null);
 const shouldAutoScrollReasoning = ref(true);
 
 // 只有支持思考的模型才显示思考状态
@@ -228,7 +248,6 @@ watch(() => props.reasoning, () => {
 const handleReasoningScroll = (event: Event) => {
   const container = event.target as HTMLElement;
   const scrollOffset = container.scrollHeight - container.scrollTop - container.clientHeight;
-  // 如果用户手动滚动离开底部，禁用自动滚动
   shouldAutoScrollReasoning.value = scrollOffset < 30;
 };
 
@@ -267,158 +286,51 @@ const wrapperClasses = computed(() => [
   props.message.role === 'user'
     // User: 现代灰底气泡，右对齐展示，无头像
     ? 'bg-zinc-100/80 text-zinc-900 px-5 py-3 rounded-lg rounded-tr-sm max-w-[85%] md:max-w-[75%] ml-auto text-[15px] w-fit'
-    
     // AI: 无边框，纯净正文排版，左对齐
     : 'text-zinc-800 px-1 py-1 text-[15px] leading-relaxed flex-1'
 ]);
 
 const formattedContent = computed(() => formatMarkdown(props.message.content));
+
+// 监听 Markdown 内容渲染，自动驱动 Mermaid 矢量图解析
+watch(formattedContent, () => {
+  nextTick(() => {
+    if (contentContainerRef.value) {
+      renderMermaidCharts(contentContainerRef.value);
+    }
+  });
+}, { immediate: true });
+
+onMounted(() => {
+  nextTick(() => {
+    if (contentContainerRef.value) {
+      renderMermaidCharts(contentContainerRef.value);
+    }
+  });
+});
 </script>
 
 <style scoped>
-/* 
-  Style System: Zinc (Vercel-like)
-  Target: Clean, High Contrast, Fine Details
-*/
-
 .message-content {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 14px; /* 14px 紧凑 */
-  line-height: 1.65;
-}
-
-/* 标题 - 使用 Zinc-900 加粗 */
-.message-content :deep(h1),
-.message-content :deep(h2),
-.message-content :deep(h3) {
-  font-weight: 700;
-  color: #18181b; /* Zinc-900 */
-  margin: 1.5em 0 0.75em 0;
-  letter-spacing: -0.025em; /* Tight tracking */
-}
-.message-content :deep(h1) { font-size: 1.4em; }
-.message-content :deep(h2) { font-size: 1.25em; }
-
-/* 链接 - 黑色加下划线，经典极简 */
-.message-content :deep(a) {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   color: #18181b;
-  font-weight: 500;
-  text-decoration: underline;
-  text-decoration-color: #d4d4d8; /* Zinc-300 */
-  text-underline-offset: 3px;
-  transition: all 0.2s;
-}
-.message-content :deep(a:hover) {
-  text-decoration-color: #18181b;
-  background: #f4f4f5;
+  font-size: 15px;
+  line-height: 1.75;
 }
 
-/* 列表 */
-.message-content :deep(ul),
-.message-content :deep(ol) {
-  margin: 0.75em 0;
-  padding-left: 1.5em;
-  list-style-position: outside;
-}
-.message-content :deep(ul) {
-  list-style-type: disc;
-}
-.message-content :deep(ol) {
-  list-style-type: decimal;
-}
-.message-content :deep(li) {
-  margin: 0.25em 0;
-  padding-left: 0.25em;
-}
-.message-content :deep(li::marker) { 
-  color: #71717a; /* Zinc-500 */
+:deep(.katex-block-wrapper) {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5rem 0;
+  margin: 0.75rem 0;
 }
 
-/* 引用块 - 左侧细灰线 */
-.message-content :deep(blockquote) {
-  border-left: 3px solid #e4e4e7; /* Zinc-200 */
-  margin: 1em 0;
-  padding-left: 1em;
-  font-style: italic;
-  color: #52525b; /* Zinc-600 */
-}
-
-/* 行内代码 - 浅灰背景，深色文字 */
-.message-content :deep(code:not(pre code)) {
-  background: #f4f4f5; /* Zinc-100 */
-  color: #18181b; /* Zinc-900 */
-  padding: 0.2em 0.4em;
-  border-radius: 6px;
-  font-size: 0.85em;
-  font-family: 'JetBrains Mono', monospace;
-  border: 1px solid #e4e4e7; /* Zinc-200 */
-}
-
-/* 
-  代码块样式统一在 deepseek.css 全局声明
-*/
-
-.message-content :deep(table) {
+:deep(.mermaid-diagram-wrapper) {
   width: 100%;
-  border-collapse: collapse;
-  margin: 1em 0;
-  font-size: 0.95em;
-}
-.message-content :deep(th) {
-  border-bottom: 2px solid #e4e4e7;
-  padding: 8px;
-  text-align: left;
-  color: #18181b;
-  font-weight: 600;
-}
-.message-content :deep(td) {
-  border-bottom: 1px solid #f4f4f5;
-  padding: 8px;
-  color: #52525b;
+  margin: 1rem 0;
 }
 
-/* User 模式下的特殊样式覆盖 (因为背景是黑色的) */
-.group:has(.justify-end) .message-content {
-  color: #ffffff;
-}
-.group:has(.justify-end) .message-content :deep(h1),
-.group:has(.justify-end) .message-content :deep(h2),
-.group:has(.justify-end) .message-content :deep(a) {
-  color: #ffffff;
-}
-.group:has(.justify-end) .message-content :deep(code:not(pre code)) {
-  background: rgba(255,255,255,0.2);
-  border-color: rgba(255,255,255,0.3);
-  color: #fff;
-}
-
-/* 思考内容区域样式 */
-.reasoning-content {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-}
-
-.reasoning-content :deep(p) {
-  margin: 0.5em 0;
-}
-
-.reasoning-content :deep(ul),
-.reasoning-content :deep(ol) {
-  margin: 0.5em 0;
-  padding-left: 1.25em;
-}
-
-/* 自定义滚动条 */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 4px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #d4d4d8;
-  border-radius: 20px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: #a1a1aa;
+:deep(.mermaid-diagram-container) {
+  transition: all 0.2s ease;
 }
 </style>

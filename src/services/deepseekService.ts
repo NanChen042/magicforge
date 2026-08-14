@@ -34,60 +34,48 @@ export function getFormattedEndpoint(url: string): string {
  * 用于生成游戏场景和对话
  */
 export class DeepseekService {
-  // 使用API_CONFIG.model替代静态属性
-  // private static currentModel = 'QwQ-32B';
-
-  // 添加场景历史记录
   private static sceneHistory: {
     type: string;
     description: string;
     dialog: string;
   }[] = [];
 
-  // 记录已使用的特殊事件，避免重复
   private static usedSpecialEvents = new Set<string>();
 
-  /**
-   * 完整剧情系统设计
-   */
   private static storyStructure = {
-    // 剧情总长度：10个场景
     totalScenes: 10,
-
-    // 关键节点场景
     keyScenes: {
-      1: { type: "开场", title: "新学期的开始", description: "高三开学，小明面临学习和游戏的选择" },
-      2: { type: "日常", title: "课堂风波", description: "上课时想着游戏被老师发现" },
-      3: { type: "冲突", title: "家长会风暴", description: "家长发现游戏成绩，爆发激烈冲突" },
-      4: { type: "抉择", title: "深夜的思考", description: "面临是否放弃游戏的重大选择" },
-      5: { type: "转折", title: "意外的机会", description: "收到电竞俱乐部邀请或重要考试机会" },
-      6: { type: "挑战", title: "双重压力", description: "同时面临游戏比赛和重要考试" },
-      7: { type: "危机", title: "关键时刻", description: "必须在游戏和学习中做出最终选择" },
-      8: { type: "高潮", title: "决战时刻", description: "面临人生最重要的考验" },
-      9: { type: "结果", title: "尘埃落定", description: "选择的结果开始显现" },
-      10: { type: "结局", title: "新的开始", description: "根据之前选择走向不同结局" }
+      1: { type: "开场", title: "序幕抉择", description: "故事拉开序幕，主角面临第一道命途考验" },
+      2: { type: "日常", title: "突发风波", description: "日常秩序被突发事件打破" },
+      3: { type: "冲突", title: "矛盾激化", description: "核心矛盾与外部压力全面爆发" },
+      4: { type: "抉择", title: "深夜沉思", description: "面临关键道路的方向性抉择" },
+      5: { type: "转折", title: "破晓之机", description: "迎来重大战略转折与隐藏机遇" },
+      6: { type: "挑战", title: "双重考验", description: "多方危机同时降临" },
+      7: { type: "危机", title: "生死一线", description: "至关重要的决断时刻" },
+      8: { type: "高潮", title: "终极决战", description: "全力以赴迎接命运终局" },
+      9: { type: "结果", title: "尘埃初定", description: "选择的连锁反应全面显现" },
+      10: { type: "结局", title: "命运归宿", description: "故事走向终章与新篇章" }
     },
-
-    // 三种结局路线
     endings: {
       academic: {
-        name: "学霸之路",
+        name: "理智之巅",
         condition: (progress: any) => progress.mainQuests.study >= 70 && progress.mainQuests.gaming <= 30,
-        description: "放下游戏专心学习，最终考上理想大学，成为学霸"
+        description: "专注学识与解析，开创理性新世界"
       },
       gaming: {
-        name: "电竞传奇",
+        name: "巅峰执剑",
         condition: (progress: any) => progress.mainQuests.gaming >= 70 && progress.mainQuests.study <= 30,
-        description: "坚持游戏梦想，成为职业电竞选手，在赛场上发光发热"
+        description: "以战止战，登临最高荣耀殿堂"
       },
       balanced: {
-        name: "平衡人生",
+        name: "双界至尊",
         condition: (progress: any) => progress.mainQuests.study >= 40 && progress.mainQuests.gaming >= 40 && progress.mainQuests.social >= 30,
-        description: "学习游戏两不误，既保持了不错的成绩，也在游戏上有所成就"
+        description: "多维掌控，走出无人企及的圆满之道"
       }
     }
   };
 
+  private static activeScriptTitle = '剑道传奇 · 最强剑魔的高考抉择';
   private static characterBackground = `角色背景：
 - 姓名：小明（游戏ID：最强剑魔）
 - 身份：高三学生，知名游戏主播
@@ -96,33 +84,15 @@ export class DeepseekService {
   1. 游戏时激情四射，现实中是个普通学生
   2. 直播时经常情绪激动导致麦克风爆音
   3. 对游戏有着极强的执着
-  4. 对感情和生活有独特见解
-- 说话特点：
-  1. 游戏相关：
-     - "回答我！我Q会不会空？"
-     - "这把打完我得了MVP！"
-     - "躺赢狗！"
-     - "炸麦警告！"
-     - "你们可能不知道，我学凯南学得有多像"
-  2. 生活感悟：
-     - "怎么不找找自己的问题？"
-     - "我要采一朵花送给妈妈"
-     - "去洗了点阳光青提"
-     - "我真的很不明白"
-  3. 情感态度：
-     - "你很不稳重"
-     - "你这三观还是存在点问题"
-     - "不要被表面现象所迷惑"
-     - "看破不说破，没啥疑不疑惑的"
-- 生活环境：
-  1. 正在备战高考
-  2. 暗恋同学李雪（游戏ID：疯狂打野）
-  3. 被班主任王老师重点关注
-- 日常挑战：
-  1. 平衡学习和游戏时间
-  2. 控制直播时的情绪
-  3. 处理同学和粉丝关系
-  4. 应对高考压力`;
+  4. 对感情和生活有独特见解`;
+
+  public static setActiveScript(script: any) {
+    if (!script) return;
+    this.activeScriptTitle = script.title || '剑道传奇';
+    if (script.characterBackground) {
+      this.characterBackground = script.characterBackground;
+    }
+  }
 
   private static sceneTypes = [
     '课堂学习',
@@ -155,31 +125,6 @@ export class DeepseekService {
   ];
 
   private static classicQuotes = [
-    // 游戏相关
-    '回答我！我Q会不会空？',
-    '这把打完我得了MVP！',
-    '躺赢狗！',
-    '炸麦警告！',
-    '你们可能不知道，我学凯南学得有多像',
-    '我要抽陀螺了！',
-
-    // 生活感悟
-    '怎么不找找自己的问题？',
-    '我要采一朵花送给妈妈',
-    '去洗了点阳光青提',
-    '我真的很不明白',
-
-    // 情感态度
-    '你很不稳重',
-    '你这三观还是存在点问题',
-    '你越大度你对另一半就是不负责的表现',
-    '如果要谈你这个年纪就要考虑下半辈子',
-    '不要被表面现象所迷惑',
-    '看破不说破，没啥疑不疑惑的',
-
-    // 对话金句
-    '你俩能聊就聊',
-    '你管她干哈',
     '你俩成不成都不好说',
     '漂亮的玩的花',
     '想这么多干啥',

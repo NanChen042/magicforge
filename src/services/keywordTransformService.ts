@@ -37,7 +37,7 @@ class KeywordTransformService {
       const response = await axios.post(
         this.ensureCorrectApiUrl(options.apiUrl),
         {
-          model: options.model || 'doubao-seed-1-6-250615',
+          model: options.model || 'deepseek-ai/DeepSeek-V3',
           messages: [
             {
               role: 'system',

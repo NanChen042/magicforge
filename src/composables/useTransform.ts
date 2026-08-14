@@ -1,4 +1,5 @@
 import { ref } from 'vue';
+import { ElMessage } from 'element-plus';
 import keywordTransformService, { type TransformResult } from '@/services/keywordTransformService';
 import { API_CONFIG } from '@/services/deepseekService';
 
@@ -23,7 +24,7 @@ export function useTransform() {
 
     if (!apiKey) {
       console.error('转换失败: API Key 未配置');
-      alert('请先配置 API Key');
+      ElMessage.warning('请先配置 SiliconFlow API Key');
       return;
     }
 
@@ -56,7 +57,7 @@ export function useTransform() {
         errorMessage += '未知错误';
       }
 
-      alert(errorMessage);
+      ElMessage.error(errorMessage);
     } finally {
       isTransforming.value = false;
     }

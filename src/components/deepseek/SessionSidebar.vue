@@ -13,11 +13,13 @@
       <div class="flex items-center gap-1">
         <button
           @click="$emit('toggle-collapse')"
-          class="p-1 text-zinc-400 hover:text-blue-600 rounded-sm hover:bg-blue-50 transition-colors cursor-pointer"
-          title="收起边栏"
+          class="p-1.5 text-zinc-400 hover:text-blue-600 rounded-md hover:bg-blue-50 transition-colors cursor-pointer"
+          title="收起历史边栏"
         >
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <line x1="9" y1="3" x2="9" y2="21"/>
+            <path d="M15 9l-3 3 3 3"/>
           </svg>
         </button>
       </div>

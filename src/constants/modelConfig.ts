@@ -23,7 +23,7 @@ export interface ModelConfig {
 }
 
 /**
- * SiliconFlow 免费模型配置列表 (2026年1月更新)
+ * SiliconFlow 常用模型配置列表
  */
 export const MODEL_CONFIGS: ModelConfig[] = [
   // ========== 对话型模型 ==========
@@ -35,6 +35,30 @@ export const MODEL_CONFIGS: ModelConfig[] = [
     free: false,
     provider: 'DeepSeek',
     capabilities: { temperature: true, topP: true, topK: false, frequencyPenalty: true, presencePenalty: true }
+  },
+  {
+    id: 'Qwen/Qwen2.5-72B-Instruct',
+    name: 'Qwen2.5 72B',
+    type: 'chat',
+    description: '通义千问 2.5 72B 满血开源旗舰模型',
+    free: false,
+    provider: 'Qwen'
+  },
+  {
+    id: 'Qwen/Qwen2.5-32B-Instruct',
+    name: 'Qwen2.5 32B',
+    type: 'chat',
+    description: '通义千问 2.5 32B 平衡性价比与强劲表现',
+    free: false,
+    provider: 'Qwen'
+  },
+  {
+    id: 'Qwen/Qwen2.5-14B-Instruct',
+    name: 'Qwen2.5 14B',
+    type: 'chat',
+    description: '通义千问 2.5 14B 快速响应模型',
+    free: false,
+    provider: 'Qwen'
   },
   {
     id: 'Qwen/Qwen2.5-7B-Instruct',
@@ -60,16 +84,40 @@ export const MODEL_CONFIGS: ModelConfig[] = [
     free: true,
     provider: 'InternLM'
   },
+  {
+    id: 'meta-llama/Meta-Llama-3.1-8B-Instruct',
+    name: 'Llama 3.1 8B',
+    type: 'chat',
+    description: 'Meta 开源 Llama 3.1 8B 极速对话模型',
+    free: true,
+    provider: 'Meta'
+  },
 
   // ========== 思考型推理模型 ==========
   {
     id: 'deepseek-ai/DeepSeek-R1',
     name: 'DeepSeek R1',
     type: 'reasoning',
-    description: 'DeepSeek 满血版 R1 深度逻辑推理模型',
+    description: 'DeepSeek 满血版 R1 深度逻辑推理模型 (671B)',
     free: false,
     provider: 'DeepSeek',
     capabilities: { temperature: true, topP: true, topK: false, frequencyPenalty: true, presencePenalty: true }
+  },
+  {
+    id: 'deepseek-ai/DeepSeek-R1-Distill-Qwen-32B',
+    name: 'DeepSeek R1 Distill 32B',
+    type: 'reasoning',
+    description: 'R1 蒸馏 Qwen 32B，高阶数理与深度推理',
+    free: false,
+    provider: 'DeepSeek'
+  },
+  {
+    id: 'deepseek-ai/DeepSeek-R1-Distill-Qwen-14B',
+    name: 'DeepSeek R1 Distill 14B',
+    type: 'reasoning',
+    description: 'R1 蒸馏 Qwen 14B，兼具深度思考与高速率',
+    free: false,
+    provider: 'DeepSeek'
   },
   {
     id: 'deepseek-ai/DeepSeek-R1-Distill-Qwen-7B',
@@ -87,8 +135,24 @@ export const MODEL_CONFIGS: ModelConfig[] = [
     free: true,
     provider: 'DeepSeek'
   },
+  {
+    id: 'deepseek-ai/DeepSeek-R1-Distill-Llama-70B',
+    name: 'DeepSeek R1 Distill Llama 70B',
+    type: 'reasoning',
+    description: 'R1 蒸馏 Llama 70B 超大参数推理模型',
+    free: false,
+    provider: 'DeepSeek'
+  },
 
   // ========== 代码与专精模型 ==========
+  {
+    id: 'Qwen/Qwen2.5-Coder-32B-Instruct',
+    name: 'Qwen2.5 Coder 32B',
+    type: 'coder',
+    description: '通义千问 32B 旗舰代码编写与架构模型',
+    free: false,
+    provider: 'Qwen'
+  },
   {
     id: 'Qwen/Qwen2.5-Coder-7B-Instruct',
     name: 'Qwen2.5 Coder 7B',
@@ -96,8 +160,49 @@ export const MODEL_CONFIGS: ModelConfig[] = [
     description: '通义千问代码生成与 Bug 修复模型',
     free: true,
     provider: 'Qwen'
+  },
+
+  // ========== 多模态视觉理解模型 ==========
+  {
+    id: 'Pro/OpenGVLab/InternVL2-8B',
+    name: 'InternVL2 8B (Vision)',
+    type: 'multimodal',
+    description: 'OpenGVLab 视觉多模态大模型，支持高精度图文理解',
+    free: false,
+    provider: 'OpenGVLab',
+    capabilities: { temperature: true, topP: true, topK: true, frequencyPenalty: false, presencePenalty: false }
+  },
+  {
+    id: 'Qwen/Qwen2-VL-72B-Instruct',
+    name: 'Qwen2-VL 72B (Vision)',
+    type: 'multimodal',
+    description: '通义千问2 旗舰视觉大模型，支持细粒度图文交互',
+    free: false,
+    provider: 'Qwen',
+    capabilities: { temperature: true, topP: true, topK: true, frequencyPenalty: true, presencePenalty: true }
   }
 ];
+
+/**
+ * 过滤非聊天/文本生成的模型（如向量嵌入、重排序、图片生成、音频模型等）
+ */
+export function isChatOrLLMModel(modelId: string): boolean {
+  if (!modelId) return false;
+  // 排除 embedding, rerank, image/diffusion, tts/asr, ocr, audio 等
+  const excludePattern = /(bge|embedding|embed|rerank|reranker|bce|kolors|flux|diffusion|wanx|ernie-image|cosyvoice|whisper|sensevoice|ocr|clip|speech)/i;
+  return !excludePattern.test(modelId);
+}
+
+/**
+ * 获取友好的模型展示名称
+ */
+export function getModelDisplayName(modelId: string): string {
+  const config = getModelConfig(modelId);
+  if (config) return config.name;
+  // 解析 vendor/name 格式
+  const parts = modelId.split('/');
+  return parts.length > 1 ? parts.slice(1).join('/') : modelId;
+}
 
 /**
  * 默认模型 ID
@@ -123,10 +228,10 @@ export function getModelCapabilities(modelId: string) {
   const config = getModelConfig(modelId);
   const defaultCaps = {
     temperature: true,
-    topP: false,
-    topK: false,
-    frequencyPenalty: false,
-    presencePenalty: false
+    topP: true,
+    topK: true,
+    frequencyPenalty: true,
+    presencePenalty: true
   };
   return config?.capabilities ? { ...defaultCaps, ...config.capabilities } : defaultCaps;
 }
@@ -152,7 +257,6 @@ export function isMultimodalModel(modelId: string): boolean {
  */
 export function supportsVision(modelId: string): boolean {
   const config = getModelConfig(modelId);
-  // multimodal 类型的模型支持视觉输入
   return config?.type === 'multimodal';
 }
 

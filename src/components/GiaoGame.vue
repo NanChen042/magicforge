@@ -137,7 +137,7 @@ const handleApiConfigUpdate = (config: { apiKey: string; model: string }) => {
 }
 
 // 启动游戏
-const startGame = async (name: string) => {
+const startGame = async (name: string, trait: string = 'balanced', scriptId?: string) => {
   playerName.value = name
   loading.value = true
 
@@ -147,7 +147,7 @@ const startGame = async (name: string) => {
     apiStore.setModelName(modelName.value)
     gameStore.setPlayerName(name)
     showIntro.value = false
-    await gameStore.startNewGame()
+    await gameStore.startNewGame(trait, scriptId)
     updateProgressData()
   } catch (error) {
     console.error('游戏启动错误:', error)
@@ -463,9 +463,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50/50 via-zinc-50 to-zinc-100/70 relative">
-    <!-- 全局背景点阵微特效 -->
-    <div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none opacity-60"></div>
+  <div class="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 relative">
 
     <!-- 开始界面 -->
     <GameIntro
@@ -601,6 +599,7 @@ onMounted(() => {
           enter-active-class="transition-opacity duration-200"
           enter-from-class="opacity-0"
           leave-active-class="transition-opacity duration-150"
+          leave-from-class="opacity-100"
           leave-to-class="opacity-0"
         >
           <div

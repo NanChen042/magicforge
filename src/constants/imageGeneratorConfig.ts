@@ -1,48 +1,48 @@
 import { ImageSize } from "../services/imageService";
 
-// 图片尺寸选项
+// 图片尺寸选项 (标准 6 种工业级宽高比)
 export const imageSizeOptions = {
   Square: {
     value: ImageSize.Square,
     label: "1:1 方形",
+    desc: "头像 / 社交卡片",
     ratio: "1:1",
     ratioLabel: "1:1"
-  },
-  Portrait: {
-    value: ImageSize.Portrait,
-    label: "3:4 竖向",
-    ratio: "3:4",
-    ratioLabel: "3:4"
-  },
-  Small: {
-    value: ImageSize.Small,
-    label: "3:4 小尺寸",
-    ratio: "3:4",
-    ratioLabel: "3:4"
-  },
-  Tall: {
-    value: ImageSize.Tall,
-    label: "1:2 高竖版",
-    ratio: "1:2",
-    ratioLabel: "1:2"
-  },
-  Medium: {
-    value: ImageSize.Medium,
-    label: "9:16 中等",
-    ratio: "9:16",
-    ratioLabel: "9:16"
-  },
-  Wide: {
-    value: ImageSize.Wide,
-    label: "3:2 宽幅",
-    ratio: "3:2",
-    ratioLabel: "3:2"
   },
   Widescreen: {
     value: ImageSize.Widescreen,
     label: "16:9 宽屏",
+    desc: "桌面壁纸 / 宽幅横图",
     ratio: "16:9",
     ratioLabel: "16:9"
+  },
+  Medium: {
+    value: ImageSize.Medium,
+    label: "9:16 竖屏",
+    desc: "手机壁纸 / 海报",
+    ratio: "9:16",
+    ratioLabel: "9:16"
+  },
+  Portrait: {
+    value: ImageSize.Portrait,
+    label: "3:4 经典人像",
+    desc: "人物写真 / 立绘",
+    ratio: "3:4",
+    ratioLabel: "3:4"
+  },
+  Wide: {
+    value: ImageSize.Wide,
+    label: "3:2 摄影画幅",
+    desc: "胶片相机 / 纪实",
+    ratio: "3:2",
+    ratioLabel: "3:2"
+  },
+  Small: {
+    value: ImageSize.Small,
+    label: "4:3 标准横幅",
+    desc: "概念插画 / 场景",
+    ratio: "4:3",
+    ratioLabel: "4:3"
   },
 };
 
@@ -142,8 +142,11 @@ export const errorMessageMap: Record<string, string> = {
   "network error": "网络连接错误，请检查您的网络连接",
   "timeout": "请求超时，服务器可能繁忙，请稍后再试",
   "server error": "服务器错误，请联系管理员",
-  "invalid_api_key": "API密钥无效，请检查您的设置",
+  "invalid_api_key": "API 密钥无效或未授权，请检查您的 API 设置",
   "invalid_prompt": "提示词格式错误，请修改后重试",
   "content_policy_violation": "提示词内容不符合使用政策，请修改后重试",
+  "balance is insufficient": "您的 API 账户余额不足，请前往服务商平台 (如 SiliconFlow 硅基流动) 充值或更换有效的 API Key",
+  "insufficient_balance": "您的 API 账户余额不足，请前往服务商平台充值或更换有效的 API Key",
+  "quota_exceeded": "API 额度已耗尽，请检查账户余额或升级配额",
   "20015": "推理步骤必须小于或等于50",
 };

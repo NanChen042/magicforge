@@ -1,7 +1,10 @@
 <template>
-  <div class="min-h-screen bg-[#F8FAFC] selection:bg-indigo-500/30 text-slate-800 font-sans">
+  <div class="min-h-screen bg-[#F8FAFC] selection:bg-indigo-500/30 text-slate-800 font-sans w-full">
+    <!-- 1. 全宽首屏 Hero 区域 (背景 100% 视口满屏无缝铺满，文字居中) -->
+    <HeroSection />
+
+    <!-- 2. 核心内容标准版心容器 -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-      <HeroSection />
       <ValueShowcase />
       <CoreArchitecture />
       <CapabilitiesMatrix />

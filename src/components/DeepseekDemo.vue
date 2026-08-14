@@ -84,6 +84,7 @@
         @refresh-follow-up="handleRefreshFollowUp"
         @upload-images="handleUploadImages"
         @remove-image="handleRemoveImage"
+        @regenerate="handleRegenerate"
       />
     </div>
 
@@ -666,7 +667,6 @@ const handleSendMessage = async () => {
       ElMessage.warning('请先在模型配置中填写 SiliconFlow API Key');
       handleOpenSettings();
       return;
-      console.log("使用临时API Key");
     }
 
     const input = userInput.value;
@@ -687,8 +687,8 @@ const handleSendMessage = async () => {
     // 根据是否流式处理选择不同的发送方法
     if (streaming.value) {
       isThinking.value = true;
-      const originalInput = input; // 保存原始输入用于生成后续问题
-      
+      const originalInput = input;
+
       // 准备图片数据
       const images = uploadedImages.value
         .filter(img => img.base64)
@@ -696,10 +696,10 @@ const handleSendMessage = async () => {
           base64: img.base64!,
           mimeType: img.file.type || 'image/jpeg'
         }));
-      
+
       // 图片预览 URL 列表
       const imageUrls = uploadedImages.value.map(img => img.preview);
-      
+
       await streamChatMessage(input, {
         onContent: () => {
           nextTick(() => {
@@ -737,8 +737,8 @@ const handleSendMessage = async () => {
         images: images.length > 0 ? images : undefined,
         imageUrls: imageUrls.length > 0 ? imageUrls : undefined
       });
-      
-      // 清空上传的图片（不释放 URL，因为对话历史还需要显示）
+
+      // 清空上传的图片
       uploadedImages.value = [];
     } else {
       // 准备图片数据
@@ -748,10 +748,10 @@ const handleSendMessage = async () => {
           base64: img.base64!,
           mimeType: img.file.type || 'image/jpeg'
         }));
-      
+
       // 图片预览 URL 列表
       const imageUrls = uploadedImages.value.map(img => img.preview);
-      
+
       await sendChatMessage(input, {
         temperature: temperature.value,
         maxTokens: maxTokens.value,
@@ -764,10 +764,10 @@ const handleSendMessage = async () => {
         images: images.length > 0 ? images : undefined,
         imageUrls: imageUrls.length > 0 ? imageUrls : undefined
       });
-      
-      // 清空上传的图片（不释放 URL，因为对话历史还需要显示）
+
+      // 清空上传的图片
       uploadedImages.value = [];
-      
+
       // 非流式模式也生成后续问题
       const lastMessage = conversationHistory[conversationHistory.length - 1];
       if (lastMessage && lastMessage.role === 'assistant') {
@@ -787,6 +787,28 @@ const handleSendMessage = async () => {
   } finally {
     isSending.value = false;
   }
+};
+
+/**
+ * 重新生成最近一次回答
+ */
+const handleRegenerate = async () => {
+  if (isSending.value || isProcessing.value) return;
+  if (conversationHistory.length < 2) return;
+
+  const lastIndex = conversationHistory.length - 1;
+  if (conversationHistory[lastIndex].role !== 'assistant') return;
+
+  const userMsgIndex = lastIndex - 1;
+  if (userMsgIndex < 0 || conversationHistory[userMsgIndex].role !== 'user') return;
+
+  const lastUserPrompt = conversationHistory[userMsgIndex].content;
+
+  // 移除最近一条 AI 回答和对应用户消息，重新触发发送流程
+  conversationHistory.splice(userMsgIndex, 2);
+
+  userInput.value = lastUserPrompt;
+  await handleSendMessage();
 };
 </script>
 
@@ -892,5 +914,3 @@ const handleSendMessage = async () => {
   overflow-y: auto;
 }
 </style>
-
-

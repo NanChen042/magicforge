@@ -1,101 +1,93 @@
 <template>
   <div class="w-full h-full flex flex-col bg-white overflow-hidden min-h-0">
 
-    <!-- 1. 头部：系统配置抽屉唤起按钮 + Element Plus 高级模型下拉选择器 -->
+    <!-- 1. 头部：系统配置抽屉唤起按钮 + 模型选择器 + 导出功能 -->
     <div class="flex flex-col sm:flex-row items-center justify-between px-4 py-2.5 border-b border-zinc-200 bg-white sticky top-0 z-30 shrink-0 gap-2">
-      <div class="flex items-center gap-2 w-full sm:w-auto">
-        <!-- 唤起历史边栏按钮 (仅桌面端收起时显示) -->
+      <div class="flex items-center gap-1.5 w-full sm:w-auto">
+        <!-- 历史边栏视图切换按钮 -->
         <button
           @click="$emit('toggle-sidebar')"
-          class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-zinc-700 bg-white hover:bg-blue-50 hover:text-blue-600 rounded-sm transition-all cursor-pointer shadow-2xs border border-slate-200 hover:border-blue-200"
-          :class="{ 'hidden': isSidebarVisible }"
-          title="展开历史对话边栏"
+          class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-md transition-all cursor-pointer shadow-2xs border"
+          :class="isSidebarVisible ? 'bg-blue-50/80 text-blue-700 border-blue-200 hover:bg-blue-100/70' : 'bg-white text-zinc-700 border-slate-200 hover:bg-slate-50 hover:text-blue-600 hover:border-blue-200'"
+          :title="isSidebarVisible ? '收起历史对话' : '展开历史对话'"
         >
-          <svg class="h-3.5 w-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+          <!-- 侧边栏分栏视图图标 (Sidebar Layout View Icon) -->
+          <svg class="h-3.5 w-3.5 shrink-0" :class="isSidebarVisible ? 'text-blue-600' : 'text-zinc-500'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <line x1="9" y1="3" x2="9" y2="21"/>
           </svg>
           <span class="hidden sm:inline">历史对话</span>
         </button>
 
-        <!-- 唤起模型配置按钮 (仅移动端显示，或桌面端收起时显示) -->
+        <!-- 模型配置面板视图切换按钮 -->
         <button
           @click="$emit('open-settings')"
-          class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-zinc-700 bg-white hover:bg-blue-50 hover:text-blue-600 rounded-sm transition-all cursor-pointer shadow-2xs border border-slate-200 hover:border-blue-200"
-          :class="{ 'lg:hidden': isDesktopConfigVisible }"
-          title="展开模型配置"
+          class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-md transition-all cursor-pointer shadow-2xs border"
+          :class="isDesktopConfigVisible ? 'bg-blue-50/80 text-blue-700 border-blue-200 hover:bg-blue-100/70' : 'bg-white text-zinc-700 border-slate-200 hover:bg-slate-50 hover:text-blue-600 hover:border-blue-200'"
+          :title="isDesktopConfigVisible ? '收起模型配置' : '展开模型配置'"
         >
-          <svg class="h-3.5 w-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+          <!-- 面板参数视图图标 (Control Panel View Icon) -->
+          <svg class="h-3.5 w-3.5 shrink-0" :class="isDesktopConfigVisible ? 'text-blue-600' : 'text-zinc-500'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <line x1="15" y1="3" x2="15" y2="21"/>
           </svg>
           <span class="hidden sm:inline">模型配置</span>
         </button>
 
-        <div class="h-4 w-[1px] bg-zinc-200 mx-0.5"></div>
+        <div class="h-4 w-[1px] bg-zinc-200 mx-1"></div>
 
-        <!-- 模型下拉选择组件 -->
-        <el-dropdown trigger="click" @command="(modelId: string) => $emit('update:modelName', modelId)">
-          <button class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-blue-50 border border-zinc-200 hover:border-blue-300 rounded-md text-xs font-bold text-zinc-900 hover:text-blue-700 shadow-2xs transition-all cursor-pointer">
-            <span>{{ currentModelConfig?.name || modelName || '选择模型' }}</span>
-            <svg class="w-3 h-3 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        <!-- 现代化模型选择器组件 (Categorized, Searchable, Rich Metadata) -->
+        <ModelSelector
+          :model-value="modelName || ''"
+          :available-models="availableModels || []"
+          :loading="modelsLoading"
+          :error="modelLoadError"
+          @update:model-value="$emit('update:modelName', $event)"
+          @refresh-models="$emit('refresh-models')"
+        />
+      </div>
+
+      <!-- 右侧操作区：导出与生成状态 -->
+      <div class="flex items-center gap-2">
+        <!-- 导出对话记录 -->
+        <el-dropdown v-if="conversationHistory.length > 0" trigger="click" @command="handleExport">
+          <button 
+            class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-zinc-600 bg-white hover:bg-slate-50 border border-slate-200 rounded-md transition-colors cursor-pointer shadow-2xs"
+            title="导出对话记录"
+          >
+            <svg class="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
             </svg>
+            <span class="hidden sm:inline">导出对话</span>
           </button>
           <template #dropdown>
-            <el-dropdown-menu class="p-1.5 min-w-[220px] max-h-[380px] overflow-y-auto custom-scrollbar shadow-xl border-zinc-100">
-              <div v-if="modelsLoading" class="px-3 py-3 text-xs text-zinc-500">正在获取可用模型...</div>
-              <div v-else-if="modelLoadError" class="w-[280px] px-3 py-2">
-                <p class="text-xs leading-5 text-red-600">{{ modelLoadError }}</p>
-                <button type="button" class="mt-2 text-xs font-medium text-blue-700 hover:text-blue-800" @click="$emit('refresh-models')">重新获取</button>
-              </div>
-              <div v-else-if="Object.keys(groupedModels).length === 0" class="px-3 py-3 text-xs text-zinc-500">当前 Key 未返回可用模型。</div>
-              <div v-for="(group, index) in groupedModels" :key="group.label" class="mb-1">
-                <!-- 分类标题 -->
-                <div class="px-2 flex items-center gap-2" :class="index === 0 ? 'mb-1.5' : 'mt-3 mb-1.5'">
-                  <span class="h-1.5 w-1.5 rounded-full" :class="group.accentClass"></span>
-                  <span class="text-[11px] font-semibold text-zinc-600">{{ group.label }}</span>
-                  <span class="font-mono text-[10px] text-zinc-400">{{ group.models.length }}</span>
-                  <div class="h-[1px] flex-1 bg-zinc-100"></div>
-                </div>
-                
-                <el-dropdown-item 
-                  v-for="model in group.models" 
-                  :key="model.id"
-                  :command="model.id"
-                  :class="{'!bg-blue-50/50 !text-blue-700': model.id === modelName}"
-                  class="rounded-sm mb-0.5 transition-colors duration-200"
-                >
-                  <div class="flex w-full items-center gap-2.5 py-1.5">
-                    <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border" :class="model.id === modelName ? 'border-blue-200 bg-blue-100 text-blue-700' : 'border-zinc-200 bg-zinc-50 text-zinc-400'">
-                      <svg v-if="model.id === modelName" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6" /></svg>
-                      <span v-else class="h-1.5 w-1.5 rounded-full bg-current opacity-50"></span>
-                    </span>
-                    <div class="min-w-0 flex-1">
-                    <div class="flex items-center justify-between gap-3">
-                      <span class="text-[13px] font-medium" :class="model.id === modelName ? 'text-blue-700 font-semibold' : 'text-zinc-700'">{{ model.name }}</span>
-                    </div>
-                    <span class="mt-0.5 block truncate font-mono text-[10px]" :class="model.id === modelName ? 'text-blue-600/80' : 'text-zinc-400'">{{ model.id }}</span>
-                    </div>
-                  </div>
-                </el-dropdown-item>
-              </div>
+            <el-dropdown-menu class="p-1 min-w-[150px]">
+              <el-dropdown-item command="markdown" class="text-xs">
+                <span>导出为 Markdown (.md)</span>
+              </el-dropdown-item>
+              <el-dropdown-item command="json" class="text-xs">
+                <span>导出为 JSON (.json)</span>
+              </el-dropdown-item>
+              <el-dropdown-item command="text" class="text-xs">
+                <span>复制纯文本内容</span>
+              </el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
-      </div>
 
-      <div v-if="isProcessing" class="flex items-center gap-3 w-full sm:w-auto justify-end">
-        <span class="text-[10px] font-mono font-medium text-zinc-400 uppercase tracking-widest animate-pulse">
-          生成中... {{ streamProgress }}%
-        </span>
-        <div class="w-24 h-1.5 bg-zinc-100 rounded-full overflow-hidden">
-          <div class="h-full bg-blue-600 rounded-full transition-all duration-300 ease-out" :style="{ width: streamProgress + '%' }"></div>
+        <div v-if="isProcessing" class="flex items-center gap-3 w-full sm:w-auto justify-end">
+          <span class="text-[10px] font-mono font-medium text-zinc-400 uppercase tracking-widest animate-pulse">
+            生成中... {{ streamProgress }}%
+          </span>
+          <div class="w-24 h-1.5 bg-zinc-100 rounded-full overflow-hidden">
+            <div class="h-full bg-blue-600 rounded-full transition-all duration-300 ease-out" :style="{ width: streamProgress + '%' }"></div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- 2. 主内容区域 -->
     <div class="flex-1 overflow-hidden relative">
-      
       <!-- 对话内容 -->
       <div class="chat-container h-full relative" ref="chatContainerRef" @scroll="handleScroll">
         <!-- 背景装饰 (网格) -->
@@ -130,6 +122,7 @@
               :isStopped="isLastMessageStopped"
               :reasoning="index === conversationHistory.length - 1 && item.role === 'assistant' ? reasoningContent : undefined"
               :isReasoningModel="showReasoningTab"
+              @regenerate="$emit('regenerate')"
             />
             
             <!-- 后续问题推荐 -->
@@ -154,161 +147,139 @@
         </div>
       </div>
 
-      <!-- 错误提示 Toast -->
-      <Transition
-        enter-active-class="transition duration-300 ease-out"
-        enter-from-class="opacity-0 -translate-y-4"
-        enter-to-class="opacity-100 translate-y-0"
-        leave-active-class="transition duration-200 ease-in"
-        leave-from-class="opacity-100 translate-y-0"
-        leave-to-class="opacity-0 -translate-y-4"
-      >
-        <div v-if="error" class="absolute top-16 left-4 right-4 z-40 mx-auto max-w-lg">
-          <div class="flex items-start gap-3 p-4 bg-white border border-red-100 rounded-sm shadow-xl shadow-red-500/5 ring-1 ring-red-500/10">
-            <div class="shrink-0 w-8 h-8 rounded-full bg-red-50 flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-              </svg>
-            </div>
-            <div>
-              <h4 class="text-sm font-bold text-zinc-900 mb-0.5">系统错误</h4>
-              <p class="text-xs text-zinc-500 leading-relaxed">{{ error }}</p>
-            </div>
-          </div>
-        </div>
-      </Transition>
+      <!-- 回到底部悬浮按钮 -->
+      <transition enter-active-class="transition duration-200 ease-out" enter-from-class="opacity-0 translate-y-2" enter-to-class="opacity-100 translate-y-0" leave-active-class="transition duration-150 ease-in" leave-from-class="opacity-100 translate-y-0" leave-to-class="opacity-0 translate-y-2">
+        <button
+          v-if="showScrollToBottom"
+          @click="scrollToBottom"
+          class="absolute bottom-6 right-6 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-white text-zinc-600 shadow-md border border-zinc-200/80 hover:text-blue-600 hover:border-blue-200 transition-all cursor-pointer group"
+          title="回到底部"
+        >
+          <svg class="h-4 w-4 transition-transform group-hover:translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          </svg>
+        </button>
+      </transition>
     </div>
 
     <!-- 3. 底部输入区域 -->
-    <div class="px-3 pb-4 md:px-6 md:pb-6 relative z-20 shrink-0">
-      <div class="max-w-4xl mx-auto flex flex-col relative">
+    <div class="p-4 sm:p-6 bg-white/80 backdrop-blur-md border-t border-zinc-100 shrink-0 z-20">
+      <div class="max-w-4xl mx-auto">
         
-        <!-- 图片预览区域 -->
-        <div v-if="uploadedImages && uploadedImages.length > 0" class="mb-3 flex flex-wrap gap-2">
-          <div
-            v-for="(img, index) in uploadedImages"
-            :key="index"
-            class="relative w-16 h-16 rounded-md overflow-hidden border border-zinc-200 shadow-sm group"
+        <!-- 上传的图片预览栏 -->
+        <div v-if="uploadedImages && uploadedImages.length > 0" class="mb-3 flex flex-wrap gap-2 p-2 bg-zinc-50 rounded-lg border border-zinc-200">
+          <div 
+            v-for="(img, idx) in uploadedImages" 
+            :key="idx"
+            class="relative group w-16 h-16 rounded-md overflow-hidden border border-zinc-300 bg-white shadow-2xs"
           >
-            <img :src="img.preview" class="w-full h-full object-cover" />
+            <img :src="img.preview" :alt="img.file.name" class="w-full h-full object-cover" />
             <button
-              @click="$emit('remove-image', index)"
-              class="absolute -top-1 -right-1 w-5 h-5 bg-zinc-900 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md hover:bg-red-500"
-              title="移除图片"
+              type="button"
+              @click="$emit('remove-image', idx)"
+              class="absolute top-0.5 right-0.5 w-4 h-4 bg-zinc-900/80 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:bg-red-600"
+              title="删除图片"
             >
-              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
+          <span class="self-center text-xs text-zinc-400 ml-1">{{ uploadedImages.length }}/4 张图片</span>
         </div>
 
-        <!-- 悬浮的药丸提示词 (仅当会话为空时显示) -->
-        <div v-if="conversationHistory.length === 0 && hotTopics.length > 0" class="flex items-center flex-wrap gap-2 mb-3">
-          <button
-            v-for="(topic, index) in hotTopics.slice(0, 4)"
-            :key="index"
-            @click="$emit('select-question', topic)"
-            class="px-3 py-1.5 bg-white/80 backdrop-blur-sm border border-zinc-200/80 rounded-full text-[11px] font-medium text-zinc-600 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50/50 transition-all shadow-sm cursor-pointer whitespace-nowrap"
-          >
-            {{ topic }}
-          </button>
+        <div class="relative rounded-xl border border-zinc-200 bg-white shadow-sm transition-all duration-200 focus-within:border-zinc-400 focus-within:ring-2 focus-within:ring-zinc-100">
           
-          <button 
-            @click="$emit('clear')" 
-            class="ml-auto inline-flex items-center justify-center w-8 h-8 rounded-full bg-white/80 border border-zinc-200/80 text-zinc-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-all shadow-sm cursor-pointer"
-            title="清空对话"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-            </svg>
-          </button>
-        </div>
-        <div v-else class="flex justify-end mb-2">
-           <button 
-            @click="$emit('clear')" 
-            class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-white/80 border border-zinc-200/80 text-zinc-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-all shadow-sm cursor-pointer"
-            title="清空对话"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-            </svg>
-          </button>
-        </div>
+          <!-- 隐藏的文件上传 input -->
+          <input 
+            type="file" 
+            ref="fileInputRef" 
+            accept="image/*" 
+            multiple 
+            class="hidden" 
+            @change="handleFileInputChange"
+          />
 
-        <!-- 悬浮卡片式输入框 -->
-        <div class="relative flex flex-col rounded-md border border-zinc-300 bg-white p-2 shadow-sm transition-colors focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-600/10">
+          <!-- 文本输入框 -->
           <textarea
-            ref="textareaRef"
             id="message-input"
+            ref="inputRef"
             :value="userInput"
             @input="handleInput"
-            class="w-full resize-none bg-transparent border-0 ring-0 text-sm text-zinc-800 placeholder:text-zinc-400 leading-relaxed focus:ring-0 focus:outline-none custom-scrollbar min-h-[72px] max-h-[240px] px-2 py-2"
-            :placeholder="supportsVision ? '输入你的提示词，可上传图片进行视觉分析...' : '请输入提示词...'"
-            :disabled="isProcessing"
-            @keydown.enter.exact.prevent="$emit('send')"
+            @keydown.enter.exact.prevent="handleEnter"
+            @keydown.enter.shift.exact="handleShiftEnter"
+            rows="3"
+            placeholder="输入消息，Enter 发送，Shift + Enter 换行..."
+            class="w-full resize-none border-0 bg-transparent px-4 pt-3.5 pb-12 text-sm leading-relaxed text-zinc-900 placeholder-zinc-400 focus:outline-hidden focus:ring-0"
           ></textarea>
-          
-          <!-- 底部工具条 -->
-          <div class="flex items-center justify-between mt-1 px-1 pb-1">
-            <div class="flex items-center gap-2">
+
+          <!-- 底部工具栏 -->
+          <div class="absolute bottom-2.5 left-3 right-3 flex items-center justify-between pointer-events-none">
+            <div class="flex items-center gap-1 pointer-events-auto">
               <!-- 图片上传按钮 -->
-              <label
-                v-if="supportsVision"
-                class="inline-flex items-center justify-center p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer transition-colors"
-                title="上传图片"
+              <button
+                type="button"
+                @click="triggerImageUpload"
+                class="flex items-center justify-center w-7 h-7 rounded-md text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors cursor-pointer"
+                title="上传图片（支持多模态视觉模型）"
               >
-                <input
-                  ref="imageInputRef"
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  class="hidden"
-                  @change="handleImageSelect"
-                  :disabled="isProcessing"
-                />
-                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-              </label>
+              </button>
 
               <!-- 优化提示词 -->
               <button
-                v-if="!isProcessing"
+                type="button"
                 @click="$emit('optimize')"
-                :disabled="!userInput.trim() || isTransforming"
-                class="inline-flex items-center justify-center p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                title="AI 优化提示词"
+                :disabled="isTransforming || !userInput.trim()"
+                class="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 rounded-md transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                title="转换/优化当前输入的提示词"
               >
-                <svg v-if="isTransforming" class="h-5 w-5 animate-spin text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                <svg v-else class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <svg v-if="!isTransforming" class="w-3.5 h-3.5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
+                <div v-else class="w-3 h-3 border-2 border-zinc-400 border-t-transparent rounded-full animate-spin"></div>
+                <span>优化</span>
+              </button>
+
+              <!-- 清空历史 -->
+              <button
+                type="button"
+                @click="$emit('clear')"
+                class="flex items-center gap-1 px-2 py-1 text-xs text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-md transition-colors cursor-pointer"
+                title="清空当前对话"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                <span>清空</span>
               </button>
             </div>
 
             <!-- 发送/停止按钮 -->
-            <button
-              v-if="isProcessing"
-              @click="$emit('stop')"
-              class="flex items-center justify-center w-8 h-8 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-colors cursor-pointer"
-            >
-              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                <rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect>
-              </svg>
-            </button>
-            <button
-              v-else
-              @click="$emit('send')"
-              :disabled="!userInput.trim()"
-              class="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-sm"
-            >
-              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </button>
+            <div class="pointer-events-auto">
+              <button
+                v-if="isProcessing"
+                @click="$emit('stop')"
+                class="flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-900 text-white hover:bg-zinc-800 transition-colors cursor-pointer shadow-sm"
+                title="停止生成"
+              >
+                <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect>
+                </svg>
+              </button>
+              <button
+                v-else
+                @click="$emit('send')"
+                :disabled="!userInput.trim()"
+                class="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-sm"
+              >
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -320,19 +291,36 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue';
+import { ElMessage, ElNotification } from 'element-plus';
 import MessageItem from './chat/MessageItem.vue';
 import EmptyState from './chat/EmptyState.vue';
 import FollowUpSuggestions from './chat/FollowUpSuggestions.vue';
+import ModelSelector from './ModelSelector.vue';
+import { getModelConfig } from '@/constants/modelConfig';
 
 interface Message {
   role: string;
   content: string;
+  reasoning?: string;
+  images?: string[];
+  usage?: {
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
+    cache_hit_tokens?: number;
+  };
 }
 
 interface UploadedImage {
   file: File;
   preview: string;
   base64?: string;
+}
+
+interface SiliconFlowModel {
+  id: string;
+  name: string;
+  type?: 'chat' | 'reasoning' | 'multimodal' | 'ocr' | 'translate' | 'coder';
 }
 
 const props = defineProps<{
@@ -368,6 +356,7 @@ const emit = defineEmits<{
   'update:userInput': [value: string];
   'update:modelName': [value: string];
   'send': [];
+  'regenerate': [];
   'clear': [];
   'optimize': [];
   'stop': [];
@@ -381,152 +370,145 @@ const emit = defineEmits<{
   'refresh-models': [];
 }>();
 
-import { getModelConfig } from '@/constants/modelConfig';
-import type { SiliconFlowModel } from '@/services/siliconFlowClient';
-
-const textareaRef = ref<HTMLTextAreaElement | null>(null);
-
-const adjustTextareaHeight = () => {
-  const el = textareaRef.value;
-  if (!el) return;
-  el.style.height = 'auto';
-  const newHeight = Math.min(Math.max(el.scrollHeight, 64), 240);
-  el.style.height = `${newHeight}px`;
-};
-
-const handleInput = (event: Event) => {
-  const value = (event.target as HTMLTextAreaElement).value;
-  emit('update:userInput', value);
-  adjustTextareaHeight();
-};
-
-watch(() => props.userInput, () => {
-  nextTick(adjustTextareaHeight);
-});
-
-const MODEL_GROUPS = [
-  { key: 'reasoning', label: '推理', accentClass: 'bg-violet-500' },
-  { key: 'vision', label: '视觉', accentClass: 'bg-emerald-500' },
-  { key: 'image', label: '图像生成', accentClass: 'bg-pink-500' },
-  { key: 'audio', label: '语音', accentClass: 'bg-amber-500' },
-  { key: 'code', label: '代码', accentClass: 'bg-cyan-500' },
-  { key: 'chat', label: '对话', accentClass: 'bg-blue-500' },
-  { key: 'other', label: '其他', accentClass: 'bg-zinc-400' }
-] as const;
-
-type ModelGroupKey = (typeof MODEL_GROUPS)[number]['key'];
-
-const getModelGroup = (modelId: string): ModelGroupKey => {
-  const id = modelId.toLowerCase();
-  if (/(r1|reasoner|think|qwq)/.test(id)) return 'reasoning';
-  if (/(vl|vision|ocr|internvl|qwen2-vl)/.test(id)) return 'vision';
-  if (/(image|kolors|flux|stable-diffusion|wanx)/.test(id)) return 'image';
-  if (/(audio|speech|voice|asr|whisper|cosyvoice|fish-speech)/.test(id)) return 'audio';
-  if (/(coder|code|starcoder|deepseek-coder)/.test(id)) return 'code';
-  if (/(chat|instruct|deepseek|qwen|glm|llama|mistral|gemma)/.test(id)) return 'chat';
-  return 'other';
-};
-
-const getDisplayName = (modelId: string) => {
-  const [provider, name] = modelId.split('/');
-  return name ? `${provider} ${name}` : modelId;
-};
-
-const groupedModels = computed(() => {
-  const models = (props.availableModels || []).map((model) => ({
-    id: model.id,
-    name: getDisplayName(model.id),
-    group: getModelGroup(model.id)
-  }));
-
-  return MODEL_GROUPS.map((group) => ({
-    ...group,
-    models: models.filter((model) => model.group === group.key)
-  })).filter((group) => group.models.length > 0);
-});
-
 const currentModelConfig = computed(() => {
-  const configured = getModelConfig(props.modelName || '');
-  return configured || (props.modelName ? { name: props.modelName } : undefined);
+  return props.modelName ? getModelConfig(props.modelName) : undefined;
 });
 
-// 是否支持视觉输入
-const supportsVision = computed(() => props.supportsVision || props.modelType === 'multimodal');
-
-// 图片输入引用
-const imageInputRef = ref<HTMLInputElement | null>(null);
-
-// 处理图片选择
-const handleImageSelect = (event: Event) => {
-  const input = event.target as HTMLInputElement;
-  if (input.files && input.files.length > 0) {
-    emit('upload-images', Array.from(input.files));
-    // 清空 input 以便可以重复选择同一文件
-    input.value = '';
-  }
-};
-
-// 根据模型类型获取功能提示
-const getModelFeatureHint = () => {
-  switch (props.modelType) {
-    case 'reasoning':
-      return '思考模型：支持深度推理，可查看思维过程';
-    case 'multimodal':
-      return '视觉模型：支持图像理解，可上传图片分析';
-    case 'ocr':
-      return 'OCR模型：支持文档识别转Markdown';
-    case 'translate':
-      return '翻译模型：支持多语种互译';
-    case 'coder':
-      return '代码模型：专注代码生成与修复';
-    default:
-      return '对话模型：通用智能对话';
-  }
-};
-
-// 获取模型类型标签文字
-const getModelTypeLabel = () => {
-  switch (props.modelType) {
-    case 'reasoning':
-      return '思考';
-    case 'multimodal':
-      return '视觉';
-    case 'ocr':
-      return 'OCR';
-    case 'translate':
-      return '翻译';
-    case 'coder':
-      return '代码';
-    default:
-      return '对话';
-  }
-};
-
-// 获取模型类型标签样式
-const getModelTypeBadgeClass = () => {
-  switch (props.modelType) {
-    case 'reasoning':
-      return 'bg-amber-100 text-amber-700';
-    case 'multimodal':
-      return 'bg-emerald-100 text-emerald-700';
-    case 'ocr':
-      return 'bg-orange-100 text-orange-700';
-    case 'translate':
-      return 'bg-cyan-100 text-cyan-700';
-    case 'coder':
-      return 'bg-pink-100 text-pink-700';
-    default:
-      return 'bg-blue-100 text-blue-700';
-  }
-};
-
-
-
+const inputRef = ref<HTMLTextAreaElement | null>(null);
+const fileInputRef = ref<HTMLInputElement | null>(null);
+const showScrollToBottom = ref(false);
 const chatContainerRef = ref<HTMLElement | null>(null);
 
+const handleInput = (e: Event) => {
+  const target = e.target as HTMLTextAreaElement;
+  emit('update:userInput', target.value);
+};
+
+const handleEnter = () => {
+  if (!props.isProcessing && props.userInput.trim()) {
+    emit('send');
+  }
+};
+
+const handleShiftEnter = () => {
+  // Allow default behavior to insert a newline
+};
+
+const triggerImageUpload = () => {
+  fileInputRef.value?.click();
+};
+
+const handleFileInputChange = (e: Event) => {
+  const target = e.target as HTMLInputElement;
+  if (target.files && target.files.length > 0) {
+    emit('upload-images', Array.from(target.files));
+    target.value = '';
+  }
+};
+
 const handleScroll = (event: Event) => {
+  const container = event.target as HTMLElement;
+  const scrollOffset = container.scrollHeight - container.scrollTop - container.clientHeight;
+  showScrollToBottom.value = scrollOffset > 120;
   emit('scroll', event);
 };
+
+const scrollToBottom = () => {
+  if (chatContainerRef.value) {
+    chatContainerRef.value.scrollTo({
+      top: chatContainerRef.value.scrollHeight,
+      behavior: 'smooth'
+    });
+  }
+};
+
+/**
+ * 导出对话记录
+ */
+const handleExport = async (format: 'markdown' | 'json' | 'text') => {
+  if (props.conversationHistory.length === 0) return;
+
+  if (format === 'markdown') {
+    let mdContent = `# 对话记录 - ${new Date().toLocaleString()}\n\n`;
+    props.conversationHistory.forEach((msg) => {
+      const roleName = msg.role === 'user' ? '🧑 用户' : '🤖 AI 助手';
+      mdContent += `### ${roleName}\n\n`;
+      if (msg.reasoning) {
+        mdContent += `> **思考过程**:\n> ${msg.reasoning.replace(/\n/g, '\n> ')}\n\n`;
+      }
+      mdContent += `${msg.content}\n\n---\n\n`;
+    });
+    downloadFile(mdContent, `chat-export-${Date.now()}.md`, 'text/markdown');
+    ElMessage.success('已导出 Markdown 文件');
+  } else if (format === 'json') {
+    const jsonStr = JSON.stringify(props.conversationHistory, null, 2);
+    downloadFile(jsonStr, `chat-export-${Date.now()}.json`, 'application/json');
+    ElMessage.success('已导出 JSON 文件');
+  } else if (format === 'text') {
+    let textContent = '';
+    props.conversationHistory.forEach((msg) => {
+      textContent += `${msg.role === 'user' ? '用户' : 'AI'}: ${msg.content}\n\n`;
+    });
+    await navigator.clipboard.writeText(textContent);
+    ElMessage.success('已复制对话文本至剪贴板');
+  }
+};
+
+function downloadFile(content: string, filename: string, type: string) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+const formatErrorTitle = (err: string) => {
+  const lower = err.toLowerCase();
+  if (lower.includes('insufficient') || lower.includes('balance') || lower.includes('30001')) {
+    return '账户额度不足 (Balance Insufficient)';
+  }
+  if (lower.includes('401') || lower.includes('invalid_api_key')) {
+    return 'API 密钥无效或未授权';
+  }
+  if (lower.includes('timeout') || lower.includes('network')) {
+    return '网络连接超时';
+  }
+  return 'API 接口请求异常';
+};
+
+const formatErrorDesc = (err: string) => {
+  const lower = err.toLowerCase();
+  if (lower.includes('insufficient') || lower.includes('balance') || lower.includes('30001')) {
+    return '您的 SiliconFlow (硅基流动) 账户余额不足，请前往平台充值或在配置面板中更换有效的 API Key。';
+  }
+  if (lower.includes('401') || lower.includes('invalid_api_key')) {
+    return '当前填写的 API Key 无法通过平台鉴权，请检查密钥是否正确或已过期。';
+  }
+  // Try extracting clean message from JSON
+  if (err.includes('{')) {
+    try {
+      const obj = JSON.parse(err.substring(err.indexOf('{')));
+      if (obj.message) return obj.message;
+    } catch {}
+  }
+  return err;
+};
+
+watch(() => props.error, (newErr) => {
+  if (newErr) {
+    ElNotification({
+      title: formatErrorTitle(newErr),
+      message: formatErrorDesc(newErr),
+      type: 'error',
+      duration: 5000,
+      position: 'top-right'
+    });
+  }
+});
 
 defineExpose({
   chatContainerRef

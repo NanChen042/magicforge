@@ -1,8 +1,33 @@
 import MarkdownIt from 'markdown-it';
 import hljs from 'highlight.js';
+import katex from 'katex';
+import 'katex/dist/katex.min.css';
+import mermaid from 'mermaid';
+
+// Initialize mermaid once
+if (typeof window !== 'undefined') {
+  try {
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'neutral',
+      securityLevel: 'loose',
+      fontFamily: 'Inter, system-ui, sans-serif',
+      themeVariables: {
+        primaryColor: '#eff6ff',
+        primaryTextColor: '#1e3a8a',
+        primaryBorderColor: '#93c5fd',
+        lineColor: '#64748b',
+        secondaryColor: '#f8fafc',
+        tertiaryColor: '#ffffff'
+      }
+    });
+  } catch (e) {
+    console.warn('Failed to initialize mermaid', e);
+  }
+}
 
 const md = new MarkdownIt({
-  html: false,
+  html: true,
   linkify: true,
   typographer: true,
   breaks: true
@@ -11,11 +36,67 @@ const md = new MarkdownIt({
 const LANGUAGE_HINTS = new Set([
   'bash', 'c', 'cpp', 'csharp', 'css', 'go', 'html', 'java', 'javascript',
   'json', 'kotlin', 'markdown', 'php', 'python', 'rust', 'sql', 'swift',
-  'text', 'toml', 'tsx', 'typescript', 'xml', 'yaml', 'vue'
+  'text', 'toml', 'tsx', 'typescript', 'xml', 'yaml', 'vue', 'mermaid'
 ]);
 
 function escapeHtml(value: string): string {
   return md.utils.escapeHtml(value);
+}
+
+/**
+ * Render Math Formula with KaTeX
+ */
+function renderMath(content: string, displayMode: boolean): string {
+  try {
+    return katex.renderToString(content.trim(), {
+      displayMode,
+      throwOnError: false,
+      output: 'htmlAndMathml'
+    });
+  } catch (e) {
+    return escapeHtml(content);
+  }
+}
+
+/**
+ * Pre-process LaTeX Math before Markdown-it parses paragraphs and escapes characters
+ */
+function preprocessMath(text: string): { processedText: string; mathPlaceholders: Map<string, string> } {
+  const mathPlaceholders = new Map<string, string>();
+  let placeholderId = 0;
+
+  // 1. Block Math: $$ ... $$ or \[ ... \]
+  let processedText = text.replace(/\$\$([\s\S]+?)\$\$/g, (_, math) => {
+    const id = `__KATEX_BLOCK_${placeholderId++}__`;
+    const rendered = `<div class="katex-block-wrapper my-3 text-center overflow-x-auto py-2">${renderMath(math, true)}</div>`;
+    mathPlaceholders.set(id, rendered);
+    return id;
+  });
+
+  processedText = processedText.replace(/\\\[([\s\S]+?)\\\]/g, (_, math) => {
+    const id = `__KATEX_BLOCK_${placeholderId++}__`;
+    const rendered = `<div class="katex-block-wrapper my-3 text-center overflow-x-auto py-2">${renderMath(math, true)}</div>`;
+    mathPlaceholders.set(id, rendered);
+    return id;
+  });
+
+  // 2. Inline Math: $ ... $ (avoiding $$ and escaped \$) or \( ... \)
+  processedText = processedText.replace(/(?<!\\)\$([^\$\n]+?)(?<!\\)\$/g, (_, math) => {
+    // Basic heuristic: check if math contains standard math characters
+    const id = `__KATEX_INLINE_${placeholderId++}__`;
+    const rendered = `<span class="katex-inline-wrapper">${renderMath(math, false)}</span>`;
+    mathPlaceholders.set(id, rendered);
+    return id;
+  });
+
+  processedText = processedText.replace(/\\\(([\s\S]+?)\\\)/g, (_, math) => {
+    const id = `__KATEX_INLINE_${placeholderId++}__`;
+    const rendered = `<span class="katex-inline-wrapper">${renderMath(math, false)}</span>`;
+    mathPlaceholders.set(id, rendered);
+    return id;
+  });
+
+  return { processedText, mathPlaceholders };
 }
 
 function normalizeFence(token: { info: string; content: string }) {
@@ -23,22 +104,19 @@ function normalizeFence(token: { info: string; content: string }) {
   let code = token.content;
 
   // Some model responses use ```text followed by the actual language on line 1.
-  // Treat that line as metadata instead of rendering it as source code.
   if (!language || ['text', 'txt', 'plain', 'plaintext'].includes(language)) {
     const match = code.match(/^\s*([a-z][a-z0-9+#-]*)\s*\r?\n/i);
     const hintedLanguage = match?.[1]?.toLowerCase();
-    if (hintedLanguage && LANGUAGE_HINTS.has(hintedLanguage) && hljs.getLanguage(hintedLanguage)) {
+    if (hintedLanguage && LANGUAGE_HINTS.has(hintedLanguage) && (hljs.getLanguage(hintedLanguage) || hintedLanguage === 'mermaid')) {
       language = hintedLanguage;
       code = code.slice(match![0].length);
     }
   }
 
-  if (!language || !hljs.getLanguage(language)) {
+  if (language !== 'mermaid' && (!language || !hljs.getLanguage(language))) {
     language = 'text';
   }
 
-  // markdown-it includes the fence's terminal newline in token.content.
-  // Removing only the fence padding prevents an empty visual row above the code.
   code = code.replace(/^\r?\n/, '').replace(/\r?\n$/, '');
 
   return { language, code };
@@ -55,12 +133,23 @@ function highlightCode(code: string, language: string): string {
 }
 
 let codeBlockId = 0;
+let mermaidBlockId = 0;
 
-// A custom fence renderer is important here: markdown-it's highlight callback
-// is only allowed to return the contents of <code>, not another <pre>/<div>.
+// Custom fence renderer for code blocks and mermaid
 md.renderer.rules.fence = (tokens, index) => {
   const token = tokens[index];
   const { language, code } = normalizeFence(token);
+
+  // Special handling for Mermaid diagrams
+  if (language === 'mermaid') {
+    const mId = `mermaid-chart-${Date.now()}-${mermaidBlockId++}`;
+    return `<div class="mermaid-diagram-wrapper my-4">
+      <div class="mermaid-diagram-container bg-white border border-slate-200/80 rounded-xl p-4 shadow-2xs overflow-x-auto">
+        <div class="mermaid-chart flex justify-center" id="${mId}" data-mermaid="${escapeHtml(code)}">${escapeHtml(code)}</div>
+      </div>
+    </div>\n`;
+  }
+
   const codeId = `code-block-${Date.now()}-${codeBlockId++}`;
   const highlighted = highlightCode(code, language);
 
@@ -94,8 +183,107 @@ md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
   return defaultLinkOpen(tokens, idx, options, env, self);
 };
 
+function convertSceneJsonToScript(parsed: Record<string, any>): string {
+  let scriptMarkdown = '';
+  if (parsed.description) {
+    scriptMarkdown += `> **🎬 场景实况**\n> \n> ${parsed.description}\n\n`;
+  }
+  if (parsed.dialog) {
+    scriptMarkdown += `💬 **心声独白**\n> 「${parsed.dialog}」\n\n`;
+  }
+  if (parsed.specialEvent) {
+    const eventType = typeof parsed.specialEvent === 'object' ? parsed.specialEvent.type || '突发异动' : '突发异动';
+    const eventDesc = typeof parsed.specialEvent === 'object' ? (parsed.specialEvent.description || JSON.stringify(parsed.specialEvent)) : parsed.specialEvent;
+    scriptMarkdown += `⚡ **突发异动【${eventType}】**：${eventDesc}\n\n`;
+  }
+  if (Array.isArray(parsed.options) && parsed.options.length > 0) {
+    scriptMarkdown += `### 🧭 抉择分支\n`;
+    parsed.options.forEach((opt: any, idx: number) => {
+      const text = typeof opt === 'object' ? opt.text : opt;
+      const hint = typeof opt === 'object' && opt.hint ? ` *(${opt.hint})*` : '';
+      scriptMarkdown += `${idx + 1}. **${text}**${hint}\n`;
+    });
+  }
+  return scriptMarkdown.trim();
+}
+
+/**
+ * 自动识别并拆解大模型意外输出的 JSON 包装外壳 (如 {"response": "..."}, {"content": "..."}, 或剧本场景 JSON)
+ */
+export function unwrapJsonEnvelope(text: string): string {
+  if (!text) return '';
+  let candidate = text.trim();
+
+  // 1. 如果是以 ```json ... ``` 或 ``` ... ``` 包裹的代码块
+  const jsonBlockMatch = candidate.match(/^```(?:json)?\s*\n?([\s\S]+?)\n?```$/i);
+  if (jsonBlockMatch) {
+    candidate = jsonBlockMatch[1].trim();
+  }
+
+  // 2. 检测是否为 JSON 对象
+  if (candidate.startsWith('{') && candidate.endsWith('}')) {
+    try {
+      const parsed = JSON.parse(candidate);
+      if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+        // A. 检查是否为剧本场景对象 (具有 description 或 options 字段)
+        if (parsed.description || (parsed.options && Array.isArray(parsed.options))) {
+          const scriptText = convertSceneJsonToScript(parsed);
+          if (scriptText) return scriptText;
+        }
+
+        // B. 检查单一字段包装 (如 { "response": "..." })
+        const keys = Object.keys(parsed);
+        if (keys.length === 1 && typeof parsed[keys[0]] === 'string') {
+          const key = keys[0].toLowerCase();
+          if (['response', 'content', 'answer', 'text', 'message', 'result', 'reply', 'output'].includes(key)) {
+            return unwrapJsonEnvelope(parsed[keys[0]]);
+          }
+        }
+      }
+    } catch {
+      // 非标准 JSON 或流式不完整，保持原文
+    }
+  }
+
+  return text;
+}
+
 export function formatMarkdown(text: string): string {
-  return text ? md.render(text) : '';
+  if (!text) return '';
+  const unwrapped = unwrapJsonEnvelope(text);
+  const { processedText, mathPlaceholders } = preprocessMath(unwrapped);
+  let html = md.render(processedText);
+
+  // Restore KaTeX placeholders
+  mathPlaceholders.forEach((renderedMath, placeholder) => {
+    html = html.replace(placeholder, renderedMath);
+  });
+
+  return html;
+}
+
+/**
+ * Trigger Mermaid rendering on all unrendered .mermaid-chart elements
+ */
+export async function renderMermaidCharts(container?: HTMLElement): Promise<void> {
+  if (typeof window === 'undefined') return;
+  const root = container || document;
+  const elements = root.querySelectorAll<HTMLElement>('.mermaid-chart:not([data-processed="true"])');
+  if (!elements || elements.length === 0) return;
+
+  for (let i = 0; i < elements.length; i++) {
+    const el = elements[i];
+    const code = el.getAttribute('data-mermaid') || el.textContent || '';
+    const id = `mermaid-svg-${Date.now()}-${i}`;
+    try {
+      el.setAttribute('data-processed', 'true');
+      const { svg } = await mermaid.render(id, code);
+      el.innerHTML = svg;
+    } catch (err) {
+      console.warn('Mermaid rendering failed:', err);
+      el.innerHTML = `<pre class="text-xs text-rose-500 font-mono p-2 bg-rose-50 rounded">${escapeHtml(code)}</pre>`;
+    }
+  }
 }
 
 async function copyCodeButton(button: HTMLButtonElement): Promise<void> {
