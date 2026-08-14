@@ -10,7 +10,7 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: process.env.NODE_ENV === 'production' ? "/magicforge/" : "/",
+  base: process.env.CF_PAGES === '1' ? '/' : (process.env.NODE_ENV === 'production' ? '/magicforge/' : '/'),
   plugins: [
     vue(),
     vueDevTools(),
