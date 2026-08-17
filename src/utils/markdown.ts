@@ -10,7 +10,7 @@ if (typeof window !== 'undefined') {
     mermaid.initialize({
       startOnLoad: false,
       theme: 'neutral',
-      securityLevel: 'loose',
+      securityLevel: 'strict',
       fontFamily: 'Inter, system-ui, sans-serif',
       themeVariables: {
         primaryColor: '#eff6ff',
@@ -27,7 +27,7 @@ if (typeof window !== 'undefined') {
 }
 
 const md = new MarkdownIt({
-  html: true,
+  html: false,
   linkify: true,
   typographer: true,
   breaks: true
@@ -134,6 +134,36 @@ function highlightCode(code: string, language: string): string {
 
 let codeBlockId = 0;
 let mermaidBlockId = 0;
+
+// Keep a table from being rendered while its last row is still arriving over SSE.
+// This prevents half-written pipes from becoming stray paragraphs during streaming.
+function stabilizeStreamingMarkdown(text: string): string {
+  const lines = text.split(/\r?\n/);
+  const tableStart = lines.findIndex((line) => /^\s*\|.*\|\s*$/.test(line));
+  if (tableStart < 0) return text;
+
+  const separatorOffset = lines
+    .slice(tableStart + 1)
+    .findIndex((line) => /^\s*\|?\s*:?-{3,}:?\s*(?:\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(line));
+  if (separatorOffset < 0) return text;
+
+  const separatorIndex = tableStart + 1 + separatorOffset;
+  let stableEnd = separatorIndex + 1;
+  for (let index = stableEnd; index < lines.length; index += 1) {
+    const line = lines[index];
+    if (!line.trim() || !line.includes('|')) break;
+    if (/\|\s*$/.test(line)) stableEnd = index + 1;
+  }
+
+  if (stableEnd <= separatorIndex + 1) {
+    return lines.slice(0, tableStart).join('\n').trimEnd();
+  }
+
+  return [...lines.slice(0, tableStart), ...lines.slice(tableStart, stableEnd)].join('\n');
+}
+
+md.renderer.rules.table_open = () => '<div class="markdown-table-wrap"><table class="markdown-table">';
+md.renderer.rules.table_close = () => '</table></div>\n';
 
 // Custom fence renderer for code blocks and mermaid
 md.renderer.rules.fence = (tokens, index) => {
@@ -248,9 +278,10 @@ export function unwrapJsonEnvelope(text: string): string {
   return text;
 }
 
-export function formatMarkdown(text: string): string {
+export function formatMarkdown(text: string, options?: { streaming?: boolean }): string {
   if (!text) return '';
-  const unwrapped = unwrapJsonEnvelope(text);
+  const source = options?.streaming ? stabilizeStreamingMarkdown(text) : text;
+  const unwrapped = unwrapJsonEnvelope(source);
   const { processedText, mathPlaceholders } = preprocessMath(unwrapped);
   let html = md.render(processedText);
 

@@ -5,6 +5,22 @@ import { API_CONFIG, updateApiConfig } from '../services/deepseekService';
 import { useApiStore } from '@/stores/api';
 import { getModelCapabilities } from '@/constants/modelConfig';
 
+export interface ChatMessage {
+  role: string;
+  content: string;
+  reasoning?: string;
+  images?: string[];
+  isError?: boolean;
+  errorCode?: string;
+  error?: string;
+  usage?: {
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
+    cache_hit_tokens?: number;
+  };
+}
+
 /**
  * Deepseek API Hooks
  * 提供统一的API请求封装和状态管理
@@ -19,7 +35,7 @@ export function useDeepseekApi() {
   const isThinking = ref(false);
 
   // 聊天历史
-  const conversationHistory = reactive<Array<{role: string; content: string; reasoning?: string; images?: string[]; usage?: { prompt_tokens: number; completion_tokens: number; total_tokens: number; cache_hit_tokens?: number }}>>([]);
+  const conversationHistory = reactive<Array<ChatMessage>>([]);
 
   // 思维链内容
   const reasoningContent = ref('');
@@ -58,20 +74,38 @@ export function useDeepseekApi() {
     const model = options?.model ?? API_CONFIG.model;
     const capabilities = getModelCapabilities(model);
     return new DeepseekClient({
-      apiKey: apiKey.value,
-      baseURL: apiUrl.value,
-      temperature: options?.temperature ?? API_CONFIG.temperature,
-      maxTokens: options?.maxTokens ?? API_CONFIG.maxTokens,
+      apiKey: apiKey.value || API_CONFIG.apiKey,
+      baseURL: apiUrl.value || API_CONFIG.baseUrl,
       model,
-      topP: capabilities.topP ? options?.topP : undefined,
-      topK: capabilities.topK ? options?.topK : undefined,
-      frequencyPenalty: capabilities.frequencyPenalty ? options?.frequencyPenalty : undefined,
-      presencePenalty: capabilities.presencePenalty ? options?.presencePenalty : undefined
+      temperature: capabilities.temperature ? (options?.temperature ?? API_CONFIG.temperature) : undefined,
+      maxTokens: options?.maxTokens ?? API_CONFIG.maxTokens,
+      topP: capabilities.topP ? (options?.topP ?? API_CONFIG.topP) : undefined,
+      topK: capabilities.topK ? (options?.topK ?? API_CONFIG.topK) : undefined,
+      frequencyPenalty: capabilities.frequencyPenalty ? (options?.frequencyPenalty ?? API_CONFIG.frequencyPenalty) : undefined,
+      presencePenalty: capabilities.presencePenalty ? (options?.presencePenalty ?? API_CONFIG.presencePenalty) : undefined
     });
   };
 
+  // 更新配置
+  const updateConfig = (newConfig: {
+    apiKey?: string;
+    apiUrl?: string;
+    temperature?: number;
+    maxTokens?: number;
+  }) => {
+    if (newConfig.apiUrl) {
+      apiStore.setApiUrl(newConfig.apiUrl);
+    }
+
+    if (newConfig.apiKey) {
+      apiStore.setApiKey(newConfig.apiKey);
+    }
+
+    updateApiConfig(newConfig);
+  };
+
   // 发送聊天消息（非流式）
-  const sendChatMessage = async (
+  const chatMessage = async (
     message: string,
     options?: {
       temperature?: number;
@@ -91,7 +125,10 @@ export function useDeepseekApi() {
     try {
       error.value = '';
       isProcessing.value = true;
+      reasoningContent.value = '';
       isThinking.value = true;
+      // 重置停止状态
+      isLastMessageStopped.value = false;
 
       // 构建用户消息内容（支持图片）
       let userContent: string | Array<{ type: string; text?: string; image_url?: { url: string } }> = message;
@@ -117,9 +154,13 @@ export function useDeepseekApi() {
         images: options?.imageUrls // 保存图片预览 URL
       });
 
-      // 准备消息列表
+      // 准备消息列表（过滤掉历史中错误的记录）
+      const historyMessages = conversationHistory
+        .slice(0, -1)
+        .filter(m => !m.isError && (typeof m.content === 'string' ? m.content.trim() !== '' : true));
+
       const messages: Array<{ role: string; content: string | Array<{ type: string; text?: string; image_url?: { url: string } }> }> = 
-        conversationHistory.slice(0, -1).map(m => ({ role: m.role, content: m.content }));
+        historyMessages.map(m => ({ role: m.role, content: m.content }));
       
       // 添加当前用户消息（可能包含图片）
       messages.push({
@@ -140,7 +181,6 @@ export function useDeepseekApi() {
       let response;
 
       try {
-        // 优先尝试使用OpenAI兼容格式
         if (client.chat?.completions?.create) {
           response = await client.chat.completions.create({
             messages,
@@ -152,7 +192,6 @@ export function useDeepseekApi() {
             stream: false
           });
         } else {
-          // 直接调用chatCompletion方法
           response = await client.chatCompletion({
             messages,
             stream: false
@@ -176,7 +215,14 @@ export function useDeepseekApi() {
         // 添加助手回复到历史
         conversationHistory.push({
           role: 'assistant',
-          content: assistantMessage
+          content: assistantMessage,
+          reasoning,
+          usage: response.usage ? {
+            prompt_tokens: response.usage.prompt_tokens || 0,
+            completion_tokens: response.usage.completion_tokens || 0,
+            total_tokens: response.usage.total_tokens || 0,
+            cache_hit_tokens: response.usage.prompt_cache_hit_tokens ?? response.usage.cache_hit_tokens
+          } : undefined
         });
 
         return {
@@ -187,6 +233,28 @@ export function useDeepseekApi() {
 
       return null;
     } catch (err: any) {
+      const errMsg = err?.message || String(err);
+      const isBalance = errMsg.includes('402') || errMsg.includes('30001') || errMsg.toLowerCase().includes('balance');
+      const isAuth = errMsg.includes('401') || errMsg.toLowerCase().includes('unauthorized') || errMsg.toLowerCase().includes('invalid_api_key');
+      const isRateLimit = errMsg.includes('429') || errMsg.toLowerCase().includes('rate');
+      const errorCode = isBalance ? '402' : isAuth ? '401' : isRateLimit ? '429' : '500';
+
+      if (errorCode === '500') {
+        // 对于 500 或未知 JS 异常，仅依赖右侧 Notification，不污染对话列表
+        if (conversationHistory[conversationHistory.length - 1]?.role === 'assistant' && 
+            !conversationHistory[conversationHistory.length - 1].content) {
+          conversationHistory.pop();
+        }
+      } else {
+        conversationHistory.push({
+          role: 'assistant',
+          content: '',
+          isError: true,
+          errorCode,
+          error: errMsg
+        });
+      }
+
       error.value = err?.message || '请求失败';
       console.error('API请求失败:', err);
       return null;
@@ -199,19 +267,14 @@ export function useDeepseekApi() {
   // 添加终止生成的方法
   const stopGeneration = () => {
     if (isProcessing.value) {
-      // 停止处理
       isProcessing.value = false;
-
-      // 标记最近的消息被停止
       isLastMessageStopped.value = true;
 
-      // 如果有活跃的控制器，发送中止信号
       if (abortController.value) {
         abortController.value.abort();
         abortController.value = null;
       }
 
-      // 重置进度
       streamProgress.value = 100;
       isThinking.value = false;
     }
@@ -247,10 +310,8 @@ export function useDeepseekApi() {
       reasoningContent.value = '';
       streamProgress.value = 0;
       isThinking.value = true;
-      // 重置停止状态
       isLastMessageStopped.value = false;
 
-      // 创建新的abort controller
       abortController.value = new AbortController();
 
       // 构建用户消息内容（支持图片）
@@ -258,23 +319,21 @@ export function useDeepseekApi() {
       
       if (options?.images && options.images.length > 0) {
         userContent = [
-          // 先添加图片
           ...options.images.map(img => ({
             type: 'image_url' as const,
             image_url: {
               url: `data:${img.mimeType || 'image/jpeg'};base64,${img.base64}`
             }
           })),
-          // 再添加文本
           { type: 'text' as const, text: message }
         ];
       }
 
-      // 添加用户消息到历史（只保存文本）
+      // 添加用户消息到历史
       conversationHistory.push({
         role: 'user',
         content: message,
-        images: options?.imageUrls // 保存图片预览 URL
+        images: options?.imageUrls
       });
 
       // 添加AI响应占位
@@ -285,18 +344,19 @@ export function useDeepseekApi() {
         reasoning: ''
       });
 
-      // 准备消息列表（不包含最后一个空AI响应，并过滤掉历史中可能存在的空消息）
-      const historyMessages = conversationHistory.slice(0, -2).filter(m => typeof m.content === 'string' ? m.content.trim() !== '' : true);
+      // 准备消息列表（过滤掉历史中错误的记录）
+      const historyMessages = conversationHistory
+        .slice(0, -2)
+        .filter(m => !m.isError && (typeof m.content === 'string' ? m.content.trim() !== '' : true));
+
       const messages: Array<{ role: string; content: string | Array<{ type: string; text?: string; image_url?: { url: string } }> }> = 
         historyMessages.map(m => ({ role: m.role, content: m.content }));
       
-      // 添加当前用户消息（可能包含图片）
       messages.push({
         role: 'user',
         content: userContent
       });
 
-      // 如果有系统提示，添加到最前面
       if (options?.systemPrompt) {
         messages.unshift({
           role: 'system',
@@ -320,7 +380,7 @@ export function useDeepseekApi() {
         });
 
         for await (const chunk of stream) {
-          if (!isProcessing.value) break; // 允许中途取消
+          if (!isProcessing.value) break;
 
           const content = chunk.choices?.[0]?.delta?.content || '';
           const reasoning = chunk.choices?.[0]?.delta?.reasoning_content || '';
@@ -338,16 +398,12 @@ export function useDeepseekApi() {
 
           // 处理普通内容
           if (content) {
-            // 一旦有实际内容开始生成，将思考状态设为false
             if (isFirstContent) {
               isFirstContent = false;
               isThinking.value = false;
             }
 
-            // 直接追加流字符，由 markdown-it 全权负责标准语法解析与代码高亮
             fullContent += content;
-
-            // 更新对话历史
             conversationHistory[aiResponseIndex].content = fullContent;
 
             if (callbacks?.onContent) {
@@ -355,7 +411,6 @@ export function useDeepseekApi() {
             }
           }
 
-          // Capture usage from the final chunk (SiliconFlow sends usage on the last data chunk)
           if (chunk.usage) {
             conversationHistory[aiResponseIndex].usage = {
               prompt_tokens: chunk.usage.prompt_tokens || 0,
@@ -367,14 +422,23 @@ export function useDeepseekApi() {
         }
       }
 
-      // 完成
+      // 兜底提取 <think> 标签（某些推理模型会将思考过程作为 <think>...</think> 放在 content 中）
+      if (!fullReasoning && fullContent.includes('<think>')) {
+        const thinkMatch = fullContent.match(/<think>([\s\S]*?)(?:<\/think>|$)/i);
+        if (thinkMatch) {
+          fullReasoning = thinkMatch[1].trim();
+          fullContent = fullContent.replace(/<think>[\s\S]*?(?:<\/think>|$)/i, '').trim();
+          reasoningContent.value = fullReasoning;
+          conversationHistory[aiResponseIndex].reasoning = fullReasoning;
+          conversationHistory[aiResponseIndex].content = fullContent;
+        }
+      }
+
       streamProgress.value = 100;
       isProcessing.value = false;
       isThinking.value = false;
 
-      // 流式响应完成
       if (callbacks?.onComplete) {
-        // 如果有推理内容，设置一个短暂延迟让用户看到推理过程后再切换到最终结果
         if (fullReasoning && fullReasoning.length > 0) {
           setTimeout(() => {
             callbacks.onComplete?.();
@@ -389,19 +453,28 @@ export function useDeepseekApi() {
         reasoning: fullReasoning
       };
     } catch (err: any) {
-      // 移除刚才增加但内容为空的 AI 回复占位符，防止产生 "[响应内容为空]" 且污染下一次 API 请求
+      const errMsg = err?.message || String(err);
+      const isBalance = errMsg.includes('402') || errMsg.includes('30001') || errMsg.toLowerCase().includes('balance') || errMsg.includes('insufficient');
+      const isAuth = errMsg.includes('401') || errMsg.toLowerCase().includes('unauthorized') || errMsg.toLowerCase().includes('invalid_api_key');
+      const isRateLimit = errMsg.includes('429') || errMsg.toLowerCase().includes('rate');
+      const errorCode = isBalance ? '402' : isAuth ? '401' : isRateLimit ? '429' : '500';
+
       const lastMsg = conversationHistory[conversationHistory.length - 1];
       if (lastMsg && lastMsg.role === 'assistant' && !lastMsg.content && !lastMsg.reasoning) {
-        conversationHistory.pop();
+        if (err.name === 'AbortError' || errorCode === '500') {
+          conversationHistory.pop();
+        } else {
+          lastMsg.isError = true;
+          lastMsg.errorCode = errorCode;
+          lastMsg.error = errMsg;
+        }
       }
 
-      // 判断是否为用户主动中止的请求
       if (err.name === 'AbortError') {
         console.log('请求被用户中止');
-        // 可以选择不设置错误信息，因为这是预期行为
       } else {
         console.error('Stream请求出错:', err);
-        error.value = `请求失败: ${err.message || JSON.stringify(err)}`;
+        error.value = `请求失败: ${errMsg}`;
 
         if (callbacks?.onError) {
           callbacks.onError(err);
@@ -412,7 +485,6 @@ export function useDeepseekApi() {
       isThinking.value = false;
       return null;
     } finally {
-      // 清理控制器
       abortController.value = null;
     }
   };
@@ -431,16 +503,16 @@ export function useDeepseekApi() {
     isProcessing,
     error,
     streamProgress,
-    conversationHistory,
-    reasoningContent,
     isThinking,
     isLastMessageStopped,
+    conversationHistory,
+    reasoningContent,
 
     // 方法
-    sendChatMessage,
+    updateConfig,
+    sendChatMessage: chatMessage,
     streamChatMessage,
-    clearHistory,
-    createClient,
-    stopGeneration
+    stopGeneration,
+    clearHistory
   };
 }

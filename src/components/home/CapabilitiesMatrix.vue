@@ -32,7 +32,7 @@
       </div>
 
       <!-- 右侧：高级交互按钮 -->
-      <a href="#" class="group flex items-center justify-between gap-4 px-6 py-3 rounded-md bg-white border border-slate-200 hover:border-blue-300 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 min-w-[180px]">
+      <router-link to="/docs" class="group flex items-center justify-between gap-4 px-6 py-3 rounded-md bg-white border border-slate-200 hover:border-blue-300 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 min-w-[180px]">
         <div class="flex flex-col">
           <span class="text-sm font-bold text-slate-800 group-hover:text-blue-600 transition-colors">查看完整文档</span>
           <span class="text-[10px] text-slate-400 font-mono">文档与 API 接口</span>
@@ -44,7 +44,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7" />
           </svg>
         </div>
-      </a>
+      </router-link>
 
     </div>
 

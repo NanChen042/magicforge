@@ -1,12 +1,6 @@
 <template>
   <!-- Main Studio Layout: MagicForge Clean Light Theme -->
-  <div class="relative flex flex-col h-[calc(100vh-60px)] min-h-[700px] overflow-hidden bg-[#f8fafc] text-zinc-800 font-sans select-none">
-    
-    <!-- Background Subtle Matrix Atmosphere -->
-    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden">
-      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[80vw] max-w-4xl h-[300px] bg-gradient-to-b from-blue-100/30 via-sky-50/15 to-transparent rounded-full blur-3xl opacity-60"></div>
-      <div class="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:24px_24px] [mask-image:radial-gradient(ellipse_70%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-40"></div>
-    </div>
+  <div class="relative flex h-full min-h-0 flex-col overflow-hidden bg-white text-zinc-800 font-sans">
 
     <!-- 1. Unified Studio Header -->
     <header class="relative z-10 shrink-0 pt-5 pb-4 px-4 md:px-8 max-w-[1920px] mx-auto w-full">
@@ -14,10 +8,10 @@
         
         <div>
           <div class="flex items-center gap-2 mb-1">
-            <span class="px-2 py-0.5 rounded-xs bg-blue-50 text-blue-700 border border-blue-200/80 font-mono text-[11px] font-bold">
+            <span class="px-2 py-0.5 rounded-xs bg-blue-50 text-blue-700 border border-blue-200/80 text-[11px] font-bold">
               视觉工坊
             </span>
-            <span class="text-xs text-zinc-400 font-mono">文生图高精度渲染</span>
+            <span class="text-xs text-zinc-400">文生图高精度渲染</span>
           </div>
           <h1 class="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight">
             视觉创作工坊
@@ -30,7 +24,7 @@
         <!-- Connection Status Pill -->
         <div class="flex items-center gap-2 self-start sm:self-center">
           <div
-            class="px-3 py-1.5 rounded-xs border text-xs font-mono flex items-center gap-2 shadow-2xs"
+            class="px-3 py-1.5 rounded-xs border text-xs flex items-center gap-2 shadow-2xs"
             :class="apiStore.apiKey ? 'bg-white border-emerald-200 text-emerald-700' : 'bg-amber-50 border-amber-200 text-amber-800'"
           >
             <span class="w-2 h-2 rounded-full" :class="apiStore.apiKey ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'"></span>
@@ -66,7 +60,7 @@
             :loading="loading"
             :progress="progress"
             :estimated-time="estimatedTime"
-            :generation-time="generationTime"
+            :generation-time="generationTime ?? undefined"
             :last-seed="lastSeed"
             :image-size="formData.image_size"
             @show-preview="(url) => showPreview(url, lastSeed)"
@@ -135,7 +129,7 @@
       <!-- Action Footer -->
       <template #footer>
         <div class="flex flex-wrap items-center justify-between gap-3 px-6 py-4 border-t border-zinc-100 bg-white">
-          <div class="text-xs text-zinc-400 font-mono hidden sm:block">
+          <div class="text-xs text-zinc-400 hidden sm:block">
             提示：支持一键复用种子进行多轮画面微调
           </div>
 
@@ -143,7 +137,7 @@
             <template v-if="lastSeed !== null">
               <button 
                 @click="copySeedToClipboard(lastSeed)" 
-                class="px-3.5 py-2 rounded-xs border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-mono font-semibold text-zinc-700 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                class="px-3.5 py-2 rounded-xs border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-semibold text-zinc-700 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
               >
                 <svg class="w-3.5 h-3.5 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="9" y="9" width="13" height="13" rx="2"></rect>
@@ -154,7 +148,7 @@
               
               <button 
                 @click="useCurrentSeedAndClose(lastSeed, formData)" 
-                class="px-3.5 py-2 rounded-xs bg-emerald-600 hover:bg-emerald-700 text-xs font-mono font-bold text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+                class="px-3.5 py-2 rounded-xs bg-emerald-600 hover:bg-emerald-700 text-xs font-bold text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
               >
                 <span>使用此种子重绘</span>
               </button>
@@ -162,7 +156,7 @@
 
             <button 
               @click="downloadCurrentPreview(lastSeed)" 
-              class="px-4 py-2 rounded-xs bg-blue-600 hover:bg-blue-700 active:scale-95 text-xs font-mono font-bold text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+                class="px-4 py-2 rounded-xs bg-blue-600 hover:bg-blue-700 active:scale-95 text-xs font-bold text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
             >
               <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />

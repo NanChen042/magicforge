@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full flex-1 flex flex-row min-h-0 relative overflow-hidden bg-white border-t border-zinc-200">
+  <div class="w-full flex-1 flex flex-row min-h-0 relative overflow-hidden bg-white">
     
     <!-- 左侧会话历史目录 Sidebar -->
     <div 
@@ -85,6 +85,7 @@
         @upload-images="handleUploadImages"
         @remove-image="handleRemoveImage"
         @regenerate="handleRegenerate"
+        @switch-free-model="handleSwitchFreeModel"
       />
     </div>
 
@@ -439,6 +440,7 @@ const handleOpenSettings = () => {
   }
 };
 
+
 /**
  * 刷新热门话题（使用 AI 生成）
  */
@@ -651,11 +653,6 @@ const handleSendMessage = async () => {
     return;
   }
 
-  if (!isAuthorizedModel.value) {
-    ElMessage.error('当前模型不在 API Key 的可用列表中，请重新选择模型');
-    return;
-  }
-
   isSending.value = true;
 
   try {
@@ -809,6 +806,20 @@ const handleRegenerate = async () => {
 
   userInput.value = lastUserPrompt;
   await handleSendMessage();
+};
+
+/**
+ * 一键切换为全免费模型并重新发起推演
+ */
+const handleSwitchFreeModel = async () => {
+  const freeModel = 'deepseek-ai/DeepSeek-R1-Distill-Qwen-7B';
+  modelName.value = freeModel;
+  apiStore.setModelName(freeModel);
+  ElMessage({
+    type: 'success',
+    message: `已切换为全免费模型：DeepSeek R1 (Distill 7B)，正在重新请求...`
+  });
+  await handleRegenerate();
 };
 </script>
 

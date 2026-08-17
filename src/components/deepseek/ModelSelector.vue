@@ -1,5 +1,5 @@
 <template>
-  <div class="relative inline-block text-left" ref="selectorRef">
+  <div class="relative inline-block text-left" ref="selectorRef" :class="{ 'z-50': isOpen }">
     <!-- Trigger Button -->
     <button
       @click="isOpen = !isOpen"
@@ -64,7 +64,8 @@
     >
       <div
         v-if="isOpen"
-        class="absolute left-0 mt-2 w-[340px] sm:w-[460px] bg-white rounded-xl shadow-2xl border border-slate-200/90 z-50 overflow-hidden flex flex-col text-slate-800"
+        class="absolute mt-2 w-[340px] sm:w-[460px] bg-white rounded-xl shadow-2xl border border-slate-200/90 z-50 overflow-hidden flex flex-col text-slate-800"
+        :class="placement === 'right' ? 'right-0' : 'left-0'"
         style="max-height: 520px;"
       >
         <!-- Header: Search & Refresh -->
@@ -272,12 +273,18 @@ import {
   type ModelType 
 } from '@/constants/modelConfig';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   modelValue: string;
-  availableModels: SiliconFlowModel[];
+  availableModels?: SiliconFlowModel[];
   loading?: boolean;
   error?: string;
-}>();
+  placement?: 'left' | 'right';
+}>(), {
+  availableModels: () => [],
+  loading: false,
+  error: '',
+  placement: 'left'
+});
 
 const emit = defineEmits<{
   'update:modelValue': [modelId: string];

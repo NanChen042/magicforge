@@ -1,6 +1,6 @@
 <template>
   <!-- Form Deck: MagicForge High-End Generative Studio Control Panel -->
-  <div class="flex flex-col w-full h-full bg-white font-sans text-zinc-800 relative select-none">
+  <div class="flex flex-col w-full h-full bg-white font-sans text-zinc-800 relative">
 
     <!-- 1. Form Header -->
     <div class="shrink-0 h-14 flex items-center justify-between px-5 border-b border-zinc-100 bg-white">
@@ -16,7 +16,7 @@
           <h2 class="text-xs font-bold text-zinc-900 tracking-wider">
             生成参数配置
           </h2>
-          <p class="text-[10px] font-mono text-zinc-400">
+          <p class="text-[10px] text-zinc-400">
             控制引擎与渲染属性
           </p>
         </div>
@@ -25,9 +25,9 @@
       <!-- Quick Randomize Seed Button -->
       <button 
         type="button"
-        class="px-2 py-1 rounded-xs border border-zinc-200 text-zinc-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50/50 text-[11px] font-mono transition-all cursor-pointer shadow-2xs flex items-center gap-1"
+        class="px-2 py-1 rounded-xs border border-zinc-200 text-zinc-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50/50 text-[11px] transition-all cursor-pointer shadow-2xs flex items-center gap-1"
         title="随机生成 Seed 种子"
-        @click="$emit('randomize-seed')"
+        @click="$emit('randomizeSeed')"
       >
         <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="23 4 23 10 17 10"></polyline>
@@ -47,7 +47,7 @@
           <label class="text-xs font-bold text-zinc-700 tracking-wider">
             图像生成引擎
           </label>
-          <span v-if="imageModels.length" class="font-mono text-[10px] text-zinc-400">
+          <span v-if="imageModels.length" class="text-[10px] text-zinc-400">
             {{ imageModels.length }} 个在线
           </span>
         </div>
@@ -74,7 +74,7 @@
 
           <!-- Prompt Template Dropdown -->
           <el-dropdown trigger="click" @command="applyTemplate">
-            <span class="text-[11px] font-mono text-blue-600 bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded-xs border border-blue-200/60 cursor-pointer transition-colors flex items-center gap-1">
+          <span class="text-[11px] text-blue-600 bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded-xs border border-blue-200/60 cursor-pointer transition-colors flex items-center gap-1">
               <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
               </svg>
@@ -95,7 +95,7 @@
             v-model="formData.prompt"
             rows="3"
             placeholder="描述您想生成的画面细节，例如：未来东方赛博朋克都市的高空浮空车流，4k超清，电影级光影..."
-            class="w-full resize-none rounded-xs border border-zinc-200 bg-zinc-50/50 p-3 text-xs leading-relaxed text-zinc-800 placeholder-zinc-400 shadow-2xs outline-none transition-all hover:border-zinc-300 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 custom-scrollbar"
+            class="w-full resize-none rounded-xs border border-zinc-200 bg-zinc-50/50 p-3 text-xs leading-relaxed text-zinc-800 placeholder-zinc-400 shadow-2xs outline-none transition-all hover:border-zinc-300 focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500/15 custom-scrollbar"
             @keydown.ctrl.enter="$emit('generate')"
           ></textarea>
         </div>
@@ -107,7 +107,7 @@
             :key="tag.label"
             type="button"
             @click="appendTag(tag.suffix)"
-            class="px-2 py-0.5 rounded-2xs text-[10px] font-mono bg-zinc-100 hover:bg-blue-50 text-zinc-600 hover:text-blue-600 border border-zinc-200/80 transition-colors cursor-pointer"
+            class="px-2 py-0.5 rounded-2xs text-[10px] bg-zinc-100 hover:bg-blue-50 text-zinc-600 hover:text-blue-600 border border-zinc-200/80 transition-colors cursor-pointer"
           >
             + {{ tag.label }}
           </button>
@@ -127,7 +127,7 @@
               </svg>
               <span>排除元素 (反向提示词)</span>
             </div>
-            <span class="text-[10px] text-zinc-400 font-mono">{{ showNegative ? '▲ 收起' : '▼ 展开' }}</span>
+            <span class="text-[10px] text-zinc-400">{{ showNegative ? '▲ 收起' : '▼ 展开' }}</span>
           </div>
 
           <div v-show="showNegative" class="pt-2">
@@ -135,7 +135,7 @@
               v-model="formData.negative_prompt"
               rows="2"
               placeholder="不需要出现的元素，如：模糊、低分辨率、畸变、多余肢体..."
-              class="w-full resize-none rounded-xs border border-zinc-200 bg-white p-2 text-xs text-zinc-800 placeholder-zinc-400 shadow-2xs outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10"
+              class="w-full resize-none rounded-xs border border-zinc-200 bg-white p-2 text-xs text-zinc-800 placeholder-zinc-400 shadow-2xs outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/15"
             ></textarea>
           </div>
         </div>
@@ -147,7 +147,7 @@
           <label class="text-xs font-bold text-zinc-700 tracking-wider">
             画幅比例
           </label>
-          <span class="text-[10px] text-blue-600 font-bold font-mono">{{ formData.image_size }}</span>
+          <span class="text-[10px] text-blue-600 font-bold tabular-nums">{{ formData.image_size }}</span>
         </div>
 
         <div class="grid grid-cols-3 gap-2">
@@ -172,7 +172,7 @@
               ></div>
             </div>
 
-            <span class="text-[11px] font-bold font-mono leading-tight">{{ value.label }}</span>
+            <span class="text-[11px] font-bold leading-tight">{{ value.label }}</span>
             <span class="text-[9px] text-zinc-400 leading-none truncate max-w-full">{{ value.desc }}</span>
           </button>
         </div>
@@ -184,7 +184,7 @@
           <label class="text-xs font-bold text-zinc-700 tracking-wider">
             单次生成张数
           </label>
-          <span class="text-[11px] text-blue-600 font-bold font-mono">并行生成 {{ formData.batch_size || 1 }} 张</span>
+          <span class="text-[11px] text-blue-600 font-bold">并行生成 {{ formData.batch_size || 1 }} 张</span>
         </div>
 
         <div class="grid grid-cols-4 gap-2">
@@ -193,7 +193,7 @@
             :key="num"
             type="button"
             @click="formData.batch_size = num"
-            class="py-2 px-3 rounded-xs border text-xs font-mono font-bold transition-all cursor-pointer flex items-center justify-center gap-1"
+            class="py-2 px-3 rounded-xs border text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1"
             :class="[
               (formData.batch_size || 1) === num 
                 ? 'bg-blue-600 border-blue-600 text-white shadow-2xs' 
@@ -214,7 +214,7 @@
           <span class="font-bold tracking-wider">
             高级微调参数
           </span>
-          <span class="text-[10px] text-zinc-400 font-mono">{{ showAdvanced ? '▲ 收起' : '▼ 展开' }}</span>
+          <span class="text-[10px] text-zinc-400">{{ showAdvanced ? '▲ 收起' : '▼ 展开' }}</span>
         </div>
 
         <div v-show="showAdvanced" class="space-y-3 pt-1">
@@ -264,7 +264,7 @@
               type="number"
               v-model.number="formData.seed"
               placeholder="例如 12345678"
-              class="w-full rounded-xs border border-zinc-200 bg-white px-3 py-1.5 text-xs font-mono text-zinc-800 placeholder-zinc-400 shadow-2xs outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10"
+              class="w-full rounded-xs border border-zinc-200 bg-white px-3 py-1.5 text-xs font-mono text-zinc-800 placeholder-zinc-400 shadow-2xs outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/15"
             />
           </div>
         </div>
@@ -291,7 +291,7 @@
           <span>开始生成图像</span>
         </span>
       </button>
-      <div class="text-[10px] font-mono text-zinc-400 text-center mt-1.5">
+      <div class="text-[10px] text-zinc-400 text-center mt-1.5">
         提示：输入提示词后可按 [Ctrl + Enter] 快速生图
       </div>
     </div>

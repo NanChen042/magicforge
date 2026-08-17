@@ -135,7 +135,13 @@
             <p class="text-xs font-semibold text-zinc-800">流式打字机输出</p>
             <p class="text-[11px] text-zinc-400 mt-0.5">逐字流式返回 AI 思考与文本回答</p>
           </div>
-          <el-switch :model-value="streaming" @change="$emit('update:streaming', $event)" />
+          <el-switch 
+            class="app-switch" 
+            :model-value="streaming" 
+            active-color="#2563eb"
+            style="--el-switch-on-color: #2563eb;"
+            @change="$emit('update:streaming', $event)" 
+          />
         </div>
 
         <!-- Temperature Slider -->
@@ -213,6 +219,14 @@
           </svg>
         </button>
 
+        <Transition
+          enter-active-class="overflow-hidden transition-all duration-200 ease-out"
+          enter-from-class="max-h-0 opacity-0 -translate-y-1"
+          enter-to-class="max-h-[900px] opacity-100 translate-y-0"
+          leave-active-class="overflow-hidden transition-all duration-150 ease-in"
+          leave-from-class="max-h-[900px] opacity-100 translate-y-0"
+          leave-to-class="max-h-0 opacity-0 -translate-y-1"
+        >
         <div v-if="showAdvancedParams" class="mt-3 space-y-3.5 bg-zinc-50/60 p-3 rounded-md border border-zinc-100">
           <p v-if="currentCapabilities.temperature && currentCapabilities.topP" class="text-[11px] leading-relaxed text-zinc-500">
             💡 建议优先调节 Temperature 或 Top P 其中一项，避免采样叠加产生不可控偏差。
@@ -292,6 +306,7 @@
           </div>
 
         </div>
+        </Transition>
       </section>
 
     </div>
@@ -385,5 +400,10 @@ const systemPresets = [
   border: 2.5px solid #ffffff;
   box-shadow: 0 1px 3px rgba(37, 99, 235, 0.35);
   cursor: pointer;
+}
+
+:deep(.el-switch.is-checked .el-switch__core) {
+  background-color: #2563eb !important;
+  border-color: #2563eb !important;
 }
 </style>

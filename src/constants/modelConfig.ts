@@ -240,8 +240,11 @@ export function getModelCapabilities(modelId: string) {
  * 判断模型是否支持思考过程
  */
 export function isReasoningModel(modelId: string): boolean {
+  if (!modelId) return false;
   const config = getModelConfig(modelId);
-  return config?.type === 'reasoning';
+  if (config) return config.type === 'reasoning';
+  const lower = modelId.toLowerCase();
+  return lower.includes('r1') || lower.includes('reasoner') || lower.includes('qwq') || lower.includes('deepseek-r1') || lower.includes('thinking');
 }
 
 /**

@@ -84,6 +84,17 @@ export class DeepseekClient {
     this.presencePenalty = options.presencePenalty;
   }
 
+  private ensureCorrectApiUrl(url: string): string {
+    if (!url) return '';
+    // 如果 URL 已经包含 /chat/completions，直接返回
+    if (url.includes('/chat/completions')) {
+      return url;
+    }
+    // 处理末尾斜杠
+    const cleanUrl = url.endsWith('/') ? url.slice(0, -1) : url;
+    return `${cleanUrl}/chat/completions`;
+  }
+
   /**
    * 使用OpenAI API格式创建聊天完成
    */
@@ -93,11 +104,8 @@ export class DeepseekClient {
     [key: string]: unknown;
   }): Promise<any> {
     try {
-      // 确保API地址格式正确
       const apiURL = this.ensureCorrectApiUrl(this.baseURL);
-
-      // 构建请求体
-      const { messages, stream = false, signal: _signal, ...requestOptions } = params;
+      const { messages, stream = false, ...requestOptions } = params;
       const requestBody: Record<string, any> = {
         model: this.model,
         messages,
@@ -107,20 +115,10 @@ export class DeepseekClient {
         ...requestOptions
       };
 
-      // 添加可选参数（只有当值有效时才添加）
-      if (this.topP !== undefined) {
-        requestBody.top_p = this.topP;
-      }
-      if (this.topK !== undefined) {
-        // SiliconFlow accepts -1 (disabled) or an integer from 1 to 100.
-        requestBody.top_k = this.topK >= 1 && this.topK <= 100 ? Math.round(this.topK) : -1;
-      }
-      if (this.frequencyPenalty !== undefined) {
-        requestBody.frequency_penalty = this.frequencyPenalty;
-      }
-      if (this.presencePenalty !== undefined) {
-        requestBody.presence_penalty = this.presencePenalty;
-      }
+      if (this.topP !== undefined) requestBody.top_p = this.topP;
+      if (this.topK !== undefined) requestBody.top_k = this.topK >= 1 && this.topK <= 100 ? Math.round(this.topK) : -1;
+      if (this.frequencyPenalty !== undefined) requestBody.frequency_penalty = this.frequencyPenalty;
+      if (this.presencePenalty !== undefined) requestBody.presence_penalty = this.presencePenalty;
 
       const response = await fetch(apiURL, {
         method: 'POST',
@@ -134,18 +132,10 @@ export class DeepseekClient {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        throw new Error(
-          `API请求失败: ${response.status} ${response.statusText}\n${
-            errorData ? JSON.stringify(errorData) : ''
-          }`
-        );
+        throw new Error(`API请求失败: ${response.status} ${response.statusText}\n${errorData ? JSON.stringify(errorData) : ''}`);
       }
 
-      if (params.stream) {
-        return this.handleStream(response);
-      } else {
-        return response.json();
-      }
+      return params.stream ? this.handleStream(response) : response.json();
     } catch (error) {
       console.error('API请求失败:', error);
       throw error;
@@ -184,159 +174,86 @@ export class DeepseekClient {
   }
 
   /**
-   * 确保API地址正确包含/chat/completions
-   */
-  private ensureCorrectApiUrl(url: string): string {
-    if (url.includes('/chat/completions')) {
-      return url;
-    }
-
-    // 移除末尾斜杠
-    const baseUrl = url.endsWith('/') ? url.slice(0, -1) : url;
-    return `${baseUrl}/chat/completions`;
-  }
-
-  /**
-   * 处理流式响应
-   * 支持多种 SSE 格式：
-   * 1. 标准格式：每个 data: 后跟换行
-   * 2. 紧凑格式：多个 data: 连在一起无换行
+   * 处理流式响应 (标准 Server-Sent Events 流式解析)
    */
   private async handleStream(response: Response): Promise<AsyncIterable<any>> {
-    // 自定义异步迭代器来处理流式响应
-    const iterator = {
+    const reader = response.body!.getReader();
+    const decoder = new TextDecoder();
+
+    return {
       [Symbol.asyncIterator]() {
-        const reader = response.body!.getReader();
-        const decoder = new TextDecoder();
         let buffer = '';
-        // 用于存储已解析但未返回的数据块
-        const pendingChunks: any[] = [];
-
-        /**
-         * 从缓冲区解析所有完整的 SSE 数据块
-         * 支持 "data: {...}data: {...}" 这种无换行的紧凑格式
-         */
-        const parseBuffer = (): { chunks: any[]; isDone: boolean } => {
-          const chunks: any[] = [];
-          let isDone = false;
-
-          // 方法1: 先尝试按换行分割（标准 SSE 格式）
-          // 方法2: 同时处理 "data:" 作为分隔符的情况（紧凑格式）
-          
-          // 使用正则匹配所有 data: 开头的数据块
-          // 匹配 "data: " 后面跟着 JSON 对象或 [DONE]
-          const dataPattern = /data:\s*(\[DONE\]|\{[^]*?\})(?=\s*(?:data:|$))/g;
-          let match;
-          let lastIndex = 0;
-
-          while ((match = dataPattern.exec(buffer)) !== null) {
-            const content = match[1].trim();
-            lastIndex = dataPattern.lastIndex;
-
-            if (content === '[DONE]') {
-              isDone = true;
-              break;
-            }
-
-            try {
-              const data = JSON.parse(content);
-              chunks.push(data);
-            } catch (e) {
-              // JSON 解析失败，可能是不完整的数据，跳过
-              console.warn('SSE JSON 解析失败，可能是不完整数据:', content.substring(0, 100));
-            }
-          }
-
-          // 更新缓冲区，保留未处理的部分
-          if (lastIndex > 0) {
-            buffer = buffer.substring(lastIndex);
-          }
-
-          return { chunks, isDone };
-        };
+        let isDone = false;
+        const pendingQueue: any[] = [];
 
         return {
           async next(): Promise<IteratorResult<any>> {
-            try {
-              // 先检查是否有待返回的数据块
-              if (pendingChunks.length > 0) {
-                return { value: pendingChunks.shift(), done: false };
-              }
-
+            while (pendingQueue.length === 0 && !isDone) {
               const { done, value } = await reader.read();
-
               if (done) {
-                // 处理缓冲区中剩余的数据
-                if (buffer.trim().length > 0) {
-                  const { chunks, isDone } = parseBuffer();
-                  if (chunks.length > 0) {
-                    pendingChunks.push(...chunks.slice(1));
-                    return { value: chunks[0], done: false };
+                isDone = true;
+                if (buffer.trim()) {
+                  const trimmed = buffer.trim();
+                  if (trimmed.startsWith('data:')) {
+                    const jsonStr = trimmed.replace(/^data:\s*/, '');
+                    if (jsonStr !== '[DONE]') {
+                      try {
+                        pendingQueue.push(JSON.parse(jsonStr));
+                      } catch {}
+                    }
                   }
                 }
-                return { done: true, value: undefined };
+                break;
               }
 
-              // 将新的数据块添加到缓冲区
               buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split(/\r?\n/);
+              buffer = lines.pop() || '';
 
-              // 解析缓冲区
-              const { chunks, isDone } = parseBuffer();
-
-              if (isDone) {
-                return { done: true, value: undefined };
+              for (const line of lines) {
+                const trimmed = line.trim();
+                if (!trimmed || trimmed.startsWith(':')) continue;
+                if (trimmed === 'data: [DONE]' || trimmed === 'data:[DONE]') {
+                  isDone = true;
+                  break;
+                }
+                if (trimmed.startsWith('data:')) {
+                  const jsonStr = trimmed.replace(/^data:\s*/, '');
+                  try {
+                    const data = JSON.parse(jsonStr);
+                    pendingQueue.push(data);
+                  } catch {
+                    const parts = jsonStr.split(/(?=data:\s*)/);
+                    for (const p of parts) {
+                      const cleanP = p.replace(/^data:\s*/, '').trim();
+                      if (cleanP && cleanP !== '[DONE]') {
+                        try {
+                          pendingQueue.push(JSON.parse(cleanP));
+                        } catch {}
+                      }
+                    }
+                  }
+                }
               }
-
-              if (chunks.length > 0) {
-                // 将多余的块存入待处理队列
-                pendingChunks.push(...chunks.slice(1));
-                return { value: chunks[0], done: false };
-              }
-
-              // 如果没有找到有效的数据块，继续读取
-              return this.next();
-            } catch (error) {
-              console.error('流式处理出错', error);
-              return { done: true, value: undefined };
             }
+
+            if (pendingQueue.length > 0) {
+              return { value: pendingQueue.shift(), done: false };
+            }
+
+            return { done: true, value: undefined };
           },
 
           async return(): Promise<IteratorResult<any>> {
-            // 清理资源
-            await reader.cancel();
+            try {
+              await reader.cancel();
+            } catch {}
             return { done: true, value: undefined };
           }
         };
       }
     };
-
-    return iterator;
   }
-
-  /**
-   * 创建流式响应（兼容旧代码）
-   */
-  private async createStreamingResponse(url: string, body: any): Promise<AsyncIterable<any>> {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.apiKey}`
-      },
-      body: JSON.stringify(body)
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`API请求失败: ${response.status} - ${errorText}`);
-    }
-
-    return this.handleStream(response);
-  }
-
-  /**
-   * 生成初始场景
-   */
   async generateInitialScene(): Promise<GameScene> {
     const sceneType = this.sceneTypes[Math.floor(Math.random() * this.sceneTypes.length)];
     const specialEvent = Math.random() > 0.7 ? this.specialEvents[Math.floor(Math.random() * this.specialEvents.length)] : undefined;

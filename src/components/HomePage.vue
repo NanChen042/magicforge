@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#F8FAFC] selection:bg-indigo-500/30 text-slate-800 font-sans w-full">
+  <div class="min-h-screen bg-white selection:bg-indigo-500/30 text-slate-800 font-sans w-full">
     <!-- 1. 全宽首屏 Hero 区域 (背景 100% 视口满屏无缝铺满，文字居中) -->
     <HeroSection />
 

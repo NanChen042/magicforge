@@ -1,21 +1,21 @@
 <template>
   <!-- 5. 代码展示：开发者工坊 IDE (现代化多 Tab 交互、专业高对比度语法高亮与一键复制) -->
-  <section class="max-w-5xl mx-auto pt-8 pb-20 px-4 sm:px-6 relative z-20 font-sans select-none">
+  <section class="max-w-5xl mx-auto pt-12 pb-16 sm:pt-16 sm:pb-24 px-3.5 sm:px-6 relative z-20 font-sans select-none">
     
     <!-- 标题区 (告别断头标签，极简高端层次) -->
-    <div class="text-center mb-10 space-y-2.5">
+    <div class="text-center mb-8 sm:mb-10 space-y-2.5">
       <div class="text-xs font-bold text-blue-600 uppercase tracking-widest font-mono">
         DEVELOPER EXPERIENCE
       </div>
 
-      <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+      <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
         几行代码，接入
         <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-sky-600 to-indigo-600">
           全栈 AI 能力
         </span>
       </h2>
 
-      <p class="text-slate-500 text-sm sm:text-base max-w-xl mx-auto font-normal leading-relaxed">
+      <p class="text-slate-500 text-xs sm:text-base max-w-xl mx-auto font-normal leading-relaxed">
         从流式对话到多模态理解，API 设计遵循直觉，让你专注于产品而非基础设施。
       </p>
     </div>
@@ -29,29 +29,51 @@
       <!-- IDE 核心窗口 (现代化深色暗调) -->
       <div class="bg-[#090d16] rounded-xl shadow-2xl shadow-slate-950/40 overflow-hidden border border-slate-800/90">
 
-        <!-- 模拟 IDE 顶部导航栏与 Tab 切换 -->
-        <div class="flex flex-wrap items-center justify-between px-4 py-3 bg-[#0d1322] border-b border-slate-800/80 gap-3">
+        <!-- 模拟 IDE 顶部导航栏与 Tab 切换 (移动端自适应两行排版，桌面端优雅单行并列) -->
+        <div class="px-3 sm:px-4 py-2.5 sm:py-3 bg-[#0d1322] border-b border-slate-800/80 space-y-2.5 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:gap-3">
           
-          <!-- 左侧：Mac 圆点 + 文件名标签 -->
-          <div class="flex items-center gap-3">
-            <div class="flex items-center gap-1.5">
-              <div class="w-3 h-3 rounded-full bg-[#ff5f56] border border-[#e0443e]/50"></div>
-              <div class="w-3 h-3 rounded-full bg-[#ffbd2e] border border-[#dea123]/50"></div>
-              <div class="w-3 h-3 rounded-full bg-[#27c93f] border border-[#1aab29]/50"></div>
+          <!-- 第一行（移动端左右对齐）：Mac 圆点 + 文件名标签 + 移动端复制按钮 -->
+          <div class="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
+            <div class="flex items-center gap-2 sm:gap-3">
+              <div class="flex items-center gap-1.5">
+                <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#ff5f56] border border-[#e0443e]/50"></div>
+                <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#ffbd2e] border border-[#dea123]/50"></div>
+                <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#27c93f] border border-[#1aab29]/50"></div>
+              </div>
+              <div class="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-slate-900/90 border border-slate-800 text-[11px] sm:text-xs font-mono text-slate-300">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                <span>{{ activeSnippet.filename }}</span>
+              </div>
             </div>
-            <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-slate-900/80 border border-slate-800 text-xs font-mono text-slate-300">
-              <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
-              <span>{{ activeSnippet.filename }}</span>
-            </div>
+
+            <!-- 移动端右上角复制代码按钮 -->
+            <button
+              @click="copyCode"
+              class="sm:hidden px-2.5 py-1 rounded-md bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white border border-slate-700/80 text-[11px] font-mono transition-all flex items-center gap-1 cursor-pointer shadow-xs shrink-0 select-none"
+            >
+              <template v-if="copied">
+                <svg class="w-3 h-3 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span class="text-emerald-400 font-medium">已复制</span>
+              </template>
+              <template v-else>
+                <svg class="w-3 h-3 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <span>复制</span>
+              </template>
+            </button>
           </div>
 
-          <!-- 中间：4 个功能 Tab 切换 (纯矢量 SVG 图标，无雷霆/Emoji) -->
-          <div class="flex items-center gap-1 bg-slate-950/90 p-1 rounded-lg border border-slate-800 text-xs font-mono">
+          <!-- 第二行（移动端横向无阻滑动，绝不被压成坚排文字）：4 个功能 Tab 切换 -->
+          <div class="overflow-x-auto custom-scrollbar flex items-center gap-1 bg-slate-950/90 p-1 rounded-lg border border-slate-800 text-xs font-mono w-full sm:w-auto">
             <button
               v-for="item in snippets"
               :key="item.id"
               @click="activeTab = item.id"
-              class="px-3 py-1.5 rounded-md transition-all cursor-pointer flex items-center gap-1.5"
+              class="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-md transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap shrink-0 select-none"
               :class="activeTab === item.id 
                 ? 'bg-blue-600 text-white font-medium shadow-xs' 
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'"
@@ -62,10 +84,10 @@
             </button>
           </div>
 
-          <!-- 右侧：一键复制代码 -->
+          <!-- 桌面端最右侧：一键复制代码 -->
           <button
             @click="copyCode"
-            class="px-3 py-1.5 rounded-md bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white border border-slate-700/80 text-xs font-mono transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+            class="hidden sm:flex px-3 py-1.5 rounded-md bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white border border-slate-700/80 text-xs font-mono transition-all items-center gap-1.5 cursor-pointer shadow-xs select-none"
           >
             <template v-if="copied">
               <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -85,24 +107,24 @@
         </div>
 
         <!-- 代码编辑器内容区 (基于 highlight.js 真实高亮，带精确行号与舒适行高) -->
-        <div class="p-4 sm:p-6 overflow-x-auto custom-scrollbar font-mono text-[13px] leading-6 text-slate-300 bg-[#060911]">
-          <pre class="font-mono m-0 p-0"><code class="grid grid-cols-[auto_1fr] gap-x-4"><template v-for="(line, idx) in formattedLines" :key="idx"><span class="text-slate-600 select-none text-right font-mono pr-3 border-r border-slate-800/80">{{ idx + 1 }}</span><span class="code-line pl-2" v-html="line || '&nbsp;'"></span></template></code></pre>
+        <div class="p-3 sm:p-6 overflow-x-auto custom-scrollbar font-mono text-[12px] sm:text-[13px] leading-5 sm:leading-6 text-slate-300 bg-[#060911]">
+          <pre class="font-mono m-0 p-0"><code class="grid grid-cols-[auto_1fr] gap-x-3 sm:gap-x-4"><template v-for="(line, idx) in formattedLines" :key="idx"><span class="text-slate-600 select-none text-right font-mono pr-2 sm:pr-3 border-r border-slate-800/80">{{ idx + 1 }}</span><span class="code-line pl-2 whitespace-pre" v-html="line || '&nbsp;'"></span></template></code></pre>
         </div>
 
         <!-- IDE 底部状态栏 -->
-        <div class="px-4 py-2 bg-[#090d16] border-t border-slate-800/80 flex items-center justify-between text-[11px] font-mono text-slate-500">
-          <div class="flex items-center gap-3">
+        <div class="px-3 sm:px-4 py-2 bg-[#090d16] border-t border-slate-800/80 flex items-center justify-between text-[10px] sm:text-[11px] font-mono text-slate-500">
+          <div class="flex items-center gap-2 sm:gap-3">
             <span class="flex items-center gap-1.5 text-emerald-400 font-medium">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
               TypeScript 5.0
             </span>
+            <span class="text-slate-700">|</span>
+            <span>UTF-8</span>
             <span class="hidden sm:inline text-slate-700">|</span>
-            <span class="hidden sm:inline">UTF-8</span>
-            <span class="hidden sm:inline text-slate-700">|</span>
-            <span>LF</span>
+            <span class="hidden sm:inline">LF</span>
           </div>
           <div class="flex items-center gap-2">
-            <span class="text-slate-400">MagicForge SDK v3.0</span>
+            <span class="text-slate-400">MagicForge SDK</span>
           </div>
         </div>
 

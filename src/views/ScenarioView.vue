@@ -2,7 +2,7 @@
   <!-- Modern Light AVG Adventure: 第13号列车 · 轮回观测 (Cinematic CG Backdrops, Script Workshop, Codex & Auto/Skip Engine) -->
   <div 
     ref="containerRef"
-    class="relative w-full h-[calc(100vh-60px)] min-h-[720px] overflow-hidden bg-[#f8fafc] font-sans select-none text-zinc-800"
+    class="relative h-full min-h-0 w-full overflow-hidden bg-white font-sans select-none text-zinc-800"
     @mousemove="handleMouseMove"
     @mouseleave="handleMouseLeave"
     tabindex="0"
@@ -19,8 +19,6 @@
 
       <!-- Background Ambient Atmosphere & Precision Grid -->
       <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[85vw] max-w-5xl h-[380px] bg-gradient-to-b from-blue-100/40 via-sky-50/20 to-transparent rounded-full blur-3xl opacity-70"></div>
-        <div class="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:28px_28px] opacity-40"></div>
       </div>
 
       <!-- Top Header Brand & Actions -->
@@ -69,7 +67,7 @@
             <span>第13号近地轨道实验舱 · 轮回观测器</span>
           </div>
 
-          <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-zinc-900 drop-shadow-sm font-sans">
+          <h1 class="scenario-title text-4xl sm:text-6xl font-black tracking-tight text-zinc-900 font-sans">
             第<span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-sky-600 to-cyan-500">13</span>号列车
           </h1>
 
@@ -188,22 +186,22 @@
       </transition>
 
       <!-- TOP HUD STATUS BAR -->
-      <header class="relative z-20 p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4 pointer-events-auto border-b border-zinc-200 bg-white/90 backdrop-blur-md shadow-2xs">
+      <header class="relative z-20 px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3 pointer-events-auto border-b border-zinc-200/80 bg-white/90 backdrop-blur-md shadow-xs">
         
         <!-- Left: Mission & Loop Telemetry -->
         <div class="flex items-center gap-3">
-          <div class="w-2 h-7 bg-blue-600 rounded-2xs shadow-xs"></div>
+          <div class="w-1.5 h-8 bg-blue-600 rounded-full shadow-xs"></div>
           <div>
             <div class="flex items-center gap-2">
-              <h2 class="text-sm font-bold text-zinc-900 tracking-wider">第13号列车</h2>
-              <span class="px-1.5 py-0.2 rounded-2xs bg-blue-50 border border-blue-200 text-blue-700 text-[10px] font-mono font-bold">
+              <h2 class="text-sm font-bold text-zinc-900 tracking-wide">第13号列车</h2>
+              <span class="px-2 py-0.5 rounded-full bg-blue-50 border border-blue-200/70 text-blue-700 text-[10px] font-mono font-bold">
                 探索推演中
               </span>
             </div>
             <div class="flex items-center gap-2 text-[11px] text-zinc-400 font-mono mt-0.5">
               <span>时间循环: 第 {{ loopCount }} 轮</span>
-              <span>|</span>
-              <span>场景代号: {{ currentSceneId }}</span>
+              <span>·</span>
+              <span>场景: {{ currentSceneId }}</span>
             </div>
           </div>
         </div>
@@ -212,15 +210,15 @@
         <div class="flex items-center gap-2.5">
           
           <!-- 5 Memory Shards Matrix -->
-          <div class="flex items-center gap-1.5 bg-zinc-50 px-3 py-1.5 rounded-xs border border-zinc-200 shadow-2xs">
-            <span class="text-[10px] font-mono text-zinc-500 mr-1 hidden sm:inline font-bold">线索碎片:</span>
+          <div class="flex items-center gap-1.5 bg-zinc-100/90 px-3 py-1 rounded-full border border-zinc-200/70 shadow-2xs">
+            <span class="text-[10px] font-mono text-zinc-500 mr-0.5 hidden sm:inline font-bold">线索碎片:</span>
             <div 
               v-for="frag in allFragments" 
               :key="frag.id"
-              class="w-6 h-6 rounded-2xs flex items-center justify-center text-[10px] font-mono transition-all"
+              class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-mono transition-all select-none"
               :class="hasFragment(frag.id) 
                 ? 'bg-blue-600 text-white font-bold shadow-xs' 
-                : 'bg-white text-zinc-300 border border-zinc-200'"
+                : 'bg-white text-zinc-300 border border-zinc-200/80'"
               :title="hasFragment(frag.id) ? frag.name : '未解锁'"
             >
               {{ hasFragment(frag.id) ? '◆' : '◇' }}
@@ -230,7 +228,7 @@
           <!-- Flowchart Visualizer Drawer Trigger -->
           <button 
             @click.stop="showFlowDrawer = true; playClickSfx()"
-            class="px-3 py-1.5 rounded-xs bg-white hover:bg-zinc-50 text-zinc-700 text-xs font-mono font-semibold transition-colors flex items-center gap-1.5 cursor-pointer border border-zinc-200 shadow-2xs"
+            class="px-3 py-1.5 rounded-lg bg-white hover:bg-zinc-50 text-zinc-700 text-xs font-mono font-semibold transition-all flex items-center gap-1.5 cursor-pointer border border-zinc-200/80 hover:border-zinc-300 shadow-2xs select-none"
             title="查看剧情分支图谱"
           >
             <svg class="w-3.5 h-3.5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -246,7 +244,7 @@
           <!-- Backlog History Trigger -->
           <button 
             @click.stop="showHistoryDrawer = true; playClickSfx()"
-            class="px-3 py-1.5 rounded-xs bg-white hover:bg-zinc-50 text-zinc-700 text-xs font-mono font-semibold transition-colors flex items-center gap-1.5 cursor-pointer border border-zinc-200 shadow-2xs"
+            class="px-3 py-1.5 rounded-lg bg-white hover:bg-zinc-50 text-zinc-700 text-xs font-mono font-semibold transition-all flex items-center gap-1.5 cursor-pointer border border-zinc-200/80 hover:border-zinc-300 shadow-2xs select-none"
             title="查看剧情对话回溯"
           >
             <svg class="w-3.5 h-3.5 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -258,7 +256,7 @@
           <!-- Return to Cover Settings -->
           <button 
             @click.stop="gameStarted = false; playClickSfx()"
-            class="px-3 py-1.5 rounded-xs bg-white hover:bg-zinc-50 text-zinc-700 text-xs font-mono font-semibold transition-colors flex items-center gap-1 cursor-pointer border border-zinc-200 shadow-2xs"
+            class="px-3 py-1.5 rounded-lg bg-white hover:bg-zinc-50 text-zinc-700 text-xs font-mono font-semibold transition-all flex items-center gap-1 cursor-pointer border border-zinc-200/80 hover:border-zinc-300 shadow-2xs select-none"
           >
             <svg class="w-3.5 h-3.5 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M18 15l-6-6-6 6"/>
@@ -273,7 +271,7 @@
       <button 
         v-if="hideUi" 
         @click.stop="hideUi = false; playClickSfx()" 
-        class="absolute bottom-6 right-6 z-50 px-4 py-2 rounded-xs bg-white/90 backdrop-blur-md border border-blue-500 text-blue-600 text-xs font-mono font-bold shadow-xl flex items-center gap-2 cursor-pointer animate-pulse hover:bg-white"
+        class="absolute bottom-6 right-6 z-50 px-4 py-2 rounded-xl bg-white/90 backdrop-blur-md border border-blue-500 text-blue-600 text-xs font-mono font-bold shadow-xl flex items-center gap-2 cursor-pointer animate-pulse hover:bg-white select-none"
       >
         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -288,43 +286,60 @@
         class="relative z-10 flex-1 flex flex-col justify-end p-4 sm:p-8 max-w-5xl mx-auto w-full pointer-events-none pb-6"
       >
 
-        <!-- Character Holographic Standee (Bespoke Vector Avatar Deck) -->
-        <div v-if="currentSceneData?.character" class="relative h-[220px] sm:h-[260px] flex items-end justify-center mb-[-12px] z-10 pointer-events-none">
+        <!-- Character Holographic Standee: ONLY shown when a real NPC is speaking (NOT 旁白 / 广播) -->
+        <div 
+          v-if="currentSceneData?.character && isNpcSpeaker(currentSceneData.speaker)" 
+          class="relative h-[200px] sm:h-[240px] flex items-end justify-center mb-[-16px] z-10 pointer-events-none"
+        >
           <div class="flex flex-col items-center animate-fade-in">
-            <!-- Standee Avatar -->
-            <div class="w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-gradient-to-b from-blue-100 to-sky-50 border-2 border-blue-400 shadow-xl flex items-center justify-center backdrop-blur-md relative overflow-hidden">
-              <!-- Character Hologram Icon -->
-              <component :is="getCharacterIcon(currentSceneData.character)" class="w-14 h-14 sm:w-18 sm:h-18 text-blue-600" />
+            <!-- Standee Hologram Avatar -->
+            <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gradient-to-b from-blue-100/90 via-sky-50/80 to-white/90 border-2 border-blue-400/80 shadow-xl shadow-blue-500/10 flex items-center justify-center backdrop-blur-md relative overflow-hidden ring-4 ring-blue-100/60">
+              <component :is="getCharacterIcon(currentSceneData.character)" class="w-12 h-12 sm:w-16 sm:h-16 text-blue-600" />
             </div>
 
             <!-- Role Badge -->
-            <div class="mt-2 px-3 py-0.5 rounded-full bg-white border border-blue-300 text-blue-800 text-[11px] font-mono font-bold shadow-xs">
-              {{ currentSceneData.speaker || '通讯对端' }}
+            <div class="mt-2 px-3 py-0.5 rounded-full bg-white/95 border border-blue-300 text-blue-800 text-[11px] font-mono font-bold shadow-xs">
+              {{ currentSceneData.speaker }}
             </div>
           </div>
         </div>
 
         <!-- Dialogue Box Card (Visual Novel Dialogue Deck in Clean Light Theme) -->
         <div 
-          class="relative bg-white/95 backdrop-blur-xl border border-zinc-200 rounded-xs p-6 sm:p-8 shadow-xl space-y-4 pointer-events-auto transition-all"
+          class="relative bg-white/95 backdrop-blur-xl border border-zinc-200/90 rounded-2xl p-6 sm:p-7 shadow-2xl space-y-4 pointer-events-auto transition-all"
           :class="{ 'cursor-pointer hover:border-blue-500': canClickNext }"
           @click.stop="handleBoxClick"
         >
           <!-- Speaker Name Plate & AVG Controls Tool bar -->
-          <div class="flex items-center justify-between border-b border-zinc-100 pb-2">
-            <div v-if="currentSceneData?.speaker" class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-              <span class="text-sm font-bold text-zinc-900 font-mono tracking-wider">
-                {{ currentSceneData.speaker }}
-              </span>
+          <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
+            
+            <!-- Speaker Identity Tag -->
+            <div v-if="currentSceneData?.speaker" class="flex items-center gap-2.5">
+              <div 
+                class="w-7 h-7 rounded-lg flex items-center justify-center text-xs shadow-2xs border"
+                :class="getSpeakerAvatarStyle(currentSceneData.speaker)"
+              >
+                <component :is="getCharacterIcon(currentSceneData.character)" class="w-4 h-4" />
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-bold text-zinc-900 tracking-wide font-sans">
+                  {{ currentSceneData.speaker }}
+                </span>
+                <span 
+                  class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold border"
+                  :class="getSpeakerBadgeStyle(currentSceneData.speaker)"
+                >
+                  {{ getSpeakerRoleName(currentSceneData.speaker) }}
+                </span>
+              </div>
             </div>
 
             <!-- AVG Playback Controls: AUTO | SKIP | HIDE -->
-            <div class="flex items-center gap-1.5 ml-auto text-xs font-mono">
+            <div class="inline-flex p-0.5 bg-zinc-100/90 rounded-lg border border-zinc-200/60 text-xs font-mono">
               <button 
                 @click.stop="toggleAutoPlay"
-                class="px-2.5 py-1 rounded-2xs border transition-all flex items-center gap-1 cursor-pointer font-bold"
-                :class="isAutoPlay ? 'bg-emerald-500 text-white border-emerald-600 shadow-2xs' : 'bg-zinc-50 hover:bg-zinc-100 text-zinc-600 border-zinc-200'"
+                class="px-2.5 py-1 rounded-md transition-all flex items-center gap-1.5 cursor-pointer font-bold select-none outline-none focus:outline-none"
+                :class="isAutoPlay ? 'bg-emerald-500 text-white shadow-2xs' : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/50'"
                 title="自动播放 (快捷键 A)"
               >
                 <span class="w-1.5 h-1.5 rounded-full" :class="isAutoPlay ? 'bg-white animate-ping' : 'bg-zinc-400'"></span>
@@ -333,7 +348,7 @@
 
               <button 
                 @click.stop="handleSkip"
-                class="px-2.5 py-1 rounded-2xs border bg-zinc-50 hover:bg-zinc-100 text-zinc-600 border-zinc-200 transition-all cursor-pointer font-bold"
+                class="px-2.5 py-1 rounded-md text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/50 transition-all cursor-pointer font-bold select-none outline-none focus:outline-none"
                 title="跳过/快进文本"
               >
                 <span>SKIP</span>
@@ -341,7 +356,7 @@
 
               <button 
                 @click.stop="hideUi = true; playClickSfx()"
-                class="px-2.5 py-1 rounded-2xs border bg-zinc-50 hover:bg-zinc-100 text-zinc-600 border-zinc-200 transition-all cursor-pointer font-bold"
+                class="px-2.5 py-1 rounded-md text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/50 transition-all cursor-pointer font-bold select-none outline-none focus:outline-none"
                 title="隐藏界面 (快捷键 H)"
               >
                 <span>HIDE</span>
@@ -350,21 +365,24 @@
           </div>
 
           <!-- Main Dialogue / Scene Narration Text -->
-          <div class="text-base sm:text-lg text-zinc-800 leading-relaxed font-medium min-h-[64px]">
+          <div class="text-base sm:text-lg text-zinc-800 leading-relaxed font-sans min-h-[72px] whitespace-pre-wrap select-text">
             <div v-if="isAIGenerating" class="flex items-center gap-2 text-blue-600">
               <div class="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
               <span class="font-mono text-sm">正在实时生成当前时间线剧情...</span>
             </div>
             <template v-else>
-              <span v-html="displayedText"></span>
+              <span>{{ displayedText }}</span>
               <span v-if="isTyping" class="inline-block w-2 h-4.5 ml-1 bg-blue-600 animate-pulse align-middle"></span>
             </template>
           </div>
 
           <!-- Decision Options (When choices available) -->
-          <div v-if="!isTyping && !isLinearScene && currentOptions.length > 0" class="pt-3 space-y-2">
-            <div class="text-[11px] font-bold text-zinc-700 font-mono uppercase tracking-wider mb-1">
-              抉择分支
+          <div v-if="!isTyping && !isLinearScene && currentOptions.length > 0" class="pt-2 space-y-2.5">
+            <div class="text-[11px] font-bold text-zinc-500 font-mono uppercase tracking-wider mb-1 flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+              <span>抉择分支</span>
             </div>
 
             <button
@@ -372,27 +390,27 @@
               :key="index"
               @click.stop="handleSelect(opt)"
               :disabled="opt.locked"
-              class="w-full p-3.5 rounded-xs border text-left transition-all cursor-pointer flex items-center justify-between gap-3 group"
+              class="w-full p-3.5 sm:p-4 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between gap-3 group select-none"
               :class="opt.locked 
                 ? 'bg-zinc-50 border-zinc-200 text-zinc-400 cursor-not-allowed' 
-                : 'bg-white hover:bg-blue-50/40 border-zinc-200 hover:border-blue-600 text-zinc-800 hover:text-blue-900 shadow-2xs hover:shadow-xs'"
+                : 'bg-white hover:bg-blue-50/50 border-zinc-200/80 hover:border-blue-300 text-zinc-800 hover:text-blue-950 shadow-2xs hover:shadow-xs'"
             >
               <div class="flex items-center gap-3">
-                <span class="w-5 h-5 rounded-2xs flex items-center justify-center text-xs font-mono font-bold bg-zinc-100 text-zinc-700 group-hover:bg-blue-600 group-hover:text-white transition-colors border border-zinc-200">
+                <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-mono font-bold bg-zinc-100 text-zinc-700 group-hover:bg-blue-600 group-hover:text-white transition-colors border border-zinc-200/70">
                   0{{ index + 1 }}
                 </span>
                 <span class="text-xs sm:text-sm font-semibold">{{ opt.text }}</span>
               </div>
 
               <!-- Locked Hint -->
-              <span v-if="opt.locked" class="text-[11px] text-rose-500 font-mono flex items-center gap-1">
-                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <span v-if="opt.locked" class="text-[11px] text-rose-600 font-mono flex items-center gap-1 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                   <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                 </svg>
                 <span>需线索: {{ getFragmentName(opt.reqFragment) }}</span>
               </span>
-              <span v-else class="text-zinc-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all">
+              <span v-else class="text-zinc-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all text-sm font-bold">
                 →
               </span>
             </button>
@@ -405,14 +423,14 @@
             </div>
             <button
               @click.stop="restartGame"
-              class="px-8 py-3 rounded-xs bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs font-mono tracking-wider shadow-md shadow-blue-600/20 transition-all cursor-pointer"
+              class="px-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs font-mono tracking-wider shadow-md shadow-blue-600/20 transition-all cursor-pointer"
             >
               重启时间循环
             </button>
           </div>
 
           <!-- Next Continue Hint -->
-          <div v-if="canClickNext" class="flex items-center justify-end gap-1.5 text-xs text-blue-600 font-mono animate-bounce pt-1">
+          <div v-if="canClickNext" class="flex items-center justify-end gap-1.5 text-xs text-blue-600 font-mono animate-bounce pt-1 select-none">
             <span>{{ isAutoPlay ? '自动播放中...' : '点击继续 / 按空格' }}</span>
             <span>▼</span>
           </div>
@@ -656,7 +674,7 @@
           class="p-3 bg-zinc-50 rounded-xs border border-zinc-200 space-y-1 text-xs"
         >
           <div class="font-bold text-blue-600 font-mono">{{ item.speaker }}</div>
-          <div class="text-zinc-700 leading-relaxed" v-html="item.text"></div>
+          <div class="text-zinc-700 leading-relaxed" v-text="item.text"></div>
         </div>
       </div>
     </el-drawer>
@@ -746,6 +764,39 @@ const getCharacterIcon = (charId?: string) => {
   if (charId === 'oldman') return OldmanIcon;
   if (charId === 'boss') return BossIcon;
   return ProtagonistIcon;
+};
+
+const isNpcSpeaker = (speaker?: string) => {
+  if (!speaker) return false;
+  return !['旁白', '电子广播', 'ORACLE', '系统广播'].includes(speaker);
+};
+
+const getSpeakerRoleName = (speaker?: string) => {
+  if (speaker === '旁白') return '场景叙述';
+  if (speaker === '电子广播' || speaker === 'ORACLE') return 'ORACLE 广播';
+  if (speaker === '阿哲') return '实验样本';
+  if (speaker === '林') return '记忆残留 404';
+  if (speaker === '老人') return '旧乘务长';
+  if (speaker === '乘务长') return '执行程序';
+  return '通讯对端';
+};
+
+const getSpeakerAvatarStyle = (speaker?: string) => {
+  if (speaker === '旁白') return 'bg-zinc-100 text-zinc-600 border-zinc-200';
+  if (speaker === '电子广播' || speaker === 'ORACLE') return 'bg-indigo-50 text-indigo-600 border-indigo-200';
+  if (speaker === '阿哲') return 'bg-blue-50 text-blue-600 border-blue-200';
+  if (speaker === '林') return 'bg-rose-50 text-rose-600 border-rose-200';
+  if (speaker === '老人') return 'bg-amber-50 text-amber-600 border-amber-200';
+  return 'bg-blue-50 text-blue-600 border-blue-200';
+};
+
+const getSpeakerBadgeStyle = (speaker?: string) => {
+  if (speaker === '旁白') return 'bg-zinc-100 text-zinc-600 border-zinc-200';
+  if (speaker === '电子广播' || speaker === 'ORACLE') return 'bg-indigo-50 text-indigo-700 border-indigo-200/80';
+  if (speaker === '阿哲') return 'bg-blue-50 text-blue-700 border-blue-200/80';
+  if (speaker === '林') return 'bg-rose-50 text-rose-700 border-rose-200/80';
+  if (speaker === '老人') return 'bg-amber-50 text-amber-700 border-amber-200/80';
+  return 'bg-blue-50 text-blue-700 border-blue-200/80';
 };
 
 // Types & Data
@@ -1308,7 +1359,7 @@ const handleSkip = () => {
   playClickSfx();
   if (isTyping.value) {
     if (typingTimer) clearInterval(typingTimer);
-    displayedText.value = currentSceneData.value?.text || "";
+    displayedText.value = (currentSceneData.value?.text || "").replace(/<br\s*\/?>/gi, '\n');
     isTyping.value = false;
   }
   if (canClickNext.value) {
@@ -1318,7 +1369,8 @@ const handleSkip = () => {
 };
 
 // Typewriter Effect
-const typeText = (fullText: string) => {
+const typeText = (rawFullText: string) => {
+  const fullText = (rawFullText || "").replace(/<br\s*\/?>/gi, '\n');
   if (typingTimer) clearInterval(typingTimer);
   if (autoPlayTimer) clearTimeout(autoPlayTimer);
   displayedText.value = "";
@@ -1351,7 +1403,7 @@ const goToScene = async (nextSceneId: string) => {
   if (scene) {
     dialogueHistory.value.push({
       speaker: scene.speaker || '旁白',
-      text: scene.text
+      text: (scene.text || '').replace(/<br\s*\/?>/gi, '\n')
     });
 
     if (scene.isEnding) {
@@ -1385,7 +1437,7 @@ const goToScene = async (nextSceneId: string) => {
       isAIGenerating.value = false;
     }
   } else {
-    typeText(scene.text);
+    typeText(scene?.text || "");
   }
 };
 
@@ -1401,7 +1453,7 @@ const handleSelect = (option: Option) => {
 const handleBoxClick = () => {
   if (isTyping.value) {
     if (typingTimer) clearInterval(typingTimer);
-    displayedText.value = currentSceneData.value?.text || "";
+    displayedText.value = (currentSceneData.value?.text || "").replace(/<br\s*\/?>/gi, '\n');
     isTyping.value = false;
     if (isAutoPlay.value) scheduleAutoNext();
   } else if (canClickNext.value) {
@@ -1844,6 +1896,14 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.scenario-title {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
 .flash-enter-active,
 .flash-leave-active {
   transition: opacity 0.3s ease;

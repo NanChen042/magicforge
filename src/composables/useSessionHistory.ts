@@ -5,6 +5,12 @@ export interface Message {
   content: string;
   images?: string[];
   reasoning?: string;
+  usage?: {
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
+    cache_hit_tokens?: number;
+  };
 }
 
 export interface ChatSession {
@@ -99,7 +105,12 @@ export function useSessionHistory() {
     const session = sessions.value.find(s => s.id === currentSessionId.value);
     if (session) {
       // Object URLs are valid only for the live page. Persist text history, not stale image URLs.
-      session.messages = messages.map(({ role, content, reasoning }) => ({ role, content, reasoning }));
+      session.messages = messages.map(({ role, content, reasoning, usage }) => ({
+        role,
+        content,
+        reasoning,
+        usage
+      }));
       session.updatedAt = Date.now();
       if (modelName) session.modelName = modelName;
 

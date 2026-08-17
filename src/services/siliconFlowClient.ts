@@ -1,5 +1,6 @@
 export interface SiliconFlowModel {
   id: string;
+  name?: string;
   object?: string;
   owned_by?: string;
 }
@@ -9,7 +10,7 @@ export function isImageModel(modelId: string) {
 }
 
 export function isAudioModel(modelId: string) {
-  return /(audio|cosyvoice|fish-speech|speech|sensevoice|telespeech|whisper)/i.test(modelId);
+  return /(audio|cosyvoice|moss-ttsd|speech|sensevoice|telespeech|whisper)/i.test(modelId);
 }
 
 export interface SiliconFlowConnection {
@@ -52,19 +53,14 @@ async function readError(response: Response) {
 
 /**
  * 确保根据 SiliconFlow 规则组装正确的 voice 标识
- * 例如 FunAudioLLM/CosyVoice2-0.5B 需要 "FunAudioLLM/CosyVoice2-0.5B:alex"
+ * 例如 FunAudioLLM/CosyVoice2-0.5B:alex 或 fnlp/MOSS-TTSD-v0.5:alex
  */
 export function formatSiliconFlowVoice(model: string, voice: string): string {
-  if (!voice) return 'FunAudioLLM/CosyVoice2-0.5B:alex';
+  const targetVoice = voice || 'alex';
   // 如果已经包含冒号前缀，则保持
-  if (voice.includes(':')) return voice;
+  if (targetVoice.includes(':')) return targetVoice;
 
-  // 如果是 CosyVoice 或 fish-speech 系列，自动补全前缀
-  if (model.includes('CosyVoice') || model.includes('fish-speech')) {
-    return `${model}:${voice}`;
-  }
-
-  return voice;
+  return `${model}:${targetVoice}`;
 }
 
 export class SiliconFlowClient {

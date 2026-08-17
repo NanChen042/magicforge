@@ -1,10 +1,9 @@
 <template>
   <div class="flex flex-col items-center justify-center min-h-full py-8 px-4 text-center max-w-3xl mx-auto animate-in fade-in duration-500">
     
-    <!-- DeepSeek 官方风格 Hero 区域与模式选择键 -->
-    <div class="mb-10 flex flex-col items-center relative">
-      <div class="flex items-center gap-3 mb-4">
-        <!-- DeepSeek 标识与科技 Icon -->
+    <!-- Hero 标题区域 -->
+    <div class="mb-8 flex flex-col items-center">
+      <div class="flex items-center gap-3 mb-2">
         <div class="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center shadow-md shadow-blue-600/10 border border-zinc-200/80 bg-white">
           <img src="@/assets/ai.png" alt="AI Logo" class="w-full h-full object-cover" />
         </div>
@@ -12,27 +11,12 @@
           使用大模型开始对话
         </h1>
       </div>
-
-      <!-- 模式切换芯片组 (DeepSeek Segmented Mode Pills) -->
-      <div class="flex items-center gap-2 p-1 bg-zinc-100/80 rounded-full border border-zinc-200/80 shadow-2xs mb-2">
-        <button
-          v-for="mode in modes"
-          :key="mode.id"
-          @click="activeMode = mode.id"
-          class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer"
-          :class="activeMode === mode.id
-            ? 'bg-white text-blue-600 shadow-2xs border border-blue-200'
-            : 'text-zinc-500 hover:text-blue-600 hover:bg-blue-50/50 border border-transparent'"
-        >
-          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" :d="mode.icon" />
-          </svg>
-          <span>{{ mode.label }}</span>
-        </button>
-      </div>
+      <p class="text-xs text-zinc-400">
+        可在下方输入框随心切换「深度思考 (R1)」或多模态识图进行推演
+      </p>
     </div>
 
-    <!-- 热门话题 (Trending) -->
+    <!-- 热门话题推荐 (Trending) -->
     <div class="w-full">
       <div class="flex items-center justify-between mb-3 px-1">
         <h3 class="text-xs font-bold text-zinc-500 flex items-center gap-1.5">
@@ -79,7 +63,7 @@
               {{ topic }}
             </span>
           </div>
-          <!-- 装饰角标 (垂直居中并在悬停时平滑滑入) -->
+          <!-- 悬停箭头图标 -->
           <div class="shrink-0 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
             <svg class="w-3.5 h-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -92,8 +76,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-
 defineProps<{
   hotTopics: string[];
   isLoadingTopics: boolean;
@@ -103,12 +85,4 @@ defineEmits<{
   'select-question': [question: string];
   'refresh-topics': [];
 }>();
-
-const activeMode = ref('fast');
-
-const modes = [
-  { id: 'fast', label: '快速模式', icon: 'M13 10V3L4 14h7v7l9-11h-7z' },
-  { id: 'think', label: '深度思考', icon: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z' },
-  { id: 'vision', label: '识图模式', icon: 'M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z' }
-];
 </script>

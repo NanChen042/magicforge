@@ -45,6 +45,12 @@ const router = createRouter({
       component: () => import('../views/ScenarioView.vue'),
       meta: { title: '第13号列车' }
     },
+    {
+      path: '/docs',
+      name: 'docs',
+      component: () => import('../views/DocsView.vue'),
+      meta: { title: '开发文档与 API 参考' }
+    },
 
     // 捕获所有未匹配路由，重定向到首页
     {

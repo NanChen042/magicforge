@@ -60,29 +60,19 @@ export const useGameStore = defineStore('game', {
     isGenerating: false,
     aiErrorMessage: '',
     gameLogs: [] as GameLog[],
-    activeScriptId: 'sword_gaokao',
+    activeScriptId: GAME_SCRIPTS[0].id,
     activeScript: GAME_SCRIPTS[0] as GameScript,
+    activeTraitId: 'gaming',
 
     // 故事进度追踪
     storyProgress: {
       mainQuests: {
-        gaming: 15,
+        gaming: 25,
         study: 15,
         social: 10,
         other: 0
       },
-      relationships: {
-        '李雪': {
-          character: '李雪',
-          affinity: 0,
-          events: []
-        },
-        '王老师': {
-          character: '王老师',
-          affinity: 0,
-          events: []
-        }
-      },
+      relationships: {} as Record<string, { character: string; affinity: number; events: string[] }>,
       flags: new Set<string>()
     } as StoryProgress,
 
@@ -101,6 +91,7 @@ export const useGameStore = defineStore('game', {
         this.activeScriptId = found.id
         this.activeScript = found
         this.initialScene = found.initialScene as GameScene
+        DeepseekService.setActiveScript(found)
       }
     },
 
@@ -108,18 +99,20 @@ export const useGameStore = defineStore('game', {
       this.activeScriptId = customScript.id
       this.activeScript = customScript
       this.initialScene = customScript.initialScene as GameScene
+      DeepseekService.setActiveScript(customScript)
     },
 
-    async startNewGame(trait: string = 'balanced', scriptId?: string) {
+    async startNewGame(traitId: string = 'balanced', scriptId?: string) {
       if (scriptId) {
         this.setScript(scriptId)
       }
 
-      this.currentScene = this.activeScript.initialScene as GameScene
+      this.activeTraitId = traitId
+      this.currentScene = JSON.parse(JSON.stringify(this.activeScript.initialScene)) as GameScene
       this.currentSceneId = 1
       this.gameLogs = []
       
-      const foundTrait = this.activeScript.traits.find(t => t.id === trait)
+      const foundTrait = this.activeScript.traits.find(t => t.id === traitId)
       if (foundTrait?.bonus) {
         this.storyProgress.mainQuests = {
           gaming: foundTrait.bonus.gaming ?? 15,
@@ -131,10 +124,13 @@ export const useGameStore = defineStore('game', {
         this.storyProgress.mainQuests = { gaming: 15, study: 15, social: 10, other: 0 }
       }
 
+      this.storyProgress.relationships = {}
+      this.storyProgress.flags = new Set<string>()
+
       // 同步到 DeepseekService
       DeepseekService.setActiveScript(this.activeScript)
 
-      this.addGameLog(1, `剧本【${this.activeScript.title}】开启，玩家【${this.playerName}】登场`)
+      this.addGameLog(1, `世界线【${this.activeScript.title}】启动，身份【${this.playerName || '主角'}】就绪`)
     },
 
     async handleChoice(option: { text: string, next?: number, impact?: any }) {
@@ -153,7 +149,7 @@ export const useGameStore = defineStore('game', {
 
         // 生成下一个场景（完全通过AI）
         const nextScene = await DeepseekService.generateScene({
-          playerName: this.playerName,
+          playerName: this.playerName || '主角',
           currentSceneId: this.currentSceneId,
           choiceText: choiceText,
           currentScene: this.currentScene,
@@ -170,6 +166,19 @@ export const useGameStore = defineStore('game', {
 
         if (!nextScene) {
           throw new Error('未能生成有效场景数据')
+        }
+
+        // 如果新场景自带 impact，也同步应用
+        if (nextScene.options) {
+          // ensure each option has basic next or impact structure
+          nextScene.options.forEach((opt: any, idx: number) => {
+            if (!opt.impact) {
+              const types: ('gaming' | 'study' | 'social' | 'other')[] = ['gaming', 'study', 'social', 'other']
+              opt.impact = {
+                quest: { type: types[idx % 4], value: 8 + Math.floor(Math.random() * 5) }
+              }
+            }
+          })
         }
 
         // 成功生成，更新场景
@@ -194,8 +203,9 @@ export const useGameStore = defineStore('game', {
       if (impact.quest) {
         const { type, value } = impact.quest
         if (type in this.storyProgress.mainQuests) {
+          const currentVal = this.storyProgress.mainQuests[type as keyof typeof this.storyProgress.mainQuests] || 0
           this.storyProgress.mainQuests[type as keyof typeof this.storyProgress.mainQuests] = 
-            Math.max(0, Math.min(100, this.storyProgress.mainQuests[type as keyof typeof this.storyProgress.mainQuests] + value))
+            Math.max(0, Math.min(100, currentVal + value))
         }
       }
 
@@ -225,38 +235,33 @@ export const useGameStore = defineStore('game', {
       })
     },
 
-    updateReasoningStream(content: string) {
-      if (this.currentScene) {
-        if (!this.currentScene.reasoning) {
-          this.currentScene.reasoning = ''
-        }
-        this.currentScene.reasoning += content
-      }
+    updateReasoningStream(_content: string) {
+      // 触发订阅监听
     },
 
-    updateDialogStream(content: string) {
-      if (this.currentScene) {
-        if (!this.currentScene.dialog) {
-          this.currentScene.dialog = ''
-        }
-        this.currentScene.dialog += content
-      }
+    updateDialogStream(_content: string) {
+      // 触发订阅监听
     },
 
     resetGame() {
       this.currentSceneId = 1
-      this.currentScene = this.activeScript.initialScene as GameScene
+      this.currentScene = JSON.parse(JSON.stringify(this.activeScript.initialScene)) as GameScene
       this.gameLogs = []
-      this.storyProgress = {
-        mainQuests: {
-          gaming: 15,
-          study: 15,
-          social: 10,
-          other: 0
-        },
-        relationships: {},
-        flags: new Set<string>()
+      
+      const foundTrait = this.activeScript.traits.find(t => t.id === this.activeTraitId)
+      if (foundTrait?.bonus) {
+        this.storyProgress.mainQuests = {
+          gaming: foundTrait.bonus.gaming ?? 15,
+          study: foundTrait.bonus.study ?? 15,
+          social: foundTrait.bonus.social ?? 10,
+          other: foundTrait.bonus.other ?? 0
+        }
+      } else {
+        this.storyProgress.mainQuests = { gaming: 15, study: 15, social: 10, other: 0 }
       }
+      
+      this.storyProgress.relationships = {}
+      this.storyProgress.flags = new Set<string>()
       this.isGenerating = false
       this.aiErrorMessage = ''
     }

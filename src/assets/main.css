@@ -1,118 +1,52 @@
 @import "tailwindcss";
 @config "../../tailwind.config.js";
 
-:root {
-  --primary-color: #2563eb;
-  --secondary-color: #dc2626;
-  --accent-color: #0ea5e9;
-  --dark-color: #18181b;
-  --medium-color: #3f3f46;
-  --light-color: #ffffff;
-  --text-color: #18181b;
-  --text-light: #71717a;
-  --text-dark: #09090b;
-  --gray-100: #f7f8fa;
-  --gray-200: #e4e4e7;
-  --gray-300: #d4d4d8;
-  --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
-  --transition-fast: all 0.2s ease;
-  --transition-normal: all 0.3s ease;
-}
-
 button {
   cursor: pointer;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background-color: var(--gray-100);
-  color: var(--text-color);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", "Helvetica Neue", Arial, sans-serif;
+  background-color: #ffffff;
+  color: #18181b;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
-code, pre, kbd, .font-mono {
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+code, pre, kbd {
+  font-family: 'JetBrains Mono', ui-monospace, "SF Mono", "Cascadia Code", "Segoe UI Mono", Menlo, Monaco, Consolas, "PingFang SC", "Microsoft YaHei", "微软雅黑", monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-/* 自定义按钮样式 */
-.btn {
-  @apply px-4 py-2 rounded-sm font-semibold;
+.app-switch,
+.el-switch {
+  --el-switch-on-color: #2563eb !important;
+  --el-color-primary: #2563eb !important;
 }
 
-.btn-primary {
-  @apply bg-[#2563eb] hover:bg-[#1d4ed8] text-white;
+.el-switch.is-checked .el-switch__core {
+  background-color: #2563eb !important;
+  border-color: #2563eb !important;
 }
 
-.btn-secondary {
-  @apply bg-[#ff5a5f] hover:bg-[#ff4146] text-white;
+.app-switch .el-switch__core {
+  min-width: 40px;
+  height: 20px;
+  border: 0;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08);
 }
 
-.btn-accent {
-  @apply bg-[#ffc107] hover:bg-[#e6ae00] text-[#292639];
+.app-switch .el-switch__action {
+  width: 16px;
+  height: 16px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.2);
 }
 
-/* 自定义卡片样式 */
-.card {
-  @apply bg-white rounded-sm shadow-lg overflow-hidden border border-[#e9e7f0];
-}
-
-/* 渐变背景 */
-.gradient-bg {
-  background-image: linear-gradient(to bottom, var(--dark-color), var(--medium-color));
-}
-
-/* 渐变文本 */
-.gradient-text {
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* 通用过渡 */
-.transition-common {
-  @apply transition-all duration-300 ease-in-out;
-}
-
-/* 响应式容器 */
-.container-custom {
-  @apply max-w-6xl mx-auto px-4;
-}
-
-/* 标题样式 */
-.title-lg {
-  @apply text-3xl font-bold text-[#292639] mb-6;
-}
-
-.title-md {
-  @apply text-2xl font-bold text-[#292639] mb-4;
-}
-
-.title-sm {
-  @apply text-xl font-bold text-[#292639] mb-3;
-}
-
-/* 图标容器 */
-.icon-container {
-  @apply flex items-center justify-center w-10 h-10 rounded-full;
-}
-
-/* 提示样式 */
-.badge {
-  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
-}
-
-.badge-primary {
-  @apply bg-[#5b48da]/10 text-[#5b48da];
-}
-
-.badge-secondary {
-  @apply bg-[#ff5a5f]/10 text-[#ff5a5f];
-}
-
-.badge-accent {
-  @apply bg-[#ffc107]/10 text-[#292639];
+.app-switch:focus-visible .el-switch__core {
+  outline: 3px solid rgba(37, 99, 235, 0.18);
+  outline-offset: 2px;
 }

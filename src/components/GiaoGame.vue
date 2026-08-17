@@ -51,23 +51,12 @@ const gameOverTitle = ref('')
 const gameOverMessage = ref('')
 const gameOverType = ref('')
 
-// 游戏进度
-const gameProgress = ref({
-  gaming: 25,
-  study: 10,
-  social: 5,
-  other: 0
-})
+// 动态四维属性（直接映射 store 单一数据源）
+const gameProgress = computed(() => gameStore.storyProgress.mainQuests)
 
 // 选择分析
 const lastChoiceAnalysis = ref({
   text: '',
-  matchedKeywords: {
-    gaming: [] as string[],
-    study: [] as string[],
-    social: [] as string[],
-    other: [] as string[]
-  },
   impactType: 'gaming'
 })
 
@@ -75,11 +64,15 @@ const lastChoiceAnalysis = ref({
 const debugInfo = ref({
   lastChoice: {
     text: '',
-    matchedKeywords: { gaming: [] as string[], study: [] as string[], social: [] as string[], other: [] as string[] },
-    impactType: 'gaming',
-    impactText: ''
+    impactType: 'gaming'
   },
   currentScene: { id: 1, dialog: '', reasoning: '', specialEvent: '', options: [] as any[] }
+})
+
+// 判断当前模型是否为深度思考/推理模型
+const isReasoningModel = computed(() => {
+  const m = (modelName.value || '').toLowerCase()
+  return m.includes('r1') || m.includes('reasoner') || m.includes('qwq') || m.includes('deepseek-r1')
 })
 
 // API 错误
@@ -91,12 +84,13 @@ interface ApiErrorInfo {
 
 const apiErrorCodes: Record<string, ApiErrorInfo> = {
   '400': { title: '格式错误', reason: '请求体格式错误', solution: '请根据错误信息提示修改请求体' },
-  '401': { title: '认证失败', reason: 'API key 错误，认证失败', solution: '请检查您的 API key 是否正确' },
-  '402': { title: '余额不足', reason: '账号余额不足', solution: '请确认账户余额，并前往充值页面进行充值' },
-  '422': { title: '参数错误', reason: '请求体参数错误', solution: '请根据错误信息提示修改相关参数' },
-  '429': { title: '请求速率达到上限', reason: '请求速率达到上限', solution: '请合理规划您的请求速率' },
-  '500': { title: '服务器故障', reason: '服务器内部故障', solution: '请等待后重试' },
-  '503': { title: '服务器繁忙', reason: '服务器负载过高', solution: '请稍后重试您的请求' }
+  '401': { title: '认证失败', reason: 'API key 错误或未设置', solution: '请检查您的 API key 是否正确配置' },
+  '402': { title: '余额不足', reason: '账号余额不足', solution: '请确认服务平台账户余额并充值' },
+  '403': { title: '模型访问受限', reason: '当前模型已下线或未对当前账户开放权限', solution: '请切换至其他可用模型（如免费模型）' },
+  '422': { title: '参数错误', reason: '请求参数超出模型上下文限制', solution: '请尝试重置或切换模型' },
+  '429': { title: '请求速率达到上限', reason: '请求过于频繁，触发限流保护', solution: '请稍候片刻再继续推演' },
+  '500': { title: '服务器故障', reason: '服务端处理异常', solution: '请等待片刻后点击重试' },
+  '503': { title: '服务器繁忙', reason: '模型推理集群负载过高', solution: '请稍后重试或切换其他可用模型' }
 }
 
 const apiError = ref({
@@ -127,28 +121,18 @@ const setModel = (model: string) => {
   apiStore.setModelName(model)
 }
 
-// 处理 API 配置更新
-const handleApiConfigUpdate = (config: { apiKey: string; model: string }) => {
-  apiKey.value = config.apiKey
-  modelName.value = config.model
-  apiStore.setApiUrl(apiUrl.value)
-  apiStore.setApiKey(config.apiKey)
-  apiStore.setModelName(config.model)
-}
-
 // 启动游戏
 const startGame = async (name: string, trait: string = 'balanced', scriptId?: string) => {
-  playerName.value = name
+  playerName.value = name || '主角'
   loading.value = true
 
   try {
     apiStore.setApiUrl(apiUrl.value)
     apiStore.setApiKey(apiKey.value)
     apiStore.setModelName(modelName.value)
-    gameStore.setPlayerName(name)
+    gameStore.setPlayerName(playerName.value)
     showIntro.value = false
     await gameStore.startNewGame(trait, scriptId)
-    updateProgressData()
   } catch (error) {
     console.error('游戏启动错误:', error)
   } finally {
@@ -163,15 +147,9 @@ const setupStreamListeners = () => {
   gameStore.$onAction(({ name, args }) => {
     if (name === 'updateReasoningStream' && args[0]) {
       reasoningContent.value += args[0]
-      if (modelName.value !== 'deepseek-chat' && reasoningContent.value && activeTab.value === 'dialog') {
-        activeTab.value = 'reasoning'
-      }
     }
     if (name === 'updateDialogStream' && args[0]) {
       currentDialogStream.value += args[0]
-      if (currentDialogStream.value && activeTab.value === 'reasoning') {
-        activeTab.value = 'dialog'
-      }
     }
   })
 
@@ -183,7 +161,7 @@ const handleChoice = async (option: { text: string; next?: number; impact?: any 
   try {
     reasoningContent.value = ''
     currentDialogStream.value = ''
-    isThinking.value = modelName.value !== 'deepseek-chat'
+    isThinking.value = isReasoningModel.value
     isStreamResponseActive.value = true
     clearApiError()
 
@@ -191,22 +169,19 @@ const handleChoice = async (option: { text: string; next?: number; impact?: any 
       setupStreamListeners()
     }
 
-    if (option.impact) {
-      processImpact(option.impact)
-      lastChoiceAnalysis.value = {
-        text: option.text,
-        matchedKeywords: { gaming: [], study: [], social: [], other: [] },
-        impactType: option.impact.quest?.type || 'other'
-      }
-    } else {
-      analyzeChoice(option.text)
+    lastChoiceAnalysis.value = {
+      text: option.text,
+      impactType: option.impact?.quest?.type || 'gaming'
     }
 
-    activeTab.value = modelName.value === 'deepseek-chat' ? 'dialog' : 'reasoning'
     await gameStore.handleChoice(option)
 
     if (currentScene.value) {
       setDebugInfo(currentScene.value)
+      // 如果到达结局（ID === 999）
+      if (currentScene.value.id === 999) {
+        checkEndingMilestone()
+      }
     }
 
     isThinking.value = false
@@ -219,111 +194,18 @@ const handleChoice = async (option: { text: string; next?: number; impact?: any 
   }
 }
 
-// 分析选择
-const analyzeChoice = (text: string) => {
-  const optionText = text.toLowerCase()
-  const scores = { gaming: 0, study: 0, social: 0, other: 0 }
-  const matchedKeywords = { gaming: [] as string[], study: [] as string[], social: [] as string[], other: [] as string[] }
-
-  const keywords = {
-    gaming: ['游戏', '剑魔', '技能', '排位', '连招', '对线', '比赛', '击败', '电竞', '英雄', '段位', 'LOL', '打野', '屏幕', '键盘', '打游戏', '王者', 'MVP', '玩家'],
-    study: ['学习', '考试', '上课', '听讲', '作业', '专心', '知识', '读书', '笔记', '成绩', '课程', '教授', '学校', '老师', '教室', '课本', '学科', '复习', '思考'],
-    social: ['朋友', '社交', '关系', '交流', '合作', '团队', '聚会', '聚餐', '派对', '沟通', '网友', '约会', '同学会', '女生', '男生', '聚在一起'],
-    other: ['神秘', '命运', '思考', '冥想', '灵感', '直觉', '预感', '奇怪', '奇特', '感悟', '超自然', '第六感', '梦境', '星象', '符文']
-  }
-
-  Object.entries(keywords).forEach(([type, words]) => {
-    words.forEach(word => {
-      if (optionText.includes(word)) {
-        scores[type as keyof typeof scores]++
-        matchedKeywords[type as keyof typeof matchedKeywords].push(word)
-      }
-    })
-  })
-
-  // 权重调整
-  if (scores.social > 0 && scores.social <= 2) scores.social *= 0.7
-  if (scores.other > 0) scores.other *= 1.2
-
-  // 确定影响类型
-  let impactType: 'gaming' | 'study' | 'social' | 'other' = 'gaming'
-  let maxScore = -1
-
-  Object.entries(scores).forEach(([type, score]) => {
-    if (score > maxScore) {
-      maxScore = score
-      impactType = type as typeof impactType
-    }
-  })
-
-  if (maxScore === 0) impactType = 'other'
-
-  const baseValue = 5
-  const lengthBonus = Math.min(3, Math.floor(text.length / 20))
-  const valueIncrease = baseValue + lengthBonus
-
-  lastChoiceAnalysis.value = { text, matchedKeywords, impactType }
-  processImpact({ quest: { type: impactType, value: valueIncrease } })
-}
-
-// 处理影响
-const processImpact = (impact: any) => {
-  if (impact.quest) {
-    const { type, value } = impact.quest
-    if (type === 'gaming') gameProgress.value.gaming = Math.min(100, gameProgress.value.gaming + value)
-    if (type === 'study') gameProgress.value.study = Math.min(100, gameProgress.value.study + value)
-    if (type === 'social') gameProgress.value.social = Math.min(100, gameProgress.value.social + value)
-    if (type === 'other') gameProgress.value.other = Math.min(100, gameProgress.value.other + value)
-    checkGameProgress()
-  }
-}
-
-// 检查游戏进度
-const checkGameProgress = () => {
-  const completedAbilities: string[] = []
-
-  if (gameProgress.value.gaming >= 100) completedAbilities.push('gaming')
-  if (gameProgress.value.study >= 100) completedAbilities.push('study')
-  if (gameProgress.value.social >= 100) completedAbilities.push('social')
-  if (gameProgress.value.other >= 100) completedAbilities.push('other')
-
-  if (completedAbilities.length === 0 || showGameOver.value) return
-
-  const primaryAbility = completedAbilities[0]
-  const titles: Record<string, string> = {
-    gaming: '游戏大师',
-    study: '学霸之路',
-    social: '社交之星',
-    other: '神秘技能'
-  }
-
-  const messages: Record<string, string> = {
-    gaming: `恭喜${playerName.value}！你在游戏技能方面达到了顶峰！你成为了传说中的电竞选手！`,
-    study: `恭喜${playerName.value}！你在学业上取得了令人瞩目的成就！成为了学院最年轻的教授！`,
-    social: `恭喜${playerName.value}！你的社交能力已经炉火纯青！成为了人际关系网络的中心！`,
-    other: `恭喜${playerName.value}！你掌握了一种无法言明的神秘能力！似乎命运的齿轮在你手中转动！`
-  }
-
-  gameOverTitle.value = titles[primaryAbility] || '游戏结束'
-  gameOverMessage.value = messages[primaryAbility] || '恭喜完成游戏！'
-  gameOverType.value = primaryAbility
+// 检查故事完成情况
+const checkEndingMilestone = () => {
+  const script = gameStore.activeScript
+  gameOverTitle.value = `《${script?.title || '世界线'}》推演终局`
+  gameOverMessage.value = currentScene.value?.description || '你已完成了本次世界线的全部抉择，因果命运已尘埃落定。'
+  gameOverType.value = 'success'
   showGameOver.value = true
-}
-
-// 更新进度数据
-const updateProgressData = () => {
-  gameProgress.value = {
-    gaming: gameStore.storyProgress?.mainQuests?.gaming || 25,
-    study: gameStore.storyProgress?.mainQuests?.study || 10,
-    social: gameStore.storyProgress?.mainQuests?.social || 5,
-    other: gameStore.storyProgress?.mainQuests?.other || 0
-  }
-  checkGameProgress()
 }
 
 // 重置游戏
 const resetGame = () => {
-  if (!confirm('确定要重置游戏进度吗？')) return
+  if (!confirm('确定要重新开始当前剧本吗？')) return
 
   currentDialogStream.value = ''
   reasoningContent.value = ''
@@ -333,7 +215,6 @@ const resetGame = () => {
   isStreamResponseActive.value = false
   clearApiError()
   gameStore.resetGame()
-  gameProgress.value = { gaming: 25, study: 10, social: 5, other: 0 }
 }
 
 // 返回首页
@@ -346,7 +227,6 @@ const backToHomepage = () => {
   isStreamResponseActive.value = false
   clearApiError()
   gameStore.resetGame()
-  gameProgress.value = { gaming: 25, study: 10, social: 5, other: 0 }
   showIntro.value = true
 }
 
@@ -363,11 +243,12 @@ const retryCurrentScene = async () => {
     gameStore.aiErrorMessage = ''
     currentDialogStream.value = ''
     reasoningContent.value = ''
-    isThinking.value = modelName.value !== 'deepseek-chat'
+    isThinking.value = isReasoningModel.value
     isStreamResponseActive.value = true
 
-    await gameStore.handleChoice({ text: '继续当前场景', next: gameStore.currentSceneId })
+    await gameStore.handleChoice({ text: '根据当前情势重新推演后续行动' })
 
+    activeTab.value = 'dialog'
     isThinking.value = false
     isStreamResponseActive.value = false
   } catch (error) {
@@ -383,23 +264,34 @@ const handleApiError = (error: any) => {
   isThinking.value = false
   isStreamResponseActive.value = false
 
+  let statusCode = ''
+  let errorMsg = error?.message || '未知错误'
+
   if (error?.response?.status) {
-    const statusCode = error.response.status.toString()
+    statusCode = error.response.status.toString()
+  } else if (errorMsg.includes('API 响应错误')) {
+    const match = errorMsg.match(/API 响应错误 (\d+):/)
+    if (match && match[1]) {
+      statusCode = match[1]
+    }
+  }
+
+  if (statusCode) {
     apiError.value = {
       show: true,
       code: statusCode,
-      message: error.message || '未知错误',
+      message: errorMsg,
       details: apiErrorCodes[statusCode] || null
     }
   } else {
     apiError.value = {
       show: true,
-      code: 'UNKNOWN',
-      message: error?.message || '连接失败，请检查API地址和网络连接',
+      code: 'NETWORK_ERROR',
+      message: errorMsg,
       details: {
-        title: '连接错误',
-        reason: '无法连接到API服务器或请求被中断',
-        solution: '请检查API地址是否正确，网络连接是否稳定'
+        title: '通信异常',
+        reason: '无法连接到 API 服务或响应超时',
+        solution: '请检查控制台网络设置与 API Key 有效性'
       }
     }
   }
@@ -419,7 +311,12 @@ const switchTab = (tab: string) => {
 
 // 切换模型
 const changeModel = () => {
-  const models = ['Qwen/Qwen2.5-7B-Instruct', 'deepseek-ai/DeepSeek-R1-Distill-Qwen-7B', 'THUDM/glm-4-9b-chat', 'Qwen/Qwen2.5-Coder-7B-Instruct']
+  const models = [
+    'deepseek-ai/DeepSeek-R1-Distill-Qwen-7B',
+    'Qwen/Qwen2.5-7B-Instruct',
+    'THUDM/glm-4-9b-chat',
+    'Qwen/Qwen2.5-Coder-7B-Instruct'
+  ]
   const currentIndex = models.indexOf(modelName.value)
   const nextIndex = (currentIndex + 1) % models.length
 
@@ -427,7 +324,7 @@ const changeModel = () => {
   currentDialogStream.value = ''
   setModel(models[nextIndex])
 
-  if (models[nextIndex] === 'deepseek-chat' && activeTab.value === 'reasoning') {
+  if (!models[nextIndex].includes('R1') && activeTab.value === 'reasoning') {
     activeTab.value = 'dialog'
   }
   showModelInfo.value = false
@@ -438,9 +335,7 @@ const setDebugInfo = (scene: any) => {
   debugInfo.value = {
     lastChoice: {
       text: lastChoiceAnalysis.value.text,
-      matchedKeywords: { ...lastChoiceAnalysis.value.matchedKeywords },
-      impactType: lastChoiceAnalysis.value.impactType,
-      impactText: ''
+      impactType: lastChoiceAnalysis.value.impactType
     },
     currentScene: {
       id: scene.id,
@@ -463,7 +358,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 relative">
+  <div class="min-h-screen bg-white text-zinc-800 font-sans selection:bg-blue-600 selection:text-white">
 
     <!-- 开始界面 -->
     <GameIntro
@@ -471,25 +366,30 @@ onMounted(() => {
       @start-game="startGame"
     />
 
-    <!-- 游戏主界面 -->
-    <div v-else class="relative z-10 min-h-screen pb-12">
-      <div class="max-w-6xl mx-auto px-2 sm:px-4 py-4">
-        <!-- 主容器 -->
-        <div class="rounded-md overflow-hidden bg-white border border-zinc-200/90 shadow-md shadow-zinc-900/5">
+    <!-- 游戏主推演界面 -->
+    <div v-else class="relative z-10 min-h-screen pb-16">
+      <div class="max-w-5xl mx-auto px-3 sm:px-6 py-4 sm:py-6">
+        
+        <!-- 主交互画卷容器 -->
+        <div class="rounded-xs overflow-hidden bg-white border border-zinc-200 shadow-xs transition-all duration-200">
+          
           <!-- 状态栏 -->
           <GameStatusBar
             :player-name="playerName"
             :scene-id="currentScene?.id"
             :model-name="modelName"
             :is-generating="isGenerating"
+            @update:model-name="setModel"
             @toggle-model-info="showModelInfo = !showModelInfo"
-            @reset-game="resetGame"
+            @retry-current-scene="retryCurrentScene"
             @back-to-homepage="backToHomepage"
+            @show-help="showGameGuide = !showGameGuide"
           />
 
-          <!-- 内容区 -->
-          <div class="p-4 sm:p-8 space-y-4 sm:space-y-6">
-            <!-- 场景内容 -->
+          <!-- 内容主体区 -->
+          <div class="p-4 sm:p-6 space-y-4 sm:space-y-5">
+            
+            <!-- 场景与对话/思维链内容 -->
             <GameScene
               :current-scene="currentScene"
               :is-generating="isGenerating"
@@ -505,10 +405,10 @@ onMounted(() => {
               @retry-current-scene="retryCurrentScene"
             />
 
-            <!-- 进度条 -->
+            <!-- 动态四维属性遥测仪表 -->
             <GameProgress :game-progress="gameProgress" />
 
-            <!-- 选项列表 -->
+            <!-- 行动抉择分支 -->
             <GameOptions
               :current-scene="currentScene"
               :is-generating="isGenerating"
@@ -516,11 +416,11 @@ onMounted(() => {
               @retry-current-scene="retryCurrentScene"
               @back-to-homepage="backToHomepage"
             />
+
           </div>
         </div>
       </div>
 
-      <!-- 游戏手册 -->
       <GameGuide
         :show="showGameGuide"
         :player-name="playerName"
@@ -533,98 +433,9 @@ onMounted(() => {
         @close="showGameGuide = !showGameGuide"
         @update:show-debug-info="showDebugInfo = $event"
       />
-
-      <!-- 模型信息弹窗 -->
-      <Teleport to="body">
-        <Transition
-          enter-active-class="transition-opacity duration-200"
-          enter-from-class="opacity-0"
-          leave-active-class="transition-opacity duration-150"
-          leave-from-class="opacity-100"
-          leave-to-class="opacity-0"
-        >
-          <div
-            v-if="showModelInfo"
-            class="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50"
-            @click="showModelInfo = false"
-          >
-            <div
-              class="relative bg-white rounded-md p-6 sm:p-8 max-w-xs sm:max-w-md w-full mx-4 shadow-2xl border border-slate-100"
-              @click.stop
-            >
-              <h2 class="text-xl sm:text-2xl font-bold text-slate-800 mb-4">AI模型信息</h2>
-              <div class="space-y-4">
-                <div>
-                  <h3 class="text-xs sm:text-sm font-medium text-slate-500">当前模型</h3>
-                  <p class="text-base sm:text-lg font-medium text-slate-800">{{ modelName }}</p>
-                </div>
-                <div>
-                  <h3 class="text-xs sm:text-sm font-medium text-slate-500">模型特点</h3>
-                  <ul class="mt-2 space-y-2">
-                    <li v-if="modelName.includes('r1') || modelName.includes('R1')" class="flex items-start gap-2">
-                      <span class="text-purple-500 mt-0.5">✓</span>
-                      <span class="text-slate-600 text-xs sm:text-sm">支持思维链展示，可观察AI思考过程</span>
-                    </li>
-                    <li v-if="modelName === 'deepseek-chat'" class="flex items-start gap-2">
-                      <span class="text-blue-500 mt-0.5">✓</span>
-                      <span class="text-slate-600 text-xs sm:text-sm">更流畅的对话体验</span>
-                    </li>
-                    <li v-if="modelName === 'QwQ-32B'" class="flex items-start gap-2">
-                      <span class="text-blue-500 mt-0.5">✓</span>
-                      <span class="text-slate-600 text-xs sm:text-sm">更大模型参数，知识面更广</span>
-                    </li>
-                    <li class="flex items-start gap-2">
-                      <span class="text-green-500 mt-0.5">✓</span>
-                      <span class="text-slate-600 text-xs sm:text-sm">实时流式生成，响应更快</span>
-                    </li>
-                  </ul>
-                </div>
-                <div class="pt-4">
-                  <button
-                    @click="changeModel"
-                    class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white rounded-sm font-semibold text-xs transition-all shadow-2xs cursor-pointer"
-                  >
-                    切换下一个模型
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Transition>
-      </Teleport>
-
-      <!-- 加载状态 -->
-      <Teleport to="body">
-        <Transition
-          enter-active-class="transition-opacity duration-200"
-          enter-from-class="opacity-0"
-          leave-active-class="transition-opacity duration-150"
-          leave-from-class="opacity-100"
-          leave-to-class="opacity-0"
-        >
-          <div
-            v-if="isGenerating && !isStreamResponseActive"
-            class="fixed inset-0 bg-black/20 backdrop-blur-xs flex items-center justify-center z-50"
-          >
-            <div class="bg-white rounded-md p-6 max-w-xs w-full border border-zinc-200 shadow-xl text-center">
-              <div class="w-10 h-10 mx-auto mb-3">
-                <svg class="animate-spin w-full h-full text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-              </div>
-              <p class="text-zinc-900 text-sm font-bold">正在书写剧情...</p>
-              <p class="text-zinc-500 text-xs mt-1">AI 正在根据你的抉择推演后续发展</p>
-              <div class="w-full h-1 bg-zinc-100 rounded-full mt-4 overflow-hidden">
-                <div class="h-full bg-blue-600 rounded-full animate-progressBar"></div>
-              </div>
-            </div>
-          </div>
-        </Transition>
-      </Teleport>
     </div>
 
-    <!-- 游戏结束弹窗 -->
+    <!-- 游戏结束与成就结算弹窗 -->
     <GameOverModal
       :show="showGameOver"
       :title="gameOverTitle"
@@ -636,17 +447,14 @@ onMounted(() => {
 </template>
 
 <style scoped>
-/* 进度条动画 */
 @keyframes progressBar {
   0% { width: 0%; }
-  20% { width: 20%; }
-  50% { width: 50%; }
-  80% { width: 80%; }
-  95% { width: 95%; }
+  50% { width: 60%; }
+  80% { width: 85%; }
   100% { width: 98%; }
 }
 
 .animate-progressBar {
-  animation: progressBar 8s cubic-bezier(0.1, 0.5, 0.2, 1) infinite;
+  animation: progressBar 6s cubic-bezier(0.1, 0.5, 0.2, 1) infinite;
 }
 </style>

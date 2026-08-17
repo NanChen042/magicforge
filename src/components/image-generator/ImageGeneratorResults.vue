@@ -1,6 +1,6 @@
 <template>
   <!-- Results Deck: MagicForge High-End Visual Studio Workspace -->
-  <div class="relative w-full h-full bg-white overflow-hidden font-sans text-zinc-700 flex flex-col select-none">
+  <div class="relative w-full h-full bg-white overflow-hidden font-sans text-zinc-700 flex flex-col">
     
     <!-- 1. EMPTY STATE / INSPIRATION STUDIO (When no image generated yet) -->
     <div v-if="!generatedImages.length && !loading" class="h-full w-full overflow-y-auto custom-scrollbar p-6 sm:p-8 flex flex-col justify-between space-y-6">
@@ -13,7 +13,7 @@
             <h3 class="text-base font-extrabold text-zinc-900 tracking-tight">
               灵感画廊 · 视觉工坊
             </h3>
-            <span class="text-[10px] font-mono px-2 py-0.2 rounded-2xs bg-blue-50 text-blue-700 border border-blue-200/60 font-bold">
+            <span class="text-[10px] px-2 py-0.2 rounded-2xs bg-blue-50 text-blue-700 border border-blue-200/60 font-bold">
               STUDIO CANVAS
             </span>
           </div>
@@ -22,7 +22,7 @@
           </p>
         </div>
 
-        <div class="flex items-center gap-2 text-xs font-mono text-zinc-400">
+        <div class="flex items-center gap-2 text-xs text-zinc-400">
           <span>支持 1~4 张批量并行渲染</span>
         </div>
       </div>
@@ -55,12 +55,12 @@
             <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none"></div>
             
             <!-- Category Tag Badge -->
-            <span class="relative z-10 text-[10px] font-mono font-bold px-2 py-0.5 rounded-2xs bg-black/60 text-white backdrop-blur-md border border-white/20">
+            <span class="relative z-10 text-[10px] font-bold tracking-wide px-2 py-0.5 rounded-2xs bg-black/60 text-white backdrop-blur-md border border-white/20">
               {{ card.tag }}
             </span>
 
             <!-- Top Right Visual Ratio Hint -->
-            <span class="absolute top-2.5 right-2.5 z-10 text-[10px] font-mono text-white px-2 py-0.5 rounded-2xs bg-black/50 backdrop-blur-md border border-white/10 font-bold">
+            <span class="absolute top-2.5 right-2.5 z-10 text-[10px] tabular-nums text-white px-2 py-0.5 rounded-2xs bg-black/50 backdrop-blur-md border border-white/10 font-bold">
               {{ card.ratio }}
             </span>
           </div>
@@ -80,11 +80,11 @@
             </div>
 
             <!-- Footer Action & Parameters -->
-            <div class="flex items-center justify-between pt-1 border-t border-zinc-200/50 text-[10px] font-mono">
+            <div class="flex items-center justify-between pt-1 border-t border-zinc-200/50 text-[10px]">
               <span class="text-blue-600 font-bold flex items-center gap-1">
                 <span>一键载入此灵感</span>
               </span>
-              <span class="text-zinc-400">CFG: {{ card.cfg }} · {{ card.steps }}步</span>
+              <span class="text-zinc-400 tabular-nums">CFG: {{ card.cfg }} · {{ card.steps }}步</span>
             </div>
           </div>
         </div>
@@ -100,7 +100,7 @@
           </div>
           <div>
             <div class="text-xs font-bold text-zinc-800">多模态模型集群</div>
-            <div class="text-[10px] font-mono text-zinc-400">集成 Kolors、Flux、SD3 引擎</div>
+            <div class="text-[10px] text-zinc-400">集成 Kolors、Flux、SD3 引擎</div>
           </div>
         </div>
 
@@ -112,7 +112,7 @@
           </div>
           <div>
             <div class="text-xs font-bold text-zinc-800">全画幅比例适配</div>
-            <div class="text-[10px] font-mono text-zinc-400">支持 1:1 / 16:9 / 9:16 / 3:4 等构图</div>
+            <div class="text-[10px] text-zinc-400">支持 1:1 / 16:9 / 9:16 / 3:4 等构图</div>
           </div>
         </div>
 
@@ -124,7 +124,7 @@
           </div>
           <div>
             <div class="text-xs font-bold text-zinc-800">种子级精准复现</div>
-            <div class="text-[10px] font-mono text-zinc-400">支持固定 Seed 进行多轮迭代微调</div>
+            <div class="text-[10px] text-zinc-400">支持固定 Seed 进行多轮迭代微调</div>
           </div>
         </div>
       </div>
@@ -166,7 +166,7 @@
     <div v-else class="h-full w-full flex flex-col">
       
       <!-- Top Gallery Header -->
-      <div class="shrink-0 h-14 px-5 border-b border-zinc-100 flex items-center justify-between bg-white text-xs font-mono">
+      <div class="shrink-0 h-14 px-5 border-b border-zinc-100 flex items-center justify-between bg-white text-xs">
         <div class="flex items-center gap-2">
           <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
           <span class="font-bold text-zinc-800">渲染完成 · 共 {{ generatedImages.length }} 张</span>
@@ -177,7 +177,7 @@
           <span v-if="lastSeed !== null" class="text-zinc-400 hidden sm:inline">Seed: {{ lastSeed }}</span>
           <button 
             @click="$emit('regenerate')" 
-            class="px-2.5 py-1 rounded-xs bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-mono text-[11px] transition-colors flex items-center gap-1 cursor-pointer"
+            class="px-2.5 py-1 rounded-xs bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] transition-colors flex items-center gap-1 cursor-pointer"
           >
             <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="23 4 23 10 17 10"></polyline>
@@ -208,13 +208,13 @@
               :src="img.url" 
               alt="AI Generated Artwork" 
               class="w-full h-auto max-h-[calc(100vh-280px)] object-cover cursor-pointer transition-transform duration-300 group-hover:scale-[1.01]"
-              @click="$emit('show-preview', img.url)"
+              @click="$emit('showPreview', img.url)"
             />
 
             <!-- Hover Action Overlay -->
             <div class="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-2.5 p-4">
               <button
-                @click.stop="$emit('show-preview', img.url)"
+                @click.stop="$emit('showPreview', img.url)"
                 class="p-2 rounded-xs bg-white/90 hover:bg-white text-slate-800 shadow-md transition-all cursor-pointer"
                 title="全屏查看"
               >
@@ -227,7 +227,7 @@
               </button>
 
               <button
-                @click.stop="$emit('download-image', img.url, idx)"
+                @click.stop="$emit('downloadImage', img.url, idx)"
                 class="p-2 rounded-xs bg-blue-600 hover:bg-blue-700 text-white shadow-md transition-all cursor-pointer"
                 title="下载原图"
               >
@@ -238,7 +238,7 @@
 
               <button
                 v-if="lastSeed !== null"
-                @click.stop="$emit('use-seed')"
+                @click.stop="$emit('useSeed')"
                 class="p-2 rounded-xs bg-white/90 hover:bg-white text-slate-800 shadow-md transition-all cursor-pointer"
                 title="使用当前种子"
               >
